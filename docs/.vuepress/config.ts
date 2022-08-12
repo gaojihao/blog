@@ -5,7 +5,6 @@ export default defineUserConfig({
   // 站点配置
   lang: 'zh-CN',
   title: 'lizhi1026.top',
-  base: '/blog/',
   description: '大前端知识分享网站',
   // debug: true,
   // bundler: webpackBundler(),
