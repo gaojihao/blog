@@ -8,7 +8,7 @@ export default defineUserConfig({
   lang: 'zh-CN',
   title: 'lizhi1026.top',
   description: '大前端知识分享网站',
-  base: '/blog/',
+  // base: '/blog/',
   // debug: true,
   bundler: webpackBundler(),
   theme: KnznTheme({
