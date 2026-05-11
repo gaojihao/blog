@@ -5,9 +5,11 @@ sidebar: false
 navbar: false
 ---
 
-<ClientOnly>
-  <span v-if="false">redirect</span>
-</ClientOnly>
+<style>
+.theme-post-container .post-aside,
+.theme-post-container .aside-btn { display: none !important; }
+.theme-post-container .post-container { margin-left: 0 !important; }
+</style>
 
 <script setup>
 import { onMounted } from 'vue'

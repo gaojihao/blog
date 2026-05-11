@@ -3,6 +3,12 @@ title: Claude Code 源码解析
 permalink: /claude/
 ---
 
+<style>
+.theme-post-container .post-aside,
+.theme-post-container .aside-btn { display: none !important; }
+.theme-post-container .post-container { margin-left: 0 !important; }
+</style>
+
 # Claude Code 源码解析
 
 这是一个隐藏入口，不会显示在站点导航中。你可以从这里访问 Claude Code 相关的各个源码解析页面。
