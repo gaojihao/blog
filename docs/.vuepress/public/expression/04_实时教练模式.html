@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>04 · 实时教练模式 · 表达力私人教练</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="progress-bar" id="progress"></div>
+<div class="container">
+
+<aside class="sidebar">
+  <h2>EXPRESSION</h2>
+  <div class="doc-no">04</div>
+  <div class="doc-title">实时教练模式 · Interactive Coaching Mode</div>
+  <a href="01_本质溯源.html" class="sidebar-home">← 返回首页</a>
+
+  <div class="toc-section">
+    <div class="toc-section-title">系统总览</div>
+    <nav class="toc">
+      <a href="#sec-overview">命令系统总览</a>
+    </nav>
+  </div>
+
+  <div class="toc-section">
+    <div class="toc-section-title">互动模块</div>
+    <nav class="toc">
+      <a href="#sec-1">模块 1 · 虚拟人格模拟器</a>
+      <a href="#sec-1-3" class="indent">1.3 预制人格库（10 卡）</a>
+      <a href="#sec-2">模块 2 · 压力测试模式</a>
+      <a href="#sec-2-2" class="indent">2.2 五级压力光谱</a>
+      <a href="#sec-3">模块 3 · 微观语言指纹</a>
+      <a href="#sec-4">模块 4 · 影子重写</a>
+      <a href="#sec-5">模块 5 · 元认知旁白</a>
+      <a href="#sec-6">模块 6 · L11 即时热更新</a>
+      <a href="#sec-7">组合训练 &amp; 长期循环</a>
+    </nav>
+  </div>
+
+  <div class="toc-section">
+    <div class="toc-section-title">示例 &amp; 行动</div>
+    <nav class="toc">
+      <a href="#sec-example">升级版示例 · 晋升答辩</a>
+      <a href="#sec-action">你的回合</a>
+    </nav>
+  </div>
+</aside>
+
+<main class="main">
+
+<header class="hero">
+  <div class="hero-eyebrow">PHASE FOUR · REAL-TIME COACH</div>
+  <h1>实时<span class="accent">教练</span>模式</h1>
+  <div class="hero-subtitle">把训练场变成虚拟实境 · 一套可随时调用的互动教练系统</div>
+  <div class="hero-quote">
+    <span class="quote-mark">"</span>前面的版本只是"事后复盘"。这个版本是<strong>虚拟实境训练场</strong>——你可以让我扮演对手、实时打击你、动态分析你的语言指纹、并行重写多个版本、上帝视角标注每一刻。这不是工具列表，这是一套<strong>可调用的教练系统</strong>。<span class="quote-mark">"</span>
+  </div>
+</header>
+
+<section id="sec-overview">
+  <div class="section-marker">
+    <div class="section-no">总览 · OVERVIEW</div>
+    <div class="section-line"></div>
+  </div>
+  <h2>教练系统<span class="accent">命令表</span></h2>
+  <div class="section-lead">每个模块都有一个开启指令，你可以随时像召唤魔法咒语一样调用。输入 <code>/help</code> 我会推荐当前最合适的模块。</div>
+  <table>
+    <thead><tr><th>模块</th><th>开启指令</th><th>功能</th></tr></thead>
+    <tbody>
+      <tr><td><strong>🎭 虚拟人格模拟器</strong></td><td><code>/persona &lt;角色定义&gt;</code></td><td>我变成你指定的对手</td></tr>
+      <tr><td><strong>⚡ 压力测试模式</strong></td><td><code>/stress &lt;强度 1-5&gt;</code></td><td>对你不停打断、质疑、刁难</td></tr>
+      <tr><td><strong>🔬 微观语言指纹</strong></td><td><code>/fingerprint &lt;表达&gt;</code></td><td>量化你的权力词 / 弱势词 / 语义密度</td></tr>
+      <tr><td><strong>✏️ 影子重写 A/B/C</strong></td><td><code>/rewrite &lt;表达&gt;</code></td><td>同时生成权力版 / 共情版 / 幽默版</td></tr>
+      <tr><td><strong>👁️ 元认知实时旁白</strong></td><td><code>/commentary on</code></td><td>上帝视角标注对话中的关键时刻</td></tr>
+      <tr><td><strong>🔥 L11 即时热更新</strong></td><td><code>/hotupdate &lt;现状&gt;</code></td><td>对话失控时"物理级掉头"</td></tr>
+      <tr><td><strong>📋 四步复盘</strong></td><td><code>/debrief</code></td><td>原版事后复盘框架（已升级）</td></tr>
+      <tr><td><strong>🎓 组合训练</strong></td><td><code>/combo &lt;场景&gt;</code></td><td>多模块叠加高强度训练</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="sec-1">
+  <div class="section-marker">
+    <div class="section-no">壹 · MODULE 1</div>
+    <div class="section-line"></div>
+  </div>
+  <h2>虚拟人格模拟器 <span class="accent">Persona Sandbox</span></h2>
+  <div class="section-lead">你不可能在现实中找到一个完全配合你训练的对手。但你可以在这里造出一个——而且要多刁有多刁。</div>
+
+  <p>普通的"角色扮演"问题是：AI 太礼貌、太合作。<strong>Persona Sandbox</strong> 会让我<strong>真正进入角色</strong>——包括他的偏见、防御、痛点、潜台词。甚至要故意打断你、故意误解你、故意冷场。</p>
+
+  <div class="insight">
+    <div class="insight-icon">🎭</div>
+    <div class="insight-body">
+      <div class="insight-label">核心规则</div>
+      <div class="insight-text">进入角色后我会保留偏见和隐藏需求，不会"假装为难一下就让步"，不会让你"轻松赢"——这不会让你成长。说 <code>/break</code> 立即出戏。</div>
+    </div>
+  </div>
+
+  <div class="section-marker" id="sec-1-1">
+    <div class="section-no">八轴人格引擎</div>
+    <div class="section-line"></div>
+  </div>
+  <h3>八轴人格设定引擎</h3>
+  <div class="flow-box"><span class="note">[1] 角色身份：</span>     他是谁？职位、行业、年龄、关系
+<span class="note">[2] 当下情境：</span>     他现在的精神状态？时间紧 / 疲惫 / 被压力？
+<span class="note">[3] 与你关系：</span>     权力差？历史？信任度？
+<span class="note">[4] 核心关切：</span>     他真正在乎什么？（往往不是表面议题）
+<span class="note">[5] 防御机制：</span>     他被触怒时会怎样反应？
+<span class="note">[6] 偏见与盲区：</span>   他的"信念锚"是什么？
+<span class="note">[7] 语言风格：</span>     直率 / 委婉 / 官腔 / 术语堆砌？
+<span class="note">[8] 隐藏需求：</span>     他没说出口但希望被回应的是什么？</div>
+
+  <div class="section-marker" id="sec-1-3">
+    <div class="section-no">预制人格库</div>
+    <div class="section-line"></div>
+  </div>
+  <h3>预制人格库（10 个直接调用）</h3>
+  <p>说 <code>/persona 1</code> 即可进入对应角色。</p>
+
+  <div class="persona-card">
+    <div class="persona-header">
+      <span class="persona-icon">🧊</span>
+      <div>
+        <span class="persona-id">#01</span>
+        <span class="persona-name">极度焦虑的财务总监</span>
+      </div>
+    </div>
+    <dl class="persona-traits">
+      <dt>身份</dt><dd>CFO，48 岁，从大厂转来 6 个月</dd><br>
+      <dt>当下</dt><dd>董事会刚被质疑成本控制</dd><br>
+      <dt>关切</dt><dd>风险、可量化 ROI、厌恶不确定性</dd><br>
+      <dt>防御</dt><dd>被质疑专业性 → 过度细节化</dd><br>
+      <dt>偏见</dt><dd>所有"创新"项目都默认烧钱</dd><br>
+      <dt>语言</dt><dd>术语密集、爱要数据、"必须谨慎"</dd><br>
+      <dt>隐藏需求</dt><dd>希望被认可"这次他守住了"</dd>
+    </dl>
+  </div>
+
+  <div class="persona-card">
+    <div class="persona-header">
+      <span class="persona-icon">👑</span>
+      <div>
+        <span class="persona-id">#02</span>
+        <span class="persona-name">控制欲强的创始人</span>
+      </div>
+    </div>
+    <dl class="persona-traits">
+      <dt>身份</dt><dd>创始 CEO，55 岁，从 0 做到 500 人</dd><br>
+      <dt>当下</dt><dd>感到"团队越大越听不懂他"</dd><br>
+      <dt>关切</dt><dd>愿景、文化、"我说的对"</dd><br>
+      <dt>防御</dt><dd>被反驳 → "我做这家公司 30 年了"</dd><br>
+      <dt>偏见</dt><dd>年轻人浮躁、外来稀释文化</dd><br>
+      <dt>语言</dt><dd>故事化 + 教父式权威</dd><br>
+      <dt>隐藏需求</dt><dd>希望被理解"他不是固执，是孤独"</dd>
+    </dl>
+  </div>
+
+  <div class="persona-card">
+    <div class="persona-header">
+      <span class="persona-icon">🤖</span>
+      <div>
+        <span class="persona-id">#03</span>
+        <span class="persona-card">冷漠的技术天才</span>
+      </div>
+    </div>
+    <dl class="persona-traits">
+      <dt>身份</dt><dd>架构师，35 岁，团队第一技术权威</dd><br>
+      <dt>当下</dt><dd>对所有"业务术语"过敏</dd><br>
+      <dt>关切</dt><dd>技术正确性、不被打扰</dd><br>
+      <dt>防御</dt><dd>用沉默 + 技术细节淹没对话</dd><br>
+      <dt>偏见</dt><dd>业务方"什么都不懂还指手画脚"</dd><br>
+      <dt>语言</dt><dd>冷、短、术语化、不爱解释</dd><br>
+      <dt>隐藏需求</dt><dd>希望被认可"他的技术决策是对的"</dd>
+    </dl>
+  </div>
+
+  <div class="persona-card">
+    <div class="persona-header">
+      <span class="persona-icon">🎭</span>
+      <div>
+        <span class="persona-id">#04</span>
+        <span class="persona-name">政治化的高管</span>
+      </div>
+    </div>
+    <dl class="persona-traits">
+      <dt>身份</dt><dd>副总裁，45 岁，10 年大厂政治存活者</dd><br>
+      <dt>当下</dt><dd>在两位高管的派系斗争之间</dd><br>
+      <dt>关切</dt><dd>自己的位置、不站错队、"看上去赢"</dd><br>
+      <dt>防御</dt><dd>永远不直接给意见，推太极</dd><br>
+      <dt>偏见</dt><dd>所有提议背后都有"政治目的"</dd><br>
+      <dt>语言</dt><dd>官腔、"这个我们再讨论"</dd><br>
+      <dt>隐藏需求</dt><dd>希望你"先告诉他这件事的政治含义"</dd>
+    </dl>
+  </div>
+
+  <div class="persona-card">
+    <div class="persona-header">
+      <span class="persona-icon">🐍</span>
+      <div>
+        <span class="persona-id">#05</span>
+        <span class="persona-name">怀疑型客户</span>
+      </div>
+    </div>
+    <dl class="persona-traits">
+      <dt>身份</dt><dd>B 端大客户采购总监，60 岁</dd><br>
+      <dt>当下</dt><dd>见过 200 个销售，对一切话术免疫</dd><br>
+      <dt>关切</dt><dd>不被骗、不出错、条款清楚</dd><br>
+      <dt>防御</dt><dd>每个承诺都追问"白纸黑字写在哪"</dd><br>
+      <dt>偏见</dt><dd>所有销售都在卖"梦"</dd><br>
+      <dt>语言</dt><dd>慢、稳、句句皆陷阱</dd><br>
+      <dt>隐藏需求</dt><dd>希望找到一个"真心实意做事"的供应商</dd>
+    </dl>
+  </div>
+
+  <div class="persona-card">
+    <div class="persona-header">
+      <span class="persona-icon">💔</span>
+      <div>
+        <span class="persona-id">#06</span>
+        <span class="persona-name">边界感薄弱的家人</span>
+      </div>
+    </div>
+    <dl class="persona-traits">
+      <dt>身份</dt><dd>父母 / 兄弟姐妹 / 长辈</dd><br>
+      <dt>当下</dt><dd>基于亲情认为"自己有权干涉你"</dd><br>
+      <dt>关切</dt><dd>你"过得好不好"（按他们定义）</dd><br>
+      <dt>防御</dt><dd>被设界 → "我都是为你好"</dd><br>
+      <dt>偏见</dt><dd>你的人生选择需要他们的批准</dd><br>
+      <dt>语言</dt><dd>情感绑架 + 经验输出</dd><br>
+      <dt>隐藏需求</dt><dd>希望被需要、被尊重</dd>
+    </dl>
+  </div>
+
+  <div class="persona-card">
+    <div class="persona-header">
+      <span class="persona-icon">🔥</span>
+      <div>
+        <span class="persona-id">#07</span>
+        <span class="persona-name">强势的伴侣</span>
+      </div>
+    </div>
+    <dl class="persona-traits">
+      <dt>身份</dt><dd>日常关系中常占上风的另一半</dd><br>
+      <dt>当下</dt><dd>因小事引发的累积情绪</dd><br>
+      <dt>关切</dt><dd>被尊重、感受被看见</dd><br>
+      <dt>防御</dt><dd>升级"你每次都……"</dd><br>
+      <dt>偏见</dt><dd>你"防御性"解释 = 不在乎</dd><br>
+      <dt>语言</dt><dd>情绪化 + 历史账本</dd><br>
+      <dt>隐藏需求</dt><dd>被理解，不是被反驳</dd>
+    </dl>
+  </div>
+
+  <div class="persona-card">
+    <div class="persona-header">
+      <span class="persona-icon">😏</span>
+      <div>
+        <span class="persona-id">#08</span>
+        <span class="persona-name">表面友善实则刁难的同行</span>
+      </div>
+    </div>
+    <dl class="persona-traits">
+      <dt>身份</dt><dd>竞争公司的同行 / 同行业前辈</dd><br>
+      <dt>当下</dt><dd>在公开场合（会议 / 论坛）</dd><br>
+      <dt>关切</dt><dd>自己的专业地位</dd><br>
+      <dt>防御</dt><dd>通过"提问"展示优越感</dd><br>
+      <dt>偏见</dt><dd>你"年轻 / 资浅 / 没经验"</dd><br>
+      <dt>语言</dt><dd>糖衣炮弹（"问个简单问题——"）</dd><br>
+      <dt>隐藏需求</dt><dd>希望被你"礼貌地战胜"——反而会让他尊重你</dd>
+    </dl>
+  </div>
+
+  <div class="persona-card">
+    <div class="persona-header">
+      <span class="persona-icon">🌫️</span>
+      <div>
+        <span class="persona-id">#09</span>
+        <span class="persona-name">模糊型决策者</span>
+      </div>
+    </div>
+    <dl class="persona-traits">
+      <dt>身份</dt><dd>你需要的"批准方"</dd><br>
+      <dt>当下</dt><dd>忙、心不在焉、不想做决定</dd><br>
+      <dt>关切</dt><dd>少花精力</dd><br>
+      <dt>防御</dt><dd>"我再想想""你看着办"</dd><br>
+      <dt>偏见</dt><dd>所有决定都嫌"还不到时候"</dd><br>
+      <dt>语言</dt><dd>半句、模糊、推延</dd><br>
+      <dt>隐藏需求</dt><dd>希望有人替他承担风险</dd>
+    </dl>
+  </div>
+
+  <div class="persona-card">
+    <div class="persona-header">
+      <span class="persona-icon">🎯</span>
+      <div>
+        <span class="persona-id">#10</span>
+        <span class="persona-name">完美主义评审者</span>
+      </div>
+    </div>
+    <dl class="persona-traits">
+      <dt>身份</dt><dd>晋升答辩官 / 学术评委 / 投资人</dd><br>
+      <dt>当下</dt><dd>今天看了 10 份材料，第 11 份是你</dd><br>
+      <dt>关切</dt><dd>找出你的"漏洞"</dd><br>
+      <dt>防御</dt><dd>以"客观提问"伪装的攻击</dd><br>
+      <dt>偏见</dt><dd>说太顺 = 没深度；说太磕 = 没准备</dd><br>
+      <dt>语言</dt><dd>精确、冷静、直击要害</dd><br>
+      <dt>隐藏需求</dt><dd>希望被你"让他对你刮目相看"</dd>
+    </dl>
+  </div>
+</section>
+
+<section id="sec-2">
+  <div class="section-marker">
+    <div class="section-no">贰 · MODULE 2</div>
+    <div class="section-line"></div>
+  </div>
+  <h2>压力测试模式 <span class="accent">Stress Inoculation</span></h2>
+  <div class="section-lead">真实表达从来不在"无菌室"里发生。能在高熵环境下保持骨架的人，才是真正掌握表达的人。</div>
+
+  <div class="section-marker" id="sec-2-2">
+    <div class="section-no">五级压力光谱</div>
+    <div class="section-line"></div>
+  </div>
+  <h3>五级强度光谱</h3>
+  <p>调用：<code>/stress 1</code> 到 <code>/stress 5</code></p>
+  <table>
+    <thead><tr><th>等级</th><th>名称</th><th>行为特征</th><th>训练目标</th></tr></thead>
+    <tbody>
+      <tr><td><span class="chip moss">1</span></td><td><strong>礼貌但分心</strong></td><td>偶尔看手机、说"嗯然后呢"、反应迟钝但不打断</td><td>在没有积极反馈时仍维持节奏</td></tr>
+      <tr><td><span class="chip gold">2</span></td><td><strong>偶尔打断</strong></td><td>每 60-90 秒打断一次，有礼貌，打断后允许回主线</td><td>优雅地吸收打断 + 回到主线</td></tr>
+      <tr><td><span class="chip terra">3</span></td><td><strong>质疑逻辑</strong></td><td>每 45 秒一个尖锐质疑，仍在论题之内</td><td>在被攻击具体点时不丢失整体</td></tr>
+      <tr><td><span class="chip crimson">4</span></td><td><strong>情绪化打击</strong></td><td>不耐烦、轻蔑、怀疑，故意让你尴尬的沉默</td><td>在情绪压力下保持镇定</td></tr>
+      <tr><td><span class="chip indigo">5</span></td><td><strong>复合干扰（地狱）</strong></td><td>同时叠加：打断 + 质疑 + 情绪化 + 无关问题 + 假装误解</td><td>极端压力下输出有结构的表达</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-marker">
+    <div class="section-no">骨架维护技术</div>
+    <div class="section-line"></div>
+  </div>
+  <h3>骨架维护五大技术</h3>
+  <p>被干扰时，普通人会丢失主线。掌握以下技术，骨架不会塌。</p>
+
+  <div class="step">
+    <div class="step-num">01</div>
+    <div>
+      <div class="step-title">锚定句（Anchor Sentence）</div>
+      <div class="step-body">开口时给自己一句"无论被打断多少次都能回来的话"——<em>"我今天想回答的核心问题是 ______。"</em>被打断后立即返回锚定句。</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">02</div>
+    <div>
+      <div class="step-title">吸收 + 桥接（Absorb &amp; Bridge）</div>
+      <div class="step-body">"你这个问题很重要——（吸收 3 秒）——而它正好回到我说的 ______。"用一个动词把你的回答嵌回主线。</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">03</div>
+    <div>
+      <div class="step-title">列表锚（List Anchoring）</div>
+      <div class="step-body">开口前给数字承诺："我有三点要说"。被打断后回："刚才说到第二点，第三点是——"数字让你的骨架对双方都可见。</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">04</div>
+    <div>
+      <div class="step-title">重置短语（Reset Phrases）</div>
+      <div class="step-body">"我倒回来一秒——""先停一下——" "这个我一会儿回答，我先把骨架走完——"</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">05</div>
+    <div>
+      <div class="step-title">主权停顿</div>
+      <div class="step-body">被持续骚扰时，不要加快——反而<strong>故意慢下来</strong>。停顿 3 秒，眼神稳定。对方的节奏被你打断。</div>
+    </div>
+  </div>
+</section>
+
+<section id="sec-3">
+  <div class="section-marker">
+    <div class="section-no">叁 · MODULE 3</div>
+    <div class="section-line"></div>
+  </div>
+  <h2>微观语言指纹 <span class="accent">Fingerprinting</span></h2>
+  <div class="section-lead">你的每段表达，都是一个可被量化的语言指纹。调用 <code>/fingerprint &lt;你的表达&gt;</code> 我会输出七维分析。</div>
+
+  <h3>七维分析雷达</h3>
+  <table>
+    <thead><tr><th>维度</th><th>测量内容</th><th>参考标准</th></tr></thead>
+    <tbody>
+      <tr><td><strong>权力词密度</strong></td><td>每 100 字中承诺 / 决断 / 行动类词数</td><td>0-2 弱势 / 3-5 平衡 / 6+ 高权力</td></tr>
+      <tr><td><strong>弱势词密度</strong></td><td>每 100 字中"可能/也许/应该/我觉得"数</td><td>0-3 稳定 / 4-7 温和 / 8+ 模糊</td></tr>
+      <tr><td><strong>语义密度</strong></td><td>实词数 / 总词数</td><td>40-60% 均衡 / 口语最佳约 50-55%</td></tr>
+      <tr><td><strong>情感效价</strong></td><td>加权情感极值（正 / 中 / 负）</td><td>偏正 = 鼓舞 / 中性 = 信息 / 偏负 = 危机</td></tr>
+      <tr><td><strong>句子复杂度</strong></td><td>平均句长 + 嵌套从句数</td><td>&lt;12 碎片 / 12-20 均衡 / &gt;25 学术化</td></tr>
+      <tr><td><strong>节奏一致性</strong></td><td>句子长度的方差</td><td>方差大好（长短交错） / 方差小坏</td></tr>
+      <tr><td><strong>主语指向</strong></td><td>我 / 你 / 我们 的比例</td><td>"我们"+"你"最高 = 协作感</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="sec-4">
+  <div class="section-marker">
+    <div class="section-no">肆 · MODULE 4</div>
+    <div class="section-line"></div>
+  </div>
+  <h2>影子重写 <span class="accent">Shadow Rewriting</span></h2>
+  <div class="section-lead">同一个意思，可以用三种完全不同的语调向量说出。调用 <code>/rewrite &lt;你的表达&gt;</code> 并行生成三种版本。</div>
+
+  <h3>三种重写维度</h3>
+  <div class="compare">
+    <div class="compare-card neutral">
+      <div class="label" style="color:var(--terracotta)">权力版 · Status Projection</div>
+      <p>短句、命令式、第一人称单数。删除所有弱势词。立场直球。</p>
+      <p><strong>目标</strong>：建立 Ethos、压住场面、推动决策</p>
+    </div>
+    <div class="compare-card neutral">
+      <div class="label" style="color:var(--moss)">共情版 · Empathic Resonance</div>
+      <p>软垫开头、"我们"语气、情感词丰富。适度弱势词释放威胁感。反映对方关切。</p>
+      <p><strong>目标</strong>：解除防御、建立信任、深入对话</p>
+    </div>
+    <div class="compare-card neutral">
+      <div class="label" style="color:var(--indigo)">幽默版 · Disarming Levity</div>
+      <p>自嘲 + 反差 + 意外比喻。打破紧张但不能稀释核心信息。</p>
+      <p><strong>目标</strong>：缓解高压、建立亲近感、被记住</p>
+    </div>
+  </div>
+</section>
+
+<section id="sec-5">
+  <div class="section-marker">
+    <div class="section-no">伍 · MODULE 5</div>
+    <div class="section-line"></div>
+  </div>
+  <h2>元认知实时旁白 <span class="accent">Meta-Cognitive Commentary</span></h2>
+  <div class="section-lead">在练习时拥有一个"上帝视角"——你说一句话，旁边自动跳出标注。<code>/commentary on</code> 开启。</div>
+  <p>以下是我在旁白模式中会标注的关键标签：</p>
+  <table>
+    <thead><tr><th>标签</th><th>含义</th><th>标签</th><th>含义</th></tr></thead>
+    <tbody>
+      <tr><td><code class="chip crimson">[防御启动]</code></td><td>对方杏仁核刚被激活</td><td><code class="chip indigo">[Kairos !]</code></td><td>植入影响力的最佳时机</td></tr>
+      <tr><td><code class="chip crimson">[逻辑断裂]</code></td><td>你两句话之间有跳跃</td><td><code class="chip indigo">[微胜]</code></td><td>你得了一分（对方点头 / 放松）</td></tr>
+      <tr><td><code class="chip crimson">[受众分心]</code></td><td>对方注意力刚刚滑走</td><td><code class="chip indigo">[微失]</code></td><td>你失了一分（对方质疑 / 转移）</td></tr>
+      <tr><td><code class="chip crimson">[Ethos +]</code></td><td>你的可信度刚刚提升</td><td><code class="chip indigo">[情绪窗口]</code></td><td>对方露出真实情绪，可借势深入</td></tr>
+      <tr><td><code class="chip crimson">[Ethos -]</code></td><td>你的可信度刚刚被削弱</td><td><code class="chip indigo">[框架失守]</code></td><td>你被拉进了对方的框架</td></tr>
+      <tr><td><code class="chip crimson">[硬墙]</code></td><td>对方进入"怎么说都不变"模式</td><td><code class="chip indigo">[共谋时刻]</code></td><td>对方开始"和你一起想"</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="sec-6">
+  <div class="section-marker">
+    <div class="section-no">陆 · MODULE 6</div>
+    <div class="section-line"></div>
+  </div>
+  <h2>L11 即时热更新 <span class="accent">Hot-Update</span></h2>
+  <div class="section-lead">你正在说话，突然意识到风向不对。大师会做一件事：<strong>物理级地把整段表达"掉头"</strong>。不重启对话，不掉链子。</div>
+
+  <div class="section-marker" id="sec-6-2">
+    <div class="section-no">六种掉头动作</div>
+    <div class="section-line"></div>
+  </div>
+  <h3>热更新的六种"掉头"动作</h3>
+  <table>
+    <thead><tr><th>动作</th><th>触发信号</th><th>做法</th></tr></thead>
+    <tbody>
+      <tr><td><strong>元层切换</strong></td><td>对方开始反驳具体内容</td><td>跳到上一层："我退一步——你真正担心的是？"</td></tr>
+      <tr><td><strong>失败承认 + 重启</strong></td><td>你已经讲了一段但对方完全没接住</td><td>明确说"这段没说好"，然后重说核心</td></tr>
+      <tr><td><strong>直接换框架</strong></td><td>你和对方在不同的"框架"里讨论</td><td>显式化框架差异，提议换一个</td></tr>
+      <tr><td><strong>沉默重置</strong></td><td>对话节奏太快，话没被消化</td><td>突然停 5 秒，眼神稳定，用一句"重启句"开场</td></tr>
+      <tr><td><strong>转交话筒</strong></td><td>你判断"现在我多说一句都是错"</td><td>把对话权完全交给对方："你怎么看？我先听。"</td></tr>
+      <tr><td><strong>暂停-重设</strong></td><td>对话彻底失控，需要紧急止损</td><td>直接暂停整次对话："我们 30 分钟后再谈。"</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-marker" id="sec-6-3">
+    <div class="section-no">识别信号</div>
+    <div class="section-line"></div>
+  </div>
+  <h3>热更新的"识别信号"</h3>
+  <p>以下任何一个信号出现 → 你有 <strong>5 秒</strong>决定是否热更新：</p>
+  <div class="flow-box">🚨 对方第二次显示防御（皱眉 / 反驳 / 转移话题）
+🚨 你说了 3 分钟以上对方没真正回应
+🚨 你听见自己的声音"飘"——不在重心上
+🚨 对方开始问"所以你想怎样？"——他没听懂结构
+🚨 对方语速突然变化（变快=急；变慢=冷）
+🚨 你自己感到"我在重复 / 我在解释 / 我在证明"
+🚨 你的核心论点讲了两次但没被对方"复述"过</div>
+
+  <p>烂熟六句掉头开场句：<em>"我退一步——你真正担心的是？""我刚那段没讲好，让我重说核心。""我意识到说的角度不对——从你的角度看……"（停顿 5 秒）"让我说最关键的一件事——""你怎么看？我先听。""我们暂停一下，30 分钟后再谈。"</em></p>
+</section>
+
+<section id="sec-7">
+  <div class="section-marker">
+    <div class="section-no">柒 · COMBO</div>
+    <div class="section-line"></div>
+  </div>
+  <h2>组合训练 <span class="accent">Combo Training</span></h2>
+  <div class="section-lead">不同情境用不同模块组合最高效。</div>
+
+  <h3>经典组合配方</h3>
+  <table>
+    <thead><tr><th>级别</th><th>配方指令</th><th>适用场景</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="chip terra">🥉 基础</span></td>
+        <td><code>/persona &lt;1-10&gt;</code> → 对话 → <code>/fingerprint</code> → <code>/rewrite</code></td>
+        <td>刚开始训练，建立基础</td>
+      </tr>
+      <tr>
+        <td><span class="chip gold">🥈 高强度</span></td>
+        <td><code>/persona 自定义</code> + <code>/stress 3</code> + <code>/commentary on</code> → 对话 → <code>/hotupdate</code> → <code>/fingerprint compare</code> → <code>/rewrite</code> → <code>/debrief</code></td>
+        <td>重要表达前 24-48 小时演练（每周 1 次）</td>
+      </tr>
+      <tr>
+        <td><span class="chip indigo">🥇 地狱模式</span></td>
+        <td><code>/persona 10</code> + <code>/stress 5</code> + <code>/commentary detailed</code> → 30 分钟强制模拟 → 每 5 分钟 <code>/hotupdate</code></td>
+        <td>备战晋升 / 投资人路演 / 关键谈判（每月 1 次）</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="sec-example">
+  <div class="section-marker">
+    <div class="section-no">示例 · EXAMPLE</div>
+    <div class="section-line"></div>
+  </div>
+  <h2>升级版示例：<span class="accent">晋升答辩</span>完整链路</h2>
+
+  <p>用全部六模块重做小张的晋升答辩失败案例。</p>
+
+  <h3>第一步：模拟演练</h3>
+  <p>调用 <code>/persona 10</code>（完美主义评审者）+ <code>/stress 4</code> + <code>/commentary on</code></p>
+  <div class="flow-box"><span class="label">旁白输出：</span>
+[Ethos -] —— 第一句"感谢各位评委"是新人本能，浪费了开场注意力。
+[框架失守] —— "过去一年我主要参与了 5 个项目"让评委进入"听简历"模式。
+[⚠ Kairos lost] —— 你在第 4 秒已经输了。</div>
+
+  <h3>第二步：/fingerprint 分析</h3>
+  <table>
+    <thead><tr><th>维度</th><th>评分</th><th>判断</th></tr></thead>
+    <tbody>
+      <tr><td>权力词密度</td><td>2/10</td><td>⚠️ 太弱</td></tr>
+      <tr><td>弱势词密度</td><td>6/10</td><td>过高</td></tr>
+      <tr><td>语义密度</td><td>4/10</td><td>⚠️ 稀薄</td></tr>
+      <tr><td>情感效价</td><td>-0.1</td><td>偏负</td></tr>
+      <tr><td>主语指向</td><td>"我"75%</td><td>自我中心</td></tr>
+    </tbody>
+  </table>
+
+  <h3>第三步：/rewrite 三版开场</h3>
+  <div class="compare">
+    <div class="compare-card good">
+      <div class="label">权力版</div>
+      <p>"今天 30 分钟，我回答一个问题：把这个位置给我，公司能多得到什么？三个证据：①我在做下一级的事；②我比同级多看一个维度；③我能带人，不只是会做事。"</p>
+    </div>
+    <div class="compare-card good">
+      <div class="label">共情版</div>
+      <p>"我知道你们今天看了很多答辩。我想用 30 分钟回答你们心里最关心的问题——把这个位置交出来，公司有没有风险？我打算用三个角度回应这个担心……"</p>
+    </div>
+    <div class="compare-card good">
+      <div class="label">幽默版</div>
+      <p>"我猜你们今天已经听了好几个'我做过 X 件事'的开场——我换一个：今天 30 分钟，我证明三件事——我已经在做下一级的事 / 我看的维度比同级多一个 / 我搞得定人。不证明这三件，你们可以提前结束。"</p>
+    </div>
+  </div>
+
+  <h3>第四步：/hotupdate（讲到第 15 分钟，CEO 看手机）</h3>
+  <blockquote><strong>热更新动作 5：转交话筒</strong><br>"我先停一下——各位看了我前 15 分钟，最大的疑问可能是什么？我想先回答它。"<br><br><strong>为什么强</strong>：把 CEO 从"评判者"变为"提问者"。下半场你的命中率提升 5 倍。</blockquote>
+
+  <div class="insight">
+    <div class="insight-icon">💡</div>
+    <div class="insight-body">
+      <div class="insight-label">四步复盘核心</div>
+      <div class="insight-text"><strong>原则一句话：</strong>向上沟通时，先回答他心里的问题，再讲你想讲的内容。<br><strong>下次动作：</strong>任何向上汇报，开场第一句就是"我今天回答的核心问题是 ___"。</div>
+    </div>
+  </div>
+</section>
+
+<section id="sec-action">
+  <div class="section-marker">
+    <div class="section-no">行动 · START</div>
+    <div class="section-line"></div>
+  </div>
+  <h2>你的<span class="accent">回合</span></h2>
+  <div class="section-lead">现在系统已经全部就位。选择以下任一方式开始。</div>
+
+  <div class="compare">
+    <div class="compare-card neutral">
+      <div class="label">从真实场景开始</div>
+      <p>告诉我一个最近"没说好"的真实场景。我会用 /debrief + /fingerprint + /rewrite 给你完整诊断。</p>
+    </div>
+    <div class="compare-card neutral">
+      <div class="label">从下周的挑战开始</div>
+      <p>告诉我下周要面对的具体表达场景。我会用 /persona + /stress + /commentary 给你模拟演练。</p>
+    </div>
+    <div class="compare-card neutral">
+      <div class="label">从训练对手开始</div>
+      <p>直接发 <code>/persona 1</code>~<code>10</code> 进入预制人格，或 <code>/persona 自定义</code> 自己定义八轴人格，然后开始模拟对话。</p>
+    </div>
+    <div class="compare-card neutral">
+      <div class="label">开放式入口</div>
+      <p>直接发 <code>/help</code>——我会基于你当前的对话状态推荐最适合的模块。</p>
+    </div>
+  </div>
+
+  <div class="insight">
+    <div class="insight-icon">🎯</div>
+    <div class="insight-body">
+      <div class="insight-label">最后的忠告</div>
+      <div class="insight-text">优秀的表达者不是天生的，是被一次次"模拟 + 重写 + 反馈"磨出来的。这套系统给你的不是"答案"——是<strong>一万次模拟战的训练场</strong>。把你的第一个场景或第一条指令给我吧。</div>
+    </div>
+  </div>
+
+  <div class="section-marker">
+    <div class="section-no">系统提示</div>
+    <div class="section-line"></div>
+  </div>
+  <blockquote>
+    <code>/help</code> 列出可用模块 &nbsp;·&nbsp; <code>/break</code> 立即出戏 &nbsp;·&nbsp; 所有模块可以叠加组合 &nbsp;·&nbsp; 训练建议：每周累计 60-90 分钟，分散在 3-4 次
+  </blockquote>
+</section>
+
+<footer class="doc-footer">
+  <div class="doc-footer-meta">表达力私人教练 · 第四阶段 · 实时教练模式</div>
+  <div class="nav-row">
+    <a href="#" class="nav-link disabled">
+      <div class="nav-direction">← 上一章</div>
+      <div class="nav-title">03 · 刻意练习方案</div>
+      <div class="nav-subtitle">Methodology</div>
+    </a>
+    <a href="#" class="nav-link next">
+      <div class="nav-direction">下一章 →</div>
+      <div class="nav-title">05 · 表达力进化手册</div>
+      <div class="nav-subtitle">Condensed Manual</div>
+    </a>
+  </div>
+</footer>
+
+</main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
