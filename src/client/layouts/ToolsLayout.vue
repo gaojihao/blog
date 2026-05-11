@@ -34,13 +34,13 @@ const favoriteIds = ref<string[]>([])
 const recentIds = ref<string[]>([])
 const activeId = ref(typeof route.query.tool === 'string' ? route.query.tool : 'json-ts')
 const input = ref(`{
-  "name": "栗志",
-  "role": "Full Stack Engineer",
-  "aiNative": true,
-  "skills": ["TypeScript", "Kotlin", "Swift", "Golang"],
+  "name": "Alex Chen",
+  "role": "Product Engineer",
+  "active": true,
+  "skills": ["TypeScript", "React", "Node.js", "PostgreSQL"],
   "profile": {
-    "github": "https://github.com/gaojihao",
-    "email": "lizhi1026@1026.com"
+    "website": "https://example.com",
+    "email": "alex@example.com"
   }
 }`)
 
@@ -601,7 +601,7 @@ const tools: Tool[] = [
   { id: 'json-ts', name: 'JSON → TypeScript', from: 'JSON', to: 'TypeScript', group: 'JSON', description: '根据 JSON 自动推导 TypeScript interface。', placeholder: input.value, inputLanguage: 'json', outputLanguage: 'typescript', transform: jsonToTypeScript },
   { id: 'json-schema', name: 'JSON → JSON Schema', from: 'JSON', to: 'JSON Schema', group: 'JSON', description: '把示例 JSON 转成基础 JSON Schema。', placeholder: input.value, inputLanguage: 'json', outputLanguage: 'json', transform: jsonToSchema },
   { id: 'json-yaml', name: 'JSON → YAML', from: 'JSON', to: 'YAML', group: 'JSON', description: '将 JSON 数据转为 YAML。', placeholder: input.value, inputLanguage: 'json', outputLanguage: 'yaml', transform: jsonToYaml },
-  { id: 'json-csv', name: 'JSON → CSV', from: 'JSON', to: 'CSV', group: 'JSON', description: '将对象或对象数组转成 CSV。', placeholder: '[{ "name": "栗志", "role": "Engineer" }]', inputLanguage: 'json', outputLanguage: 'plaintext', transform: jsonToCsv },
+  { id: 'json-csv', name: 'JSON → CSV', from: 'JSON', to: 'CSV', group: 'JSON', description: '将对象或对象数组转成 CSV。', placeholder: '[{ "name": "Alex Chen", "role": "Engineer" }]', inputLanguage: 'json', outputLanguage: 'plaintext', transform: jsonToCsv },
   { id: 'json-go', name: 'JSON → Go Struct', from: 'JSON', to: 'Go Struct', group: 'JSON', description: '根据 JSON 生成 Go 结构体。', placeholder: input.value, inputLanguage: 'json', outputLanguage: 'go', transform: jsonToGo },
   { id: 'json-kotlin', name: 'JSON → Kotlin', from: 'JSON', to: 'Kotlin', group: 'JSON', description: '根据 JSON 生成 Kotlin data class。', placeholder: input.value, inputLanguage: 'json', outputLanguage: 'kotlin', transform: jsonToKotlin },
   { id: 'json-swift', name: 'JSON → Swift', from: 'JSON', to: 'Swift', group: 'JSON', description: '根据 JSON 生成 Swift Codable struct。', placeholder: input.value, inputLanguage: 'json', outputLanguage: 'swift', transform: jsonToSwift },
@@ -609,12 +609,12 @@ const tools: Tool[] = [
   { id: 'json-dart', name: 'JSON → Dart', from: 'JSON', to: 'Dart', group: 'JSON', description: '根据 JSON 生成 Dart class。', placeholder: input.value, inputLanguage: 'json', outputLanguage: 'dart', transform: jsonToDart },
   { id: 'json-zod', name: 'JSON → Zod', from: 'JSON', to: 'Zod Schema', group: 'JSON', description: '根据 JSON 生成 Zod 校验模型。', placeholder: input.value, inputLanguage: 'json', outputLanguage: 'typescript', transform: jsonToZod },
   { id: 'json-prisma', name: 'JSON → Prisma', from: 'JSON', to: 'Prisma Model', group: 'JSON', description: '根据 JSON 对象生成基础 Prisma model。', placeholder: input.value, inputLanguage: 'json', outputLanguage: 'prisma', transform: jsonToPrisma },
-  { id: 'format-json', name: 'JSON Format', from: 'JSON', to: 'Formatted JSON', group: 'Formatters', description: '格式化 JSON。', placeholder: '{"name":"栗志","skills":["AI","Full Stack"]}', inputLanguage: 'json', outputLanguage: 'json', transform: formatJson },
+  { id: 'format-json', name: 'JSON Format', from: 'JSON', to: 'Formatted JSON', group: 'Formatters', description: '格式化 JSON。', placeholder: '{"name":"Alex Chen","skills":["AI","Full Stack"]}', inputLanguage: 'json', outputLanguage: 'json', transform: formatJson },
   { id: 'format-sql', name: 'SQL Format', from: 'SQL', to: 'Formatted SQL', group: 'Formatters', description: '格式化常见 SQL 语句。', placeholder: 'select id,name,email from users where ai_native = true order by id desc', inputLanguage: 'sql', outputLanguage: 'sql', transform: formatSql },
   { id: 'format-css', name: 'CSS Format', from: 'CSS', to: 'Formatted CSS', group: 'Formatters', description: '格式化 CSS 代码。', placeholder: '.card{color:#fff;font-size:16px}.title{font-weight:700}', inputLanguage: 'css', outputLanguage: 'css', transform: formatCss },
-  { id: 'format-html', name: 'HTML Format', from: 'HTML', to: 'Formatted HTML', group: 'Formatters', description: '格式化 HTML 结构。', placeholder: '<section><h1>栗志</h1><p>AI Native Developer</p></section>', inputLanguage: 'html', outputLanguage: 'html', transform: formatHtml },
-  { id: 'yaml-json', name: 'YAML → JSON', from: 'YAML', to: 'JSON', group: 'Others', description: '将常见 YAML 键值结构转成 JSON。', placeholder: 'name: 栗志\nrole: Engineer\nskills:\n  - TypeScript\n  - AI', inputLanguage: 'yaml', outputLanguage: 'json', transform: yamlToJson },
-  { id: 'xml-json', name: 'XML → JSON', from: 'XML', to: 'JSON', group: 'Others', description: '将 XML 文档转换成 JSON 对象。', placeholder: '<user><name>栗志</name><role>Engineer</role></user>', inputLanguage: 'xml', outputLanguage: 'json', transform: xmlToJson },
+  { id: 'format-html', name: 'HTML Format', from: 'HTML', to: 'Formatted HTML', group: 'Formatters', description: '格式化 HTML 结构。', placeholder: '<section><h1>Alex Chen</h1><p>AI Native Developer</p></section>', inputLanguage: 'html', outputLanguage: 'html', transform: formatHtml },
+  { id: 'yaml-json', name: 'YAML → JSON', from: 'YAML', to: 'JSON', group: 'Others', description: '将常见 YAML 键值结构转成 JSON。', placeholder: 'name: Alex Chen\nrole: Engineer\nskills:\n  - TypeScript\n  - AI', inputLanguage: 'yaml', outputLanguage: 'json', transform: yamlToJson },
+  { id: 'xml-json', name: 'XML → JSON', from: 'XML', to: 'JSON', group: 'Others', description: '将 XML 文档转换成 JSON 对象。', placeholder: '<user><name>Alex Chen</name><role>Engineer</role></user>', inputLanguage: 'xml', outputLanguage: 'json', transform: xmlToJson },
   { id: 'md-html', name: 'Markdown → HTML', from: 'Markdown', to: 'HTML', group: 'Others', description: '支持标题、段落、列表、加粗、链接、行内代码等常用语法。', placeholder: '# Hello\n\n**AI Native** developer', inputLanguage: 'markdown', outputLanguage: 'html', transform: markdownToHtml },
   { id: 'html-jsx', name: 'HTML → JSX', from: 'HTML', to: 'JSX', group: 'HTML / SVG', description: '将 HTML 属性转换成 JSX 常用写法。', placeholder: '<label class="title" for="name">Name</label>', inputLanguage: 'html', outputLanguage: 'javascript', transform: htmlToJsx },
   { id: 'svg-jsx', name: 'SVG → JSX', from: 'SVG', to: 'JSX', group: 'HTML / SVG', description: '将 SVG 属性转换成 JSX 写法。', placeholder: '<svg viewbox="0 0 24 24"><path stroke-width="2" d="M4 12h16" /></svg>', inputLanguage: 'xml', outputLanguage: 'javascript', transform: svgToJsx },
