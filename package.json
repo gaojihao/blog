@@ -7,7 +7,7 @@
   "scripts": {
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs",
-    "docs:deploy": "vuepress build docs --config docs/.vuepress/deploy.ts",
+    "docs:deploy": "vuepress build docs",
     "build": "tsc -b tsconfig.build.json && node scripts && yarn copy && yarn clean",
     "publish:npm": "yarn build && npm publish",
     "clean": "rimraf  *.tsbuildinfo",
