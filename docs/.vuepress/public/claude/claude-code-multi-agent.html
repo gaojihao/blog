@@ -1,0 +1,2120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code 多 Agent 协作系统详解</title>
+<style>
+  :root {
+    --orange: #D77757;
+    --orange-soft: #F4E5DD;
+    --orange-deep: #B0552F;
+    --blue: #5769F7;
+    --blue-soft: #E5E8FE;
+    --green: #5BA67A;
+    --green-soft: #E2F0E8;
+    --red: #C9534D;
+    --red-soft: #F5DEDC;
+    --yellow: #D9A441;
+    --yellow-soft: #F7ECD3;
+    --purple: #8B5CF6;
+    --purple-soft: #EDE7F8;
+    --teal: #2BA89E;
+    --teal-soft: #D6F0ED;
+    --gray-900: #1F1B17;
+    --gray-700: #4A413A;
+    --gray-500: #87796F;
+    --gray-300: #D9D0C7;
+    --gray-100: #F6F1EC;
+    --gray-50: #FBF8F4;
+    --bg: #FBF8F4;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--gray-900);
+    background: var(--bg);
+    line-height: 1.7;
+  }
+  .layout { display: grid; grid-template-columns: 280px 1fr; max-width: 1400px; margin: 0 auto; }
+  nav.toc {
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    padding: 32px 20px; border-right: 1px solid var(--gray-300);
+    background: var(--gray-50); font-size: 14px;
+  }
+  nav.toc h3 {
+    margin: 0 0 16px; font-size: 12px; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--gray-500);
+  }
+  nav.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: section; }
+  nav.toc ol li { counter-increment: section; margin-bottom: 6px; }
+  nav.toc ol li a {
+    display: block; padding: 6px 10px; color: var(--gray-700);
+    text-decoration: none; border-radius: 6px;
+    border-left: 2px solid transparent; transition: all 0.15s;
+  }
+  nav.toc ol li a::before {
+    content: counter(section, decimal-leading-zero) "  ";
+    color: var(--gray-500); font-variant-numeric: tabular-nums; font-size: 12px;
+  }
+  nav.toc ol li a:hover {
+    background: var(--orange-soft); color: var(--orange-deep);
+    border-left-color: var(--orange);
+  }
+  main { padding: 56px 56px 120px; max-width: 980px; }
+  header.hero { margin-bottom: 56px; padding-bottom: 32px; border-bottom: 1px solid var(--gray-300); }
+  header.hero .eyebrow {
+    color: var(--orange); font-size: 13px; text-transform: uppercase;
+    letter-spacing: 0.15em; margin-bottom: 12px; font-weight: 600;
+  }
+  header.hero h1 { font-size: 40px; margin: 0 0 12px; letter-spacing: -0.01em; }
+  header.hero p { font-size: 17px; color: var(--gray-700); max-width: 720px; }
+  section { margin-bottom: 64px; scroll-margin-top: 24px; }
+  section > h2 {
+    font-size: 28px; margin: 0 0 8px; padding-top: 16px;
+    border-top: 3px solid var(--orange); display: inline-block; padding-right: 64px;
+  }
+  section > h2 .num { color: var(--orange); font-variant-numeric: tabular-nums; margin-right: 12px; }
+  section > .lead { color: var(--gray-700); font-size: 16px; margin-bottom: 28px; max-width: 760px; }
+  h3 { font-size: 20px; margin: 32px 0 12px; }
+  h4 { font-size: 16px; margin: 20px 0 8px; color: var(--gray-700); }
+  code {
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 13px; background: var(--gray-100); padding: 1px 6px;
+    border-radius: 4px; color: var(--orange-deep);
+  }
+  pre {
+    background: #1F1B17; color: #E8E1D9; padding: 18px 22px; border-radius: 10px;
+    overflow-x: auto; font-size: 13px; line-height: 1.6; margin: 16px 0;
+  }
+  pre code { background: transparent; color: inherit; padding: 0; font-size: 13px; }
+  pre .kw { color: #E5A77B; }
+  pre .str { color: #C8E0B4; }
+  pre .com { color: #6F665D; font-style: italic; }
+  pre .fn { color: #93B5E0; }
+  pre .num { color: #E5A77B; }
+  pre .ty { color: #D7B5E5; }
+  .box {
+    border-left: 4px solid var(--gray-300); padding: 16px 20px; border-radius: 6px;
+    margin: 18px 0; background: white; box-shadow: 0 1px 2px rgba(31,27,23,0.04);
+  }
+  .box.info { border-color: var(--blue); background: var(--blue-soft); }
+  .box.warn { border-color: var(--yellow); background: var(--yellow-soft); }
+  .box.error { border-color: var(--red); background: var(--red-soft); }
+  .box.ok { border-color: var(--green); background: var(--green-soft); }
+  .box.note { border-color: var(--orange); background: var(--orange-soft); }
+  .box.purple { border-color: var(--purple); background: var(--purple-soft); }
+  .box.teal { border-color: var(--teal); background: var(--teal-soft); }
+  .box .title {
+    font-weight: 600; font-size: 13px; text-transform: uppercase;
+    letter-spacing: 0.05em; margin-bottom: 6px;
+  }
+  .box.info .title { color: var(--blue); }
+  .box.warn .title { color: var(--yellow); }
+  .box.error .title { color: var(--red); }
+  .box.ok .title { color: var(--green); }
+  .box.note .title { color: var(--orange-deep); }
+  .box.purple .title { color: var(--purple); }
+  .box.teal .title { color: var(--teal); }
+  table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 14px; background: white; box-shadow: 0 1px 2px rgba(31,27,23,0.04);
+    border-radius: 8px; overflow: hidden;
+  }
+  th, td {
+    text-align: left; padding: 12px 16px;
+    border-bottom: 1px solid var(--gray-300); vertical-align: top;
+  }
+  th {
+    background: var(--gray-100); font-weight: 600; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-700);
+  }
+  tr:last-child td { border-bottom: none; }
+  td code { font-size: 12px; }
+  figure {
+    margin: 24px 0; padding: 24px; background: white;
+    border: 1px solid var(--gray-300); border-radius: 12px; text-align: center;
+  }
+  figure svg { max-width: 100%; height: auto; }
+  figcaption { margin-top: 14px; font-size: 13px; color: var(--gray-500); font-style: italic; }
+  .pill {
+    display: inline-block; padding: 2px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; margin-right: 4px;
+  }
+  .pill.builtin { background: var(--blue-soft); color: var(--blue); }
+  .pill.custom { background: var(--green-soft); color: var(--green); }
+  .pill.plugin { background: var(--purple-soft); color: var(--purple); }
+  .pill.fork { background: var(--orange-soft); color: var(--orange-deep); }
+  .pill.teammate { background: var(--teal-soft); color: var(--teal); }
+  .steps { list-style: none; padding: 0; counter-reset: step; }
+  .steps li {
+    counter-increment: step; position: relative;
+    padding: 14px 18px 14px 56px; background: white;
+    border: 1px solid var(--gray-300); border-radius: 8px; margin-bottom: 10px;
+  }
+  .steps li::before {
+    content: counter(step); position: absolute; left: 14px; top: 12px;
+    width: 30px; height: 30px; border-radius: 50%; background: var(--orange);
+    color: white; font-weight: 700; display: flex; align-items: center;
+    justify-content: center; font-size: 14px;
+  }
+  .steps li strong { display: block; margin-bottom: 4px; }
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0;
+  }
+  .two-col > div {
+    background: white; border: 1px solid var(--gray-300);
+    border-radius: 8px; padding: 16px;
+  }
+  .two-col h4 { margin-top: 0; }
+  .path {
+    font-family: "SF Mono", monospace; font-size: 12px; color: var(--blue);
+    background: var(--blue-soft); padding: 2px 8px; border-radius: 4px;
+  }
+  .lbl {
+    display: inline-block; padding: 1px 6px; border-radius: 3px;
+    font-size: 11px; font-weight: 600; margin-right: 4px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .lbl.ok { background: var(--green-soft); color: var(--green); }
+  .lbl.fail { background: var(--red-soft); color: var(--red); }
+  .lbl.warn { background: var(--yellow-soft); color: #8a6520; }
+  .lbl.info { background: var(--blue-soft); color: var(--blue); }
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 1fr; }
+    nav.toc { display: none; }
+    main { padding: 32px 24px 80px; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h3>目录</h3>
+    <ol>
+      <li><a href="#overview">概览:为什么需要多 agent</a></li>
+      <li><a href="#architecture">系统架构总览</a></li>
+      <li><a href="#agent-types">Agent 类型四大分类</a></li>
+      <li><a href="#agent-def">AgentDefinition 数据结构</a></li>
+      <li><a href="#agent-tool">AgentTool 输入输出</a></li>
+      <li><a href="#three-paths">三大执行路径</a></li>
+      <li><a href="#runagent">runAgent 流水线</a></li>
+      <li><a href="#context">上下文隔离与共享</a></li>
+      <li><a href="#tools-filter">工具过滤三层机制</a></li>
+      <li><a href="#sysprompt">系统提示组装</a></li>
+      <li><a href="#sync-async">同步 vs 异步执行</a></li>
+      <li><a href="#fork">Fork Subagent 缓存共享</a></li>
+      <li><a href="#worktree">Worktree 隔离</a></li>
+      <li><a href="#swarm">Swarm 团队架构</a></li>
+      <li><a href="#backends">Backend 抽象层</a></li>
+      <li><a href="#mailbox">邮箱通信系统</a></li>
+      <li><a href="#notification">任务通知回流</a></li>
+      <li><a href="#hooks">SubagentStart / SubagentStop Hooks</a></li>
+      <li><a href="#e2e">端到端示例</a></li>
+      <li><a href="#principles">核心设计原则</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <div class="eyebrow">Claude Code 源码深度讲解 · 多 Agent 协作</div>
+      <h1>Multi-Agent 系统完整运行原理</h1>
+      <p>Claude Code 不是单一的"Claude 主循环",而是一个可以孵化、隔离、协作 N 个 agent 的<strong>分布式 LLM 运行时</strong>。
+      本文从 AgentDefinition 数据结构,到 runAgent 的 ~30 步流水线,再到 swarm 跨进程团队,逐层拆解每一个设计细节。</p>
+    </header>
+
+    <!-- ============================================================ -->
+    <section id="overview">
+      <h2><span class="num">01</span>概览:为什么需要多 agent</h2>
+      <p class="lead">主 agent 一个人干所有活会撞上 4 个根本问题:上下文窗口、工具数量、模型成本、并发隔离。多 agent 系统是这些问题的集中解法。</p>
+
+      <h3>1.1 多 agent 解决的 4 类问题</h3>
+      <table>
+        <thead><tr><th>问题</th><th>主 agent 单独干的代价</th><th>多 agent 的解法</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>上下文污染</strong></td>
+            <td>读 50 个文件做调研 → 200k context 全是噪声,后续推理跑偏</td>
+            <td>派子 agent 调研,只把 200 字 summary 带回来</td>
+          </tr>
+          <tr>
+            <td><strong>工具范围扩散</strong></td>
+            <td>所有工具 schema 都加载 → ~30k token prompt 浪费</td>
+            <td>子 agent 用 disallowedTools / 自定义 tools 列表收窄</td>
+          </tr>
+          <tr>
+            <td><strong>模型成本失衡</strong></td>
+            <td>主 Opus 跑 grep / find → 杀鸡用牛刀</td>
+            <td>Explore 用 Haiku,Verification 用 Opus,主 agent 决策</td>
+          </tr>
+          <tr>
+            <td><strong>无法并行</strong></td>
+            <td>任务串行 → 一个 5 分钟测试卡住整个会话</td>
+            <td>run_in_background 派多个 agent 并发 + 通知回流</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>1.2 一句话定义每种 agent</h3>
+      <ul>
+        <li><span class="pill builtin">built-in</span><strong>built-in agent</strong> — 源码里硬编码,如 general-purpose、Explore、Plan</li>
+        <li><span class="pill custom">custom</span><strong>custom agent</strong> — 用户在 <code>~/.claude/agents/&lt;name&gt;.md</code> 写的 markdown,带 frontmatter</li>
+        <li><span class="pill plugin">plugin</span><strong>plugin agent</strong> — 插件包提供的 agent,带 plugin 元信息</li>
+        <li><span class="pill fork">fork</span><strong>fork agent</strong> — 实验性:不传 subagent_type 时触发,继承父 agent 全部上下文 + system prompt</li>
+        <li><span class="pill teammate">teammate</span><strong>teammate</strong> — swarm 模式下的"长驻协作进程",独立 tmux/iterm pane,文件邮箱通信</li>
+      </ul>
+
+      <h3>1.3 一组关键术语</h3>
+      <table>
+        <thead><tr><th>术语</th><th>含义</th></tr></thead>
+        <tbody>
+          <tr><td><code>subagent</code></td><td>由主 agent 通过 AgentTool 派出的"一次性"子 agent,任务完成即销毁</td></tr>
+          <tr><td><code>fork</code></td><td>子 agent 的特殊形态:继承父的全部上下文,共享 prompt cache</td></tr>
+          <tr><td><code>teammate</code></td><td>长期存在的并行 agent,每个跑在自己的进程/pane 里,通过邮箱协作</td></tr>
+          <tr><td><code>leader</code></td><td>swarm 模式下创建团队、分派任务的主 agent</td></tr>
+          <tr><td><code>worktree</code></td><td>git worktree 创建的独立工作目录,子 agent 改的文件不影响父</td></tr>
+          <tr><td><code>async / background</code></td><td>子 agent 立即返回,后台跑,完成后通过 task-notification 通知父</td></tr>
+          <tr><td><code>sync / foreground</code></td><td>子 agent 跑完才返回,期间父 agent 阻塞等待</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="architecture">
+      <h2><span class="num">02</span>系统架构总览</h2>
+      <p class="lead">把多 agent 系统拆成 5 层,从工具调用到通知回流,每一层都有明确职责。</p>
+
+      <figure>
+        <svg viewBox="0 0 920 620" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#87796F"/>
+            </marker>
+            <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#F4E5DD"/><stop offset="1" stop-color="#EFD5C5"/>
+            </linearGradient>
+            <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#E5E8FE"/><stop offset="1" stop-color="#D5DAFD"/>
+            </linearGradient>
+            <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#E2F0E8"/><stop offset="1" stop-color="#CFE5D9"/>
+            </linearGradient>
+            <linearGradient id="g4" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#F7ECD3"/><stop offset="1" stop-color="#F0DEB3"/>
+            </linearGradient>
+            <linearGradient id="g5" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#EDE7F8"/><stop offset="1" stop-color="#DACEF0"/>
+            </linearGradient>
+          </defs>
+
+          <text x="460" y="28" text-anchor="middle" font-size="14" font-weight="700">多 Agent 系统 5 层架构</text>
+
+          <!-- L1: Discovery -->
+          <rect x="50" y="50" width="820" height="80" rx="10" fill="url(#g2)" stroke="#5769F7" stroke-width="1.5"/>
+          <text x="70" y="75" font-size="13" font-weight="700" fill="#5769F7">第 1 层 · Agent 发现与注册</text>
+          <text x="70" y="93" font-size="11" fill="#1F1B17">built-in 硬编码 + 用户 .md 文件 + 插件包扫描 → AgentDefinitionsResult.activeAgents</text>
+          <text x="70" y="111" font-size="11" fill="#4A413A">getActiveAgentsFromList:同名优先级 plugin &gt; user &gt; project &gt; flag &gt; managed &gt; built-in</text>
+          <text x="850" y="93" text-anchor="end" font-size="11" fill="#5769F7" font-family="monospace">loadAgentsDir.ts · builtInAgents.ts</text>
+
+          <line x1="460" y1="130" x2="460" y2="155" stroke="#87796F" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <!-- L2: AgentTool -->
+          <rect x="50" y="155" width="820" height="100" rx="10" fill="url(#g1)" stroke="#D77757" stroke-width="1.5"/>
+          <text x="70" y="180" font-size="13" font-weight="700" fill="#B0552F">第 2 层 · AgentTool 调用入口</text>
+          <text x="70" y="200" font-size="11" fill="#1F1B17">Zod schema 校验 · MCP 等待与过滤 · 权限规则 · 路径选择(teammate / fork / normal)</text>
+          <text x="70" y="218" font-size="11" fill="#4A413A">isolation 解析 · cwd 覆盖 · run_in_background 决策 · agentName 注册</text>
+          <text x="70" y="236" font-size="11" fill="#4A413A">输出形态:async_launched | completed | teammate_spawned | remote_launched</text>
+          <text x="850" y="200" text-anchor="end" font-size="11" fill="#B0552F" font-family="monospace">AgentTool.tsx</text>
+
+          <line x1="460" y1="255" x2="460" y2="280" stroke="#87796F" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <!-- L3: runAgent -->
+          <rect x="50" y="280" width="820" height="120" rx="10" fill="url(#g3)" stroke="#5BA67A" stroke-width="1.5"/>
+          <text x="70" y="305" font-size="13" font-weight="700" fill="#5BA67A">第 3 层 · runAgent 子 agent 流水线</text>
+          <text x="70" y="325" font-size="11" fill="#1F1B17">MCP 服务器初始化 · skills 预加载 · system prompt 组装 · 权限模式覆盖</text>
+          <text x="70" y="343" font-size="11" fill="#4A413A">SubagentStart hook · frontmatter hook 注册 · contentReplacementState 克隆</text>
+          <text x="70" y="361" font-size="11" fill="#4A413A">tool 过滤(filterToolsForAgent + resolveAgentTools) · transcript 持久化</text>
+          <text x="70" y="379" font-size="11" fill="#4A413A">→ 调用 query() 进入 agent 自己的 query loop</text>
+          <text x="850" y="325" text-anchor="end" font-size="11" fill="#5BA67A" font-family="monospace">runAgent.ts</text>
+
+          <!-- two branches -->
+          <line x1="220" y1="400" x2="220" y2="430" stroke="#87796F" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="700" y1="400" x2="700" y2="430" stroke="#87796F" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <!-- L4a: Local execution -->
+          <rect x="50" y="430" width="340" height="100" rx="10" fill="url(#g4)" stroke="#D9A441" stroke-width="1.5"/>
+          <text x="70" y="455" font-size="13" font-weight="700" fill="#8a6520">第 4a 层 · 本地子 agent 执行</text>
+          <text x="70" y="475" font-size="11" fill="#1F1B17">同步:阻塞父 agent 等结果</text>
+          <text x="70" y="491" font-size="11" fill="#1F1B17">异步:registerAsyncAgent + LocalAgentTask</text>
+          <text x="70" y="507" font-size="11" fill="#1F1B17">runAsyncAgentLifecycle 驱动</text>
+          <text x="70" y="523" font-size="10" fill="#87796F" font-family="monospace">tasks/LocalAgentTask</text>
+
+          <!-- L4b: Swarm execution -->
+          <rect x="530" y="430" width="340" height="100" rx="10" fill="url(#g5)" stroke="#8B5CF6" stroke-width="1.5"/>
+          <text x="550" y="455" font-size="13" font-weight="700" fill="#8B5CF6">第 4b 层 · Swarm 跨进程协作</text>
+          <text x="550" y="475" font-size="11" fill="#1F1B17">tmux / iterm2 / windows-terminal 后端</text>
+          <text x="550" y="491" font-size="11" fill="#1F1B17">in-process(同进程独立 context)</text>
+          <text x="550" y="507" font-size="11" fill="#1F1B17">spawnTeammate · TeamFile 注册</text>
+          <text x="550" y="523" font-size="10" fill="#87796F" font-family="monospace">utils/swarm/backends/</text>
+
+          <!-- merge -->
+          <line x1="220" y1="530" x2="460" y2="555" stroke="#87796F" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="700" y1="530" x2="460" y2="555" stroke="#87796F" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <!-- L5: Communication -->
+          <rect x="50" y="555" width="820" height="55" rx="10" fill="white" stroke="#1F1B17" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <text x="70" y="578" font-size="13" font-weight="700">第 5 层 · 通信回流</text>
+          <text x="70" y="595" font-size="11" fill="#4A413A">同步 → tool_result · 异步 → enqueueAgentNotification &lt;task-notification&gt; · swarm → mailbox</text>
+        </svg>
+        <figcaption>多 agent 系统 5 层数据流:发现 → 入口 → 流水线 → 执行 → 通信</figcaption>
+      </figure>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="agent-types">
+      <h2><span class="num">03</span>Agent 类型四大分类</h2>
+      <p class="lead">所有 agent 都满足同一个接口 <code>AgentDefinition</code>,但来源不同,加载逻辑、信任级别、可写性都不同。</p>
+
+      <h3>3.1 四种来源对照</h3>
+      <table>
+        <thead><tr><th>类型</th><th>位置</th><th>系统提示</th><th>信任级别</th></tr></thead>
+        <tbody>
+        <tr>
+          <td><span class="pill builtin">built-in</span></td>
+          <td>源码 <code>built-in/*.ts</code></td>
+          <td>动态 <code>getSystemPrompt({ toolUseContext })</code></td>
+          <td><span class="lbl ok">admin-trusted</span></td>
+        </tr>
+        <tr>
+          <td><span class="pill custom">custom</span></td>
+          <td><code>~/.claude/agents/*.md</code> 或项目级</td>
+          <td>静态闭包 <code>() =&gt; promptText</code></td>
+          <td>跟 source 走(user/project/managed/flag)</td>
+        </tr>
+        <tr>
+          <td><span class="pill plugin">plugin</span></td>
+          <td>插件包 <code>plugin/*/agents/*.md</code></td>
+          <td>静态闭包,带 plugin 元信息</td>
+          <td><span class="lbl ok">admin-trusted</span> (受插件签名)</td>
+        </tr>
+        <tr>
+          <td><span class="pill fork">fork (合成)</span></td>
+          <td>仅运行时存在(<code>FORK_AGENT</code>)</td>
+          <td>占位 → 实际用父的 system prompt</td>
+          <td>跟父 agent 一致</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>3.2 内置 agent 完整清单(<span class="path">builtInAgents.ts</span>)</h3>
+      <table>
+        <thead><tr><th>agentType</th><th>用途</th><th>默认模型</th><th>典型工具</th></tr></thead>
+        <tbody>
+        <tr>
+          <td><code>general-purpose</code></td>
+          <td>通用调研 + 多步任务</td>
+          <td>跟父(getDefaultSubagentModel)</td>
+          <td><code>['*']</code> 全部</td>
+        </tr>
+        <tr>
+          <td><code>Explore</code></td>
+          <td>只读代码探索(快)</td>
+          <td>ant: <code>inherit</code> / 外部: <code>haiku</code></td>
+          <td>排除 Edit/Write/NotebookEdit/Agent/ExitPlanMode</td>
+        </tr>
+        <tr>
+          <td><code>Plan</code></td>
+          <td>实现规划</td>
+          <td>—</td>
+          <td>不能 Edit/Write</td>
+        </tr>
+        <tr>
+          <td><code>verifier</code></td>
+          <td>验证主 agent 完成质量(PASS/PARTIAL/FAIL)</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>statusline-setup</code></td>
+          <td>配置 statusline 设置</td>
+          <td>—</td>
+          <td>Read + Edit(局限于 settings.json)</td>
+        </tr>
+        <tr>
+          <td><code>claude-code-guide</code></td>
+          <td>回答关于 Claude Code 本身的问题</td>
+          <td>—</td>
+          <td>Bash + Read + WebFetch + WebSearch</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <div class="box info">
+        <div class="title">合并优先级(loadAgentsDir.ts:193)</div>
+        当用户和系统 agent 重名时,按这个 Map.set 顺序覆盖,后面的覆盖前面的:
+        <pre><code>built-in &lt; plugin &lt; user &lt; project &lt; flag &lt; policy</code></pre>
+        即用户在 <code>~/.claude/agents/general-purpose.md</code> 写一个同名 agent,会覆盖内置的 general-purpose。
+        policy(企业策略)的优先级最高,可强制覆盖一切。
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="agent-def">
+      <h2><span class="num">04</span>AgentDefinition 数据结构</h2>
+      <p class="lead">理解 AgentDefinition 是理解整个 agent 系统的钥匙。所有 frontmatter 字段最终都会映射到这里。</p>
+
+      <h3>4.1 完整 schema</h3>
+      <pre><code><span class="kw">type</span> <span class="ty">BaseAgentDefinition</span> = {
+  agentType: <span class="ty">string</span>                            <span class="com">// 唯一名称,subagent_type 引用</span>
+  whenToUse: <span class="ty">string</span>                            <span class="com">// 给主 agent 看的"何时用"</span>
+  tools?: <span class="ty">string[]</span>                              <span class="com">// 白名单,['*'] = 全部</span>
+  disallowedTools?: <span class="ty">string[]</span>                    <span class="com">// 黑名单</span>
+  skills?: <span class="ty">string[]</span>                             <span class="com">// 启动时预加载的 skill</span>
+  mcpServers?: <span class="ty">AgentMcpServerSpec[]</span>             <span class="com">// agent 私有 MCP 服务器</span>
+  hooks?: <span class="ty">HooksSettings</span>                         <span class="com">// agent 生命周期内的 hook</span>
+  color?: <span class="ty">AgentColorName</span>                        <span class="com">// UI 显示颜色</span>
+  model?: <span class="ty">string</span>                                <span class="com">// 'sonnet' | 'opus' | 'haiku' | 'inherit'</span>
+  effort?: <span class="ty">EffortValue</span>                          <span class="com">// thinking 配额</span>
+  permissionMode?: <span class="ty">PermissionMode</span>                <span class="com">// 'plan' | 'acceptEdits' | 'bypass' | 'bubble'</span>
+  maxTurns?: <span class="ty">number</span>                              <span class="com">// 回合数上限</span>
+  requiredMcpServers?: <span class="ty">string[]</span>                  <span class="com">// 不满足则该 agent 不可用</span>
+  background?: <span class="ty">boolean</span>                            <span class="com">// 强制后台运行</span>
+  initialPrompt?: <span class="ty">string</span>                          <span class="com">// 拼到第一个 user turn 前</span>
+  memory?: <span class="str">'user'</span> | <span class="str">'project'</span> | <span class="str">'local'</span>          <span class="com">// 持久化记忆作用域</span>
+  isolation?: <span class="str">'worktree'</span> | <span class="str">'remote'</span>             <span class="com">// 隔离模式</span>
+  omitClaudeMd?: <span class="ty">boolean</span>                          <span class="com">// 跳过 CLAUDE.md(Explore/Plan 用)</span>
+  criticalSystemReminder_EXPERIMENTAL?: <span class="ty">string</span>    <span class="com">// 每个用户回合都注入的提醒</span>
+  filename?: <span class="ty">string</span>                              <span class="com">// 自定义 agent 的源文件</span>
+  baseDir?: <span class="ty">string</span>
+}</code></pre>
+
+      <h3>4.2 子类型分化</h3>
+      <pre><code><span class="com">// 内置:动态生成 system prompt(可读 toolUseContext)</span>
+<span class="kw">type</span> <span class="ty">BuiltInAgentDefinition</span> = <span class="ty">BaseAgentDefinition</span> &amp; {
+  source: <span class="str">'built-in'</span>
+  baseDir: <span class="str">'built-in'</span>
+  getSystemPrompt: ({ toolUseContext }) =&gt; <span class="ty">string</span>
+  callback?: () =&gt; <span class="kw">void</span>
+}
+
+<span class="com">// 自定义:从 markdown frontmatter 解析,prompt 已固化在闭包里</span>
+<span class="kw">type</span> <span class="ty">CustomAgentDefinition</span> = <span class="ty">BaseAgentDefinition</span> &amp; {
+  getSystemPrompt: () =&gt; <span class="ty">string</span>
+  source: <span class="ty">SettingSource</span>  <span class="com">// userSettings | projectSettings | flagSettings | policySettings</span>
+  filename?: <span class="ty">string</span>
+}
+
+<span class="com">// 插件:同 custom,加 plugin 元信息</span>
+<span class="kw">type</span> <span class="ty">PluginAgentDefinition</span> = <span class="ty">BaseAgentDefinition</span> &amp; {
+  getSystemPrompt: () =&gt; <span class="ty">string</span>
+  source: <span class="str">'plugin'</span>
+  plugin: <span class="ty">string</span>
+}</code></pre>
+
+      <h3>4.3 frontmatter 示例 → AgentDefinition 映射</h3>
+      <pre><code><span class="com"># ~/.claude/agents/security-reviewer.md</span>
+---
+description: <span class="str">"Senior security engineer for OWASP review"</span>
+tools: [<span class="str">"Read"</span>, <span class="str">"Bash"</span>, <span class="str">"Grep"</span>]
+disallowedTools: [<span class="str">"Bash(rm:*)"</span>]
+model: <span class="str">"opus"</span>
+permissionMode: <span class="str">"plan"</span>
+maxTurns: <span class="num">50</span>
+mcpServers: [<span class="str">"github"</span>, { vault: { command: <span class="str">"vault-mcp"</span> } }]
+skills: [<span class="str">"security-checklist"</span>]
+color: <span class="str">"red"</span>
+---
+
+You are a senior security engineer specializing in code review for OWASP top 10...</code></pre>
+      <p>解析后的 AgentDefinition:</p>
+      <pre><code>{
+  agentType: <span class="str">'security-reviewer'</span>,           <span class="com">// 文件名(去 .md)</span>
+  whenToUse: <span class="str">'Senior security engineer...'</span>,  <span class="com">// description</span>
+  tools: [<span class="str">'Read'</span>, <span class="str">'Bash'</span>, <span class="str">'Grep'</span>],
+  disallowedTools: [<span class="str">'Bash(rm:*)'</span>],          <span class="com">// 带规则模式</span>
+  model: <span class="str">'opus'</span>,
+  permissionMode: <span class="str">'plan'</span>,
+  maxTurns: <span class="num">50</span>,
+  mcpServers: [<span class="str">'github'</span>, { vault: {...} }],
+  skills: [<span class="str">'security-checklist'</span>],
+  color: <span class="str">'red'</span>,
+  source: <span class="str">'userSettings'</span>,
+  filename: <span class="str">'security-reviewer'</span>,
+  getSystemPrompt: () =&gt; <span class="str">"You are a senior..."</span>,    <span class="com">// 闭包持有 markdown 正文</span>
+}</code></pre>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="agent-tool">
+      <h2><span class="num">05</span>AgentTool 输入输出</h2>
+      <p class="lead">AgentTool 是模型与多 agent 系统的唯一接口。它的 schema 由 5+ 个特性 gate 动态裁剪,模型只看到自己 user-type 能用的部分。</p>
+
+      <h3>5.1 输入字段</h3>
+      <table>
+        <thead><tr><th>字段</th><th>类型</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td><code>description</code></td><td>string</td><td>3-5 词任务描述,显示在 UI</td></tr>
+          <tr><td><code>prompt</code></td><td>string</td><td>给子 agent 的实际任务文本</td></tr>
+          <tr><td><code>subagent_type</code></td><td>string?</td><td>选哪个 agent。fork 模式可省略</td></tr>
+          <tr><td><code>model</code></td><td><code>'sonnet'|'opus'|'haiku'</code>?</td><td>覆盖 agent 定义的 model</td></tr>
+          <tr><td><code>run_in_background</code></td><td>boolean?</td><td>后台跑 + 通过 task-notification 回流</td></tr>
+          <tr><td><code>name</code></td><td>string?</td><td><span class="lbl warn">swarm</span> 给 spawn 的 teammate 起名,可被 SendMessage 寻址</td></tr>
+          <tr><td><code>team_name</code></td><td>string?</td><td><span class="lbl warn">swarm</span> 指定团队</td></tr>
+          <tr><td><code>mode</code></td><td>PermissionMode?</td><td><span class="lbl warn">swarm</span> 例如 'plan' 强制 spawn 的 teammate 进 plan 模式</td></tr>
+          <tr><td><code>isolation</code></td><td><code>'worktree'|'remote'</code>?</td><td>worktree 隔离 / 远端执行(ant-only)</td></tr>
+          <tr><td><code>cwd</code></td><td>string?</td><td>显式覆盖工作目录(KAIROS gate)</td></tr>
+        </tbody>
+      </table>
+
+      <h3>5.2 输出 4 种形态</h3>
+      <pre><code><span class="com">// 1. 同步完成:子 agent 跑完了,带回结果</span>
+{ status: <span class="str">'completed'</span>, prompt, content: [{ type: <span class="str">'text'</span>, text: ... }], agentId, ... }
+
+<span class="com">// 2. 异步派发:立即返回,后台还在跑</span>
+{
+  status: <span class="str">'async_launched'</span>,
+  agentId: <span class="str">'agent_xyz'</span>,
+  description, prompt,
+  outputFile: <span class="str">'~/.claude/sessions/.../subagents/xyz.jsonl'</span>,
+  canReadOutputFile: <span class="kw">true</span>     <span class="com">// 主 agent 是否能 Read/Bash 该文件</span>
+}
+
+<span class="com">// 3. teammate 派生:swarm 模式,在新 pane 启动</span>
+{
+  status: <span class="str">'teammate_spawned'</span>,
+  teammate_id, agent_id, name, color,
+  tmux_session_name, tmux_window_name, tmux_pane_id,
+  team_name, plan_mode_required
+}
+
+<span class="com">// 4. 远端启动:isolation: 'remote'</span>
+{
+  status: <span class="str">'remote_launched'</span>,
+  taskId, sessionUrl, description, prompt, outputFile
+}</code></pre>
+
+      <h3>5.3 schema 动态裁剪</h3>
+      <pre><code><span class="com">// AgentTool.tsx:242</span>
+<span class="kw">export const</span> inputSchema = <span class="fn">lazySchema</span>(() =&gt; {
+  <span class="com">// KAIROS gate 控制 cwd 字段</span>
+  <span class="kw">const</span> schema = <span class="fn">feature</span>(<span class="str">'KAIROS'</span>) ? <span class="fn">fullInputSchema</span>() : <span class="fn">fullInputSchema</span>().<span class="fn">omit</span>({ cwd: <span class="kw">true</span> })
+
+  <span class="com">// background gate 或 fork 启用 → 隐藏 run_in_background(强制 async)</span>
+  <span class="kw">return</span> isBackgroundTasksDisabled || <span class="fn">isForkSubagentEnabled</span>()
+    ? schema.<span class="fn">omit</span>({ run_in_background: <span class="kw">true</span> })
+    : schema
+})</code></pre>
+      <div class="box info">
+        <div class="title">为什么用 .omit() 而不是条件 spread?</div>
+        条件三元 spread 会让 Zod 类型推断折叠成 <code>unknown</code>,丢失编译时类型检查。
+        <code>.omit()</code> 保留具体类型。call() 用<strong>显式 AgentToolInput 类型</strong>覆盖回完整字段,
+        所以即使 schema 不暴露,代码仍能安全访问。
+      </div>
+
+      <h3>5.4 prompt 是动态生成的</h3>
+      <p>AgentTool 的 prompt 不是静态文本,而是 <code>async prompt({ agents, tools, ... })</code> 函数:</p>
+      <ol>
+        <li>从 toolUseContext 拿到所有可用 agents</li>
+        <li>用 <code>filterAgentsByMcpRequirements</code> 过滤掉 MCP 不满足的</li>
+        <li>用 <code>filterDeniedAgents</code> 过滤掉权限规则禁止的</li>
+        <li>把剩下的 agent 列表(<code>type: whenToUse (Tools: ...)</code>)拼进 prompt</li>
+      </ol>
+
+      <div class="box warn">
+        <div class="title">Cache 优化:agent_listing 注入 vs 内嵌</div>
+        把 agent 列表写进 tool description 会让<strong>每次列表变化(MCP 连接、reload-plugins)都 bust prompt cache</strong>。
+        基于 GrowthBook gate <code>tengu_agent_list_attach</code>,可以改成把列表作为<strong>独立 attachment 注入</strong>,
+        让 tool description 保持稳定,大幅提升缓存命中率(节省了 ~10.2% fleet cache_creation tokens)。
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="three-paths">
+      <h2><span class="num">06</span>三大执行路径</h2>
+      <p class="lead">AgentTool.call() 进来后会根据参数分流到三条完全不同的执行路径。理解这三条路径是理解整个系统的关键。</p>
+
+      <figure>
+        <svg viewBox="0 0 920 480" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/>
+            </marker>
+          </defs>
+
+          <ellipse cx="460" cy="30" rx="160" ry="20" fill="#5769F7"/>
+          <text x="460" y="35" text-anchor="middle" font-size="13" font-weight="600" fill="white">AgentTool.call()</text>
+
+          <line x1="460" y1="50" x2="460" y2="80" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+          <!-- decision 1: teammate -->
+          <polygon points="460,80 640,135 460,190 280,135" fill="#EDE7F8" stroke="#8B5CF6" stroke-width="1.5"/>
+          <text x="460" y="125" text-anchor="middle" font-size="12" font-weight="600">teamName &amp;&amp; name?</text>
+          <text x="460" y="142" text-anchor="middle" font-size="11" fill="#87796F">(swarm 派 teammate)</text>
+
+          <line x1="640" y1="135" x2="730" y2="135" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#arrow2)"/>
+          <text x="685" y="125" text-anchor="middle" font-size="11" fill="#8B5CF6" font-weight="600">是</text>
+          <rect x="730" y="115" width="160" height="40" rx="8" fill="#EDE7F8" stroke="#8B5CF6" stroke-width="1.5"/>
+          <text x="810" y="132" text-anchor="middle" font-size="12" font-weight="600" fill="#8B5CF6">spawnTeammate()</text>
+          <text x="810" y="148" text-anchor="middle" font-size="10" fill="#1F1B17">tmux/iterm2/in-process</text>
+
+          <line x1="460" y1="190" x2="460" y2="215" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow2)"/>
+          <text x="475" y="210" font-size="11" fill="#C9534D">否</text>
+
+          <!-- decision 2: fork -->
+          <polygon points="460,215 640,265 460,315 280,265" fill="#F4E5DD" stroke="#D77757" stroke-width="1.5"/>
+          <text x="460" y="255" text-anchor="middle" font-size="12" font-weight="600">subagent_type 省略?</text>
+          <text x="460" y="272" text-anchor="middle" font-size="11" fill="#87796F">(fork gate 启用)</text>
+
+          <line x1="640" y1="265" x2="730" y2="265" stroke="#D77757" stroke-width="1.5" marker-end="url(#arrow2)"/>
+          <text x="685" y="255" text-anchor="middle" font-size="11" fill="#D77757" font-weight="600">是</text>
+          <rect x="730" y="245" width="160" height="40" rx="8" fill="#F4E5DD" stroke="#D77757" stroke-width="1.5"/>
+          <text x="810" y="262" text-anchor="middle" font-size="12" font-weight="600" fill="#D77757">FORK_AGENT</text>
+          <text x="810" y="278" text-anchor="middle" font-size="10" fill="#1F1B17">继承父上下文 + system prompt</text>
+
+          <line x1="460" y1="315" x2="460" y2="340" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow2)"/>
+          <text x="475" y="335" font-size="11" fill="#C9534D">否</text>
+
+          <!-- normal path -->
+          <rect x="280" y="340" width="360" height="80" rx="10" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1.5"/>
+          <text x="460" y="365" text-anchor="middle" font-size="13" font-weight="700" fill="#5BA67A">普通 subagent 路径</text>
+          <text x="460" y="383" text-anchor="middle" font-size="11" fill="#1F1B17">查 activeAgents 找 subagent_type</text>
+          <text x="460" y="399" text-anchor="middle" font-size="11" fill="#1F1B17">检查 MCP 依赖 · 检查权限 deny</text>
+          <text x="460" y="413" text-anchor="middle" font-size="11" fill="#1F1B17">独立 system prompt + 独立 tools</text>
+
+          <!-- isolation -->
+          <line x1="460" y1="420" x2="460" y2="450" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow2)"/>
+          <rect x="280" y="450" width="360" height="20" rx="4" fill="white" stroke="#87796F" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="460" y="464" text-anchor="middle" font-size="11" fill="#4A413A">→ 可叠加 isolation: 'worktree' / 'remote'</text>
+        </svg>
+        <figcaption>三条互斥路径:swarm teammate(独立进程)/ fork(共享上下文)/ 普通 subagent(独立上下文)</figcaption>
+      </figure>
+
+      <h3>6.1 teammate 路径(spawnTeammate)</h3>
+      <p>触发条件:<code>team_name && name</code> 同时存在,且 swarm 启用。这条路径不调用 runAgent —— 而是<strong>启动一个独立 Claude 进程</strong>。</p>
+      <pre><code><span class="com">// AgentTool.tsx:441</span>
+<span class="kw">if</span> (teamName &amp;&amp; name) {
+  <span class="com">// 防御:teammates 不能再 spawn teammates(团队结构是平的)</span>
+  <span class="kw">if</span> (<span class="fn">isTeammate</span>() &amp;&amp; teamName &amp;&amp; name) <span class="kw">throw</span>
+  <span class="com">// 防御:in-process teammate 不能 spawn 后台 agent</span>
+  <span class="kw">if</span> (<span class="fn">isInProcessTeammate</span>() &amp;&amp; teamName &amp;&amp; run_in_background === <span class="kw">true</span>) <span class="kw">throw</span>
+
+  <span class="kw">const</span> result = <span class="kw">await</span> <span class="fn">spawnTeammate</span>({
+    name, prompt, description, team_name: teamName,
+    use_splitpane: <span class="kw">true</span>,
+    plan_mode_required: spawnMode === <span class="str">'plan'</span>,
+    model, agent_type: subagent_type,
+  }, toolUseContext)
+
+  <span class="kw">return</span> { status: <span class="str">'teammate_spawned'</span>, ... }
+}</code></pre>
+
+      <h3>6.2 fork 路径</h3>
+      <p>触发条件:省略 <code>subagent_type</code> + <code>FORK_SUBAGENT</code> gate 启用 + 非 coordinator + 非 SDK。</p>
+      <pre><code><span class="com">// AgentTool.tsx:482</span>
+<span class="kw">const</span> effectiveType = subagent_type ?? (<span class="fn">isForkSubagentEnabled</span>() ? <span class="kw">undefined</span> : GENERAL_PURPOSE)
+<span class="kw">const</span> isForkPath = effectiveType === <span class="kw">undefined</span>
+
+<span class="kw">if</span> (isForkPath) {
+  <span class="com">// 递归 fork 防御:fork 子 agent 不能再 fork</span>
+  <span class="kw">if</span> (toolUseContext.options.querySource === <span class="str">'agent:builtin:fork'</span> ||
+      <span class="fn">isInForkChild</span>(toolUseContext.messages)) <span class="kw">throw</span>
+  selectedAgent = FORK_AGENT
+}</code></pre>
+
+      <h3>6.3 普通 subagent 路径</h3>
+      <p>大多数情况走这条路径。要做 4 重检查:</p>
+      <ol class="steps">
+        <li>
+          <strong>找 agent</strong>
+          <p><code>agents.find(a =&gt; a.agentType === effectiveType)</code></p>
+        </li>
+        <li>
+          <strong>权限过滤</strong>
+          <p><code>filterDeniedAgents</code> 检查 <code>Agent(name)</code> 形式的 deny 规则;
+          <code>allowedAgentTypes</code> 来自 <code>Agent(x,y)</code> 工具白名单。</p>
+        </li>
+        <li>
+          <strong>MCP 等待 + 检查</strong>
+          <p>如果 agent 定义了 <code>requiredMcpServers</code>,需要等 pending MCP 连接完成(最多 30s,500ms 轮询),
+          然后用实际有 tools 的 server 列表(server 必须是 connected + authenticated 才算)做匹配。</p>
+        </li>
+        <li>
+          <strong>isolation 处理</strong>
+          <p><code>worktree</code> 创建临时 git worktree;<code>remote</code>(ant-only)调 CCR 远端启动。</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="runagent">
+      <h2><span class="num">07</span>runAgent 流水线</h2>
+      <p class="lead"><span class="path">runAgent.ts</span> 是子 agent 真正"启动"的地方,也是整个系统最复杂的函数。它有 ~30 个步骤,每一步都解决一个具体问题。</p>
+
+      <h3>7.1 流水线全景</h3>
+      <figure>
+        <svg viewBox="0 0 920 760" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/>
+            </marker>
+          </defs>
+
+          <text x="460" y="20" text-anchor="middle" font-size="14" font-weight="700">runAgent 30 步流水线</text>
+
+          <!-- Stage 1: Setup -->
+          <rect x="50" y="40" width="820" height="120" rx="10" fill="#E5E8FE" stroke="#5769F7" stroke-width="1.5"/>
+          <text x="70" y="62" font-size="13" font-weight="700" fill="#5769F7">Stage 1 · Identity 设置</text>
+          <text x="70" y="80" font-size="11" fill="#1F1B17">① resolvedAgentModel ← getAgentModel(agentDef.model, parent.mainLoopModel, override.model, permissionMode)</text>
+          <text x="70" y="96" font-size="11" fill="#1F1B17">② agentId ← override.agentId ?? createAgentId()</text>
+          <text x="70" y="112" font-size="11" fill="#1F1B17">③ Perfetto trace 注册(可视化父子关系)</text>
+          <text x="70" y="128" font-size="11" fill="#1F1B17">④ contextMessages ← forkContextMessages 过滤掉孤儿 tool_use</text>
+          <text x="70" y="144" font-size="11" fill="#1F1B17">⑤ readFileState ← fork 时 clone 父,否则建空缓存</text>
+
+          <!-- Stage 2: Context -->
+          <rect x="50" y="170" width="820" height="100" rx="10" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1.5"/>
+          <text x="70" y="192" font-size="13" font-weight="700" fill="#5BA67A">Stage 2 · Context 裁剪</text>
+          <text x="70" y="210" font-size="11" fill="#1F1B17">⑥ baseUserContext = override ?? getUserContext()</text>
+          <text x="70" y="226" font-size="11" fill="#1F1B17">⑦ omitClaudeMd 时去掉 claudeMd(Explore/Plan 用,节省 ~5-15 Gtok/周)</text>
+          <text x="70" y="242" font-size="11" fill="#1F1B17">⑧ Explore/Plan 还要去掉 systemContext.gitStatus(stale 数据,可省 1-3 Gtok/周)</text>
+          <text x="70" y="258" font-size="11" fill="#1F1B17">⑨ permissionMode 覆盖逻辑(详见 8.2 节)</text>
+
+          <!-- Stage 3: Tools -->
+          <rect x="50" y="280" width="820" height="100" rx="10" fill="#F7ECD3" stroke="#D9A441" stroke-width="1.5"/>
+          <text x="70" y="302" font-size="13" font-weight="700" fill="#8a6520">Stage 3 · Tools 解析</text>
+          <text x="70" y="320" font-size="11" fill="#1F1B17">⑩ resolvedTools ← useExactTools ? availableTools : resolveAgentTools(agentDef, ...)</text>
+          <text x="70" y="336" font-size="11" fill="#1F1B17">⑪ MCP 服务器初始化(连接 + fetchTools)</text>
+          <text x="70" y="352" font-size="11" fill="#1F1B17">⑫ allTools ← uniqBy([resolvedTools, agentMcpTools], 'name')</text>
+          <text x="70" y="368" font-size="11" fill="#1F1B17">⑬ admin-trusted 检查(plugin/built-in/policy 才允许 frontmatter MCP)</text>
+
+          <!-- Stage 4: Prompt -->
+          <rect x="50" y="390" width="820" height="100" rx="10" fill="#F4E5DD" stroke="#D77757" stroke-width="1.5"/>
+          <text x="70" y="412" font-size="13" font-weight="700" fill="#B0552F">Stage 4 · Prompt 组装</text>
+          <text x="70" y="430" font-size="11" fill="#1F1B17">⑭ agentSystemPrompt = override.systemPrompt ?? getAgentSystemPrompt(agentDef, ...)</text>
+          <text x="70" y="446" font-size="11" fill="#1F1B17">⑮ enhanceSystemPromptWithEnvDetails 注入 cwd / OS / 日期 / 工作目录</text>
+          <text x="70" y="462" font-size="11" fill="#1F1B17">⑯ skills 预加载(getPromptForCommand 拿到内容,插入为 isMeta 用户消息)</text>
+          <text x="70" y="478" font-size="11" fill="#1F1B17">⑰ initialMessages = [...contextMessages, ...promptMessages, hookContext, skillsPrompts]</text>
+
+          <!-- Stage 5: Hooks -->
+          <rect x="50" y="500" width="820" height="80" rx="10" fill="#EDE7F8" stroke="#8B5CF6" stroke-width="1.5"/>
+          <text x="70" y="522" font-size="13" font-weight="700" fill="#8B5CF6">Stage 5 · Hooks 注册</text>
+          <text x="70" y="540" font-size="11" fill="#1F1B17">⑱ executeSubagentStartHooks(agentId, agentType) → 收集 additionalContexts</text>
+          <text x="70" y="556" font-size="11" fill="#1F1B17">⑲ registerFrontmatterHooks(...) — agent 生命周期内有效,Stop 转 SubagentStop</text>
+          <text x="70" y="572" font-size="11" fill="#1F1B17">⑳ admin-trusted gate 决定 frontmatter hooks 是否允许注册</text>
+
+          <!-- Stage 6: Run -->
+          <rect x="50" y="590" width="820" height="100" rx="10" fill="#D6F0ED" stroke="#2BA89E" stroke-width="1.5"/>
+          <text x="70" y="612" font-size="13" font-weight="700" fill="#2BA89E">Stage 6 · 执行</text>
+          <text x="70" y="630" font-size="11" fill="#1F1B17">㉑ createSubagentContext(parent, ...) — clone readFileState / contentReplacementState</text>
+          <text x="70" y="646" font-size="11" fill="#1F1B17">㉒ recordSidechainTranscript(initialMessages, agentId) — 持久化到 subagents/</text>
+          <text x="70" y="662" font-size="11" fill="#1F1B17">㉓ writeAgentMetadata(agentId, { agentType, worktreePath, description })</text>
+          <text x="70" y="678" font-size="11" fill="#1F1B17">㉔ for await (const message of query({ ... })) yield message — 进入 query loop</text>
+
+          <!-- Stage 7: Cleanup -->
+          <rect x="50" y="700" width="820" height="50" rx="10" fill="white" stroke="#1F1B17" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <text x="70" y="722" font-size="13" font-weight="700">Stage 7 · 清理</text>
+          <text x="70" y="740" font-size="11" fill="#1F1B17">㉕ mcpCleanup() — 清理 inline 定义的 MCP server · ㉖ unregisterPerfettoAgent · ㉗ clearSessionHooks · ㉘ clearInvokedSkillsForAgent</text>
+        </svg>
+        <figcaption>runAgent 30 步流水线:从 identity → context → tools → prompt → hooks → 执行 → 清理</figcaption>
+      </figure>
+
+      <h3>7.2 关键决策片段:abortController 选择</h3>
+      <pre><code><span class="com">// runAgent.ts:530</span>
+<span class="kw">const</span> agentAbortController = override?.abortController
+  ? override.abortController                <span class="com">// 显式覆盖优先</span>
+  : isAsync
+    ? <span class="kw">new</span> <span class="ty">AbortController</span>()              <span class="com">// 异步:全新独立 controller</span>
+    : toolUseContext.abortController         <span class="com">// 同步:共享父的</span></code></pre>
+      <p>这是<strong>同步/异步行为差异的根源</strong>:</p>
+      <ul>
+        <li>同步子 agent:用户按 Ctrl+C 中断主线程,会同时中断子 agent</li>
+        <li>异步子 agent:主线程被中断,子 agent 继续跑,需要显式 <code>kill</code></li>
+      </ul>
+
+      <h3>7.3 MCP 初始化的 admin-trusted 门控</h3>
+      <pre><code><span class="com">// runAgent.ts:117</span>
+<span class="kw">const</span> agentIsAdminTrusted = <span class="fn">isSourceAdminTrusted</span>(agentDefinition.source)
+<span class="kw">if</span> (<span class="fn">isRestrictedToPluginOnly</span>(<span class="str">'mcp'</span>) &amp;&amp; !agentIsAdminTrusted) {
+  <span class="com">// 用户级 agent + MCP 锁定为 plugin-only:跳过 frontmatter MCP</span>
+  <span class="kw">return</span> { clients: parentClients, tools: [], cleanup: <span class="fn">async</span>()=&gt;{} }
+}</code></pre>
+      <div class="box warn">
+        <div class="title">为什么这个 gate 重要</div>
+        企业策略可以锁定"只允许 plugin 提供的 MCP"。如果一刀切,plugin agent 自己定义的 MCP 也会被屏蔽,反而破坏功能。
+        所以 gate 在这里检查 agent 来源:built-in / plugin / policy 算 admin-trusted,放行;只有 user/project 自定义 agent 被屏蔽。
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="context">
+      <h2><span class="num">08</span>上下文隔离与共享</h2>
+      <p class="lead">子 agent 既要从父继承够用的环境信息(避免重新发现成本),又要保证错误不污染父。createSubagentContext 是这个权衡的关键。</p>
+
+      <h3>8.1 隔离 vs 共享对照</h3>
+      <table>
+        <thead><tr><th>状态</th><th>同步 subagent</th><th>异步 subagent</th><th>fork</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>readFileState</td>
+            <td><span class="lbl info">克隆</span></td>
+            <td><span class="lbl info">克隆</span></td>
+            <td><span class="lbl info">克隆</span></td>
+          </tr>
+          <tr>
+            <td>contentReplacementState</td>
+            <td><span class="lbl info">克隆</span></td>
+            <td><span class="lbl info">克隆</span></td>
+            <td><span class="lbl info">克隆</span>(关键:cache 共享必须克隆)</td>
+          </tr>
+          <tr>
+            <td>setAppState</td>
+            <td><span class="lbl warn">共享</span> shareSetAppState=true</td>
+            <td><span class="lbl fail">独立</span></td>
+            <td><span class="lbl warn">共享</span></td>
+          </tr>
+          <tr>
+            <td>abortController</td>
+            <td><span class="lbl warn">共享父的</span></td>
+            <td><span class="lbl fail">全新独立</span></td>
+            <td>取决于 isAsync</td>
+          </tr>
+          <tr>
+            <td>messages</td>
+            <td><span class="lbl fail">独立</span> 仅 promptMessages</td>
+            <td><span class="lbl fail">独立</span></td>
+            <td><span class="lbl ok">完整继承</span> forkContextMessages</td>
+          </tr>
+          <tr>
+            <td>system prompt</td>
+            <td><span class="lbl fail">独立</span> 用 agent 自己的</td>
+            <td><span class="lbl fail">独立</span></td>
+            <td><span class="lbl ok">继承父的</span></td>
+          </tr>
+          <tr>
+            <td>tools</td>
+            <td><span class="lbl fail">独立</span> agent 定义</td>
+            <td><span class="lbl fail">独立</span></td>
+            <td><span class="lbl ok">继承父的</span> useExactTools</td>
+          </tr>
+          <tr>
+            <td>thinkingConfig</td>
+            <td><span class="lbl fail">disabled</span></td>
+            <td><span class="lbl fail">disabled</span></td>
+            <td><span class="lbl ok">继承父的</span></td>
+          </tr>
+          <tr>
+            <td>MCP clients</td>
+            <td><span class="lbl warn">合并</span> parent + agent 私有</td>
+            <td><span class="lbl warn">合并</span></td>
+            <td><span class="lbl warn">合并</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>8.2 permissionMode 覆盖规则</h3>
+      <pre><code><span class="com">// runAgent.ts:421</span>
+<span class="com">// agent 定义了 permissionMode 时覆盖,但有 3 种模式不可被覆盖</span>
+<span class="kw">if</span> (
+  agentPermissionMode &amp;&amp;
+  state.toolPermissionContext.mode !== <span class="str">'bypassPermissions'</span> &amp;&amp;
+  state.toolPermissionContext.mode !== <span class="str">'acceptEdits'</span> &amp;&amp;
+  !(<span class="fn">feature</span>(<span class="str">'TRANSCRIPT_CLASSIFIER'</span>) &amp;&amp; state.toolPermissionContext.mode === <span class="str">'auto'</span>)
+) {
+  toolPermissionContext = { ...toolPermissionContext, mode: agentPermissionMode }
+}</code></pre>
+      <div class="box info">
+        <div class="title">为什么这三种模式特殊</div>
+        <ul>
+          <li><strong>bypassPermissions</strong>:用户已经接受了"全开"风险,子 agent 不应该退回更严格</li>
+          <li><strong>acceptEdits</strong>:用户已经允许编辑,不该回退</li>
+          <li><strong>auto</strong>(transcript classifier):自动分类器在管控,agent 自己的 mode 不该越权</li>
+        </ul>
+        <strong>原则:子 agent 只能<em>提升</em>限制,不能<em>降低</em>限制</strong>。
+      </div>
+
+      <h3>8.3 shouldAvoidPermissionPrompts 自动设置</h3>
+      <pre><code><span class="com">// runAgent.ts:446</span>
+<span class="kw">const</span> shouldAvoidPrompts = canShowPermissionPrompts !== <span class="kw">undefined</span>
+  ? !canShowPermissionPrompts
+  : agentPermissionMode === <span class="str">'bubble'</span>
+    ? <span class="kw">false</span>     <span class="com">// bubble 模式总是允许显示提示(冒泡到父终端)</span>
+    : isAsync   <span class="com">// 默认:同步可显示,异步自动拒绝</span></code></pre>
+      <p>异步 agent 在后台跑,UI 上没有交互入口,所以不能显示权限对话框 → 默认 deny;
+      bubble 模式特殊,允许把权限提示<strong>冒泡</strong>到父 agent 的终端处理。</p>
+
+      <h3>8.4 awaitAutomatedChecksBeforeDialog</h3>
+      <pre><code><span class="kw">if</span> (isAsync &amp;&amp; !shouldAvoidPrompts) {
+  toolPermissionContext = {
+    ...toolPermissionContext,
+    awaitAutomatedChecksBeforeDialog: <span class="kw">true</span>,
+  }
+}</code></pre>
+      <p>异步 + 允许提示的特殊场景(bubble):权限对话框前先等所有自动检查(分类器、permission hooks)跑完。
+      因为后台 agent 不该频繁打扰用户,用户只在自动化无法决策时才被打扰。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="tools-filter">
+      <h2><span class="num">09</span>工具过滤三层机制</h2>
+      <p class="lead">每个 agent 看到的 tools 列表都不同,这是通过三层过滤合成的。</p>
+
+      <h3>9.1 第 1 层:assembleToolPool 重组</h3>
+      <pre><code><span class="com">// AgentTool.tsx:840 — worker 总是用自己的 permissionMode 重组</span>
+<span class="kw">const</span> workerPermissionContext = {
+  ...appState.toolPermissionContext,
+  mode: selectedAgent.permissionMode ?? <span class="str">'acceptEdits'</span>,
+}
+<span class="kw">const</span> workerTools = <span class="fn">assembleToolPool</span>(workerPermissionContext, appState.mcp.tools)</code></pre>
+      <p>核心点:<strong>worker 的工具池跟 parent 的限制无关</strong>。即使父被限制成"只能 Read",子 agent 仍按自己的 permissionMode 重新组装 —— acceptEdits 默认开放 Edit/Write。</p>
+
+      <h3>9.2 第 2 层:filterToolsForAgent</h3>
+      <pre><code><span class="com">// agentToolUtils.ts:70</span>
+<span class="kw">function</span> <span class="fn">filterToolsForAgent</span>({ tools, isBuiltIn, isAsync, permissionMode }) {
+  <span class="kw">return</span> tools.<span class="fn">filter</span>(tool =&gt; {
+    <span class="kw">if</span> (tool.name.<span class="fn">startsWith</span>(<span class="str">'mcp__'</span>)) <span class="kw">return</span> <span class="kw">true</span>     <span class="com">// MCP 全放</span>
+
+    <span class="com">// plan mode 例外:ExitPlanMode 必须可用</span>
+    <span class="kw">if</span> (<span class="fn">toolMatchesName</span>(tool, EXIT_PLAN_MODE_V2_TOOL_NAME) &amp;&amp; permissionMode === <span class="str">'plan'</span>) <span class="kw">return</span> <span class="kw">true</span>
+
+    <span class="com">// 所有 agent 都禁止的:TaskOutput, EnterPlanMode, AskUserQuestion, TaskStop, (非 ant 还禁 Agent)</span>
+    <span class="kw">if</span> (ALL_AGENT_DISALLOWED_TOOLS.<span class="fn">has</span>(tool.name)) <span class="kw">return</span> <span class="kw">false</span>
+
+    <span class="com">// custom agent 额外禁止</span>
+    <span class="kw">if</span> (!isBuiltIn &amp;&amp; CUSTOM_AGENT_DISALLOWED_TOOLS.<span class="fn">has</span>(tool.name)) <span class="kw">return</span> <span class="kw">false</span>
+
+    <span class="com">// async 只能用白名单(in-process teammate 例外)</span>
+    <span class="kw">if</span> (isAsync &amp;&amp; !ASYNC_AGENT_ALLOWED_TOOLS.<span class="fn">has</span>(tool.name)) {
+      <span class="kw">if</span> (<span class="fn">isInProcessTeammate</span>()) {
+        <span class="kw">if</span> (<span class="fn">toolMatchesName</span>(tool, AGENT_TOOL_NAME)) <span class="kw">return</span> <span class="kw">true</span>
+        <span class="kw">if</span> (IN_PROCESS_TEAMMATE_ALLOWED_TOOLS.<span class="fn">has</span>(tool.name)) <span class="kw">return</span> <span class="kw">true</span>
+      }
+      <span class="kw">return</span> <span class="kw">false</span>
+    }
+    <span class="kw">return</span> <span class="kw">true</span>
+  })
+}</code></pre>
+
+      <h3>9.3 三套黑/白名单</h3>
+      <table>
+        <thead><tr><th>名单</th><th>包含</th><th>用途</th></tr></thead>
+        <tbody>
+        <tr>
+          <td><code>ALL_AGENT_DISALLOWED_TOOLS</code></td>
+          <td>TaskOutput, ExitPlanMode, EnterPlanMode, AskUserQuestion, TaskStop, Agent(非ant), Workflow(非ant)</td>
+          <td>所有 agent 都不可用 — 这些是"主线程协调"工具</td>
+        </tr>
+        <tr>
+          <td><code>ASYNC_AGENT_ALLOWED_TOOLS</code></td>
+          <td>FileRead, WebSearch, TodoWrite, Grep, WebFetch, Glob, Bash/PowerShell, Edit, Write, NotebookEdit, Skill, ToolSearch, EnterWorktree, ExitWorktree</td>
+          <td>异步 agent 的<strong>白名单</strong> — 没有 UI 交互的工具才能用</td>
+        </tr>
+        <tr>
+          <td><code>IN_PROCESS_TEAMMATE_ALLOWED_TOOLS</code></td>
+          <td>TaskCreate/Get/List/Update, SendMessage, CronCreate/Delete/List</td>
+          <td>同进程 teammate 的额外白名单 — 协作所需</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>9.4 第 3 层:resolveAgentTools</h3>
+      <pre><code><span class="com">// agentToolUtils.ts:122 — 根据 agentDef 的 tools / disallowedTools 收窄</span>
+<span class="kw">function</span> <span class="fn">resolveAgentTools</span>(agentDef, availableTools, isAsync) {
+  <span class="kw">const</span> filtered = <span class="fn">filterToolsForAgent</span>({ tools: availableTools, ... })
+  <span class="kw">const</span> denyOnly = filtered.<span class="fn">filter</span>(t =&gt; !disallowedTools.<span class="fn">has</span>(t.name))
+
+  <span class="com">// tools 字段处理</span>
+  <span class="kw">if</span> (agentTools === <span class="kw">undefined</span> || agentTools[<span class="num">0</span>] === <span class="str">'*'</span>) {
+    <span class="kw">return</span> { hasWildcard: <span class="kw">true</span>, resolvedTools: denyOnly }
+  }
+
+  <span class="com">// 有 allowlist:只放白名单里的</span>
+  <span class="kw">for</span> (<span class="kw">const</span> spec <span class="kw">of</span> agentTools) {
+    <span class="kw">const</span> { toolName, ruleContent } = <span class="fn">permissionRuleValueFromString</span>(spec)
+    <span class="com">// 特殊:Agent(name1, name2) 携带 allowedAgentTypes 元信息</span>
+    <span class="kw">if</span> (toolName === AGENT_TOOL_NAME &amp;&amp; ruleContent) {
+      allowedAgentTypes = ruleContent.<span class="fn">split</span>(<span class="str">','</span>).<span class="fn">map</span>(s =&gt; s.<span class="fn">trim</span>())
+    }
+    <span class="kw">const</span> tool = availableToolMap.<span class="fn">get</span>(toolName)
+    <span class="kw">if</span> (tool) resolved.<span class="fn">push</span>(tool)
+  }
+  <span class="kw">return</span> { resolvedTools: resolved, allowedAgentTypes, ... }
+}</code></pre>
+
+      <h3>9.5 Agent(x,y) 元信息特殊处理</h3>
+      <p>当 frontmatter 写 <code>tools: ['Agent(researcher,reviewer)']</code> 时,这是说"允许该 agent 调用 Agent 工具,但只能派 researcher 和 reviewer 两种"。
+      <code>resolveAgentTools</code> 提取这个元信息,设置到 <code>allowedAgentTypes</code>,后续 AgentTool.call() 会用它过滤可派 agent 列表。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="sysprompt">
+      <h2><span class="num">10</span>系统提示组装</h2>
+      <p class="lead">每个 agent 的 system prompt 都是动态拼接的,包含 agent 自己的 prompt + 环境细节 + 可选的 hook 上下文。</p>
+
+      <h3>10.1 普通路径(非 fork)</h3>
+      <pre><code><span class="com">// AgentTool.tsx:765</span>
+<span class="kw">const</span> agentPrompt = selectedAgent.<span class="fn">getSystemPrompt</span>({ toolUseContext })
+
+<span class="com">// 注入环境细节</span>
+<span class="kw">const</span> enhancedSystemPrompt = <span class="kw">await</span> <span class="fn">enhanceSystemPromptWithEnvDetails</span>(
+  [agentPrompt],
+  resolvedAgentModel,
+  additionalWorkingDirectories,
+)
+<span class="com">// enhancedSystemPrompt 现在含:</span>
+<span class="com">//   - agent 自己的 prompt</span>
+<span class="com">//   - cwd / 平台 / 日期 / shell / Git 信息</span>
+<span class="com">//   - additional working directories</span>
+<span class="com">//   - 绝对路径要求 / 表情使用约束</span></code></pre>
+
+      <h3>10.2 fork 路径(继承父的)</h3>
+      <pre><code><span class="com">// AgentTool.tsx:729</span>
+<span class="kw">if</span> (isForkPath) {
+  <span class="kw">if</span> (toolUseContext.renderedSystemPrompt) {
+    <span class="com">// 已经渲染过的字节,完全继承(用于 cache 命中)</span>
+    forkParentSystemPrompt = toolUseContext.renderedSystemPrompt
+  } <span class="kw">else</span> {
+    <span class="com">// fallback:重新构建(可能因 GrowthBook 翻转而和父不一致)</span>
+    forkParentSystemPrompt = <span class="fn">buildEffectiveSystemPrompt</span>({
+      mainThreadAgentDefinition, toolUseContext, ...
+    })
+  }
+}</code></pre>
+      <div class="box note">
+        <div class="title">renderedSystemPrompt 的妙用</div>
+        父 agent 在第一次调用 query() 时已经把 system prompt 渲染成最终字节,缓存在
+        <code>toolUseContext.renderedSystemPrompt</code> 里。fork 子 agent 直接拿这个字节复用,
+        保证 API 请求前缀字节级一致 → prompt cache 100% 命中。
+        <strong>重新调 getSystemPrompt 可能因 GrowthBook 翻转产生差异</strong>,bust cache。
+      </div>
+
+      <h3>10.3 SubagentStart hook 注入</h3>
+      <pre><code><span class="com">// runAgent.ts:551</span>
+<span class="kw">if</span> (additionalContexts.length &gt; <span class="num">0</span>) {
+  <span class="kw">const</span> contextMessage = <span class="fn">createAttachmentMessage</span>({
+    type: <span class="str">'hook_additional_context'</span>,
+    content: additionalContexts,
+    hookName: <span class="str">'SubagentStart'</span>,
+    hookEvent: <span class="str">'SubagentStart'</span>,
+  })
+  initialMessages.<span class="fn">push</span>(contextMessage)    <span class="com">// 作为第一条用户消息</span>
+}</code></pre>
+      <p>用户配置的 SubagentStart hook 可以注入自定义上下文,比如"当前在 git branch X 上"、"昨天发生了 deploy"等。
+      这些不是改 system prompt(避免 cache miss),而是作为<strong>附件用户消息</strong>插在 promptMessages 之前。</p>
+
+      <h3>10.4 critical system reminder(实验)</h3>
+      <pre><code>criticalSystemReminder_EXPERIMENTAL?: <span class="ty">string</span></code></pre>
+      <p>agent 定义里如果写了这个字段,内容会在<strong>每个用户回合</strong>都重新注入(通过 attachment 管线)。
+      用于"必须每轮都强调"的关键约束,比如"严禁运行 rm -rf"、"必须先 plan 再 implement"。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="sync-async">
+      <h2><span class="num">11</span>同步 vs 异步执行</h2>
+      <p class="lead">两种执行模式有完全不同的生命周期、通信方式、UI 行为。理解差异是用对工具的关键。</p>
+
+      <h3>11.1 决策树:shouldRunAsync</h3>
+      <pre><code><span class="com">// AgentTool.tsx:827</span>
+<span class="kw">const</span> shouldRunAsync = (
+  run_in_background === <span class="kw">true</span> ||                  <span class="com">// 用户显式</span>
+  selectedAgent.background === <span class="kw">true</span> ||              <span class="com">// agent 定义强制</span>
+  isCoordinator ||                                  <span class="com">// coordinator 模式</span>
+  forceAsync ||                                     <span class="com">// fork gate(所有 spawn 都 async)</span>
+  assistantForceAsync ||                            <span class="com">// KAIROS 助理模式</span>
+  (proactiveModule?.<span class="fn">isProactiveActive</span>() ?? <span class="kw">false</span>)     <span class="com">// proactive agent</span>
+) &amp;&amp; !isBackgroundTasksDisabled</code></pre>
+
+      <h3>11.2 同步路径详解</h3>
+      <ol class="steps">
+        <li>
+          <strong>registerAgentForeground</strong>
+          <p>注册 task 状态(可选自动后台化超时);返回 backgroundSignal Promise。</p>
+        </li>
+        <li>
+          <strong>runAgent 流式消费</strong>
+          <p><code>for await (const message of runAgent(...))</code>;同时 race backgroundPromise。</p>
+        </li>
+        <li>
+          <strong>~2s 超时显示 BackgroundHint</strong>
+          <p><code>PROGRESS_THRESHOLD_MS = 2000</code>,UI 提示"按 Ctrl+B 后台化"。</p>
+        </li>
+        <li>
+          <strong>用户主动后台化(可选)</strong>
+          <p>backgroundPromise resolve → 切换到异步路径,主线程立即返回。</p>
+        </li>
+        <li>
+          <strong>正常完成</strong>
+          <p>finalizeAgentTool 提取最后 assistant 消息文本作为结果,作为 tool_result 返回。</p>
+        </li>
+      </ol>
+
+      <h3>11.3 异步路径详解</h3>
+      <ol class="steps">
+        <li>
+          <strong>registerAsyncAgent</strong>
+          <p>注册 LocalAgentTaskState(status: 'running');立即返回 taskId 给主 agent。</p>
+        </li>
+        <li>
+          <strong>void runWithAgentContext(...)</strong>
+          <p>fire-and-forget 启动一个独立 lifecycle。AsyncLocalStorage 自动捕获父的 workload。</p>
+        </li>
+        <li>
+          <strong>tool_result 返回 async_launched</strong>
+          <p>主 agent 拿到 <code>{ status: 'async_launched', agentId, outputFile }</code>,可以继续做别的。</p>
+        </li>
+        <li>
+          <strong>子 agent 在后台跑</strong>
+          <p>每条 message 都通过 onCacheSafeParams 触发 startAgentSummarization;同时<strong>实时写入 outputFile</strong>。</p>
+        </li>
+        <li>
+          <strong>子 agent 完成</strong>
+          <p>completeAsyncAgent 标记状态;classifyHandoffIfNeeded 跑一次 transcript classifier。</p>
+        </li>
+        <li>
+          <strong>enqueueAgentNotification</strong>
+          <p>通过 messageQueueManager 把 <code>&lt;task-notification&gt;</code> XML 入队,priority='later'。</p>
+        </li>
+        <li>
+          <strong>queryLoop 下一回合排空</strong>
+          <p>主 agent 的 query loop 在合适时机消费,作为附件喂给主 agent,主 agent 知道"agent X 完成了"。</p>
+        </li>
+      </ol>
+
+      <h3>11.4 异步通知 XML 结构</h3>
+      <pre><code><span class="com">// LocalAgentTask.tsx:342</span>
+&lt;task-notification&gt;
+  &lt;task-id&gt;agent_xyz&lt;/task-id&gt;
+  &lt;tool-use-id&gt;toolu_abc&lt;/tool-use-id&gt;
+  &lt;output-file&gt;~/.claude/sessions/.../subagents/xyz.jsonl&lt;/output-file&gt;
+  &lt;status&gt;completed&lt;/status&gt;
+  &lt;summary&gt;Agent "Audit security review" completed&lt;/summary&gt;
+  &lt;result&gt;Found 3 OWASP issues: ...&lt;/result&gt;
+  &lt;usage&gt;
+    &lt;total-tokens&gt;12345&lt;/total-tokens&gt;
+    &lt;tool-uses&gt;42&lt;/tool-uses&gt;
+    &lt;duration-ms&gt;180000&lt;/duration-ms&gt;
+  &lt;/usage&gt;
+  &lt;worktree&gt;
+    &lt;worktree-path&gt;/tmp/agent-xyz-worktree&lt;/worktree-path&gt;
+    &lt;worktree-branch&gt;agent-xyz&lt;/worktree-branch&gt;
+  &lt;/worktree&gt;
+&lt;/task-notification&gt;</code></pre>
+
+      <div class="box info">
+        <div class="title">priority='later' 的设计意图</div>
+        通知不能<strong>抢占</strong>用户输入。如果用户正在打字,新通知不应该插队;
+        而是等当前 user turn 处理完后,在<strong>下一回合</strong>开始时被排空。
+        这样保证用户视角的连续性:"我打完字按回车 → 模型先看到我的话,再看到通知"。
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="fork">
+      <h2><span class="num">12</span>Fork Subagent 缓存共享</h2>
+      <p class="lead">Fork 是个非常聪明的优化:不重新发起一个独立 agent,而是<strong>复制父的当前状态</strong>派生一个分身。
+      关键技巧是"字节级前缀一致" → prompt cache 100% 命中。</p>
+
+      <h3>12.1 启用条件</h3>
+      <pre><code><span class="com">// forkSubagent.ts:32</span>
+<span class="kw">function</span> <span class="fn">isForkSubagentEnabled</span>(): <span class="ty">boolean</span> {
+  <span class="kw">if</span> (<span class="fn">feature</span>(<span class="str">'FORK_SUBAGENT'</span>)) {
+    <span class="kw">if</span> (<span class="fn">isCoordinatorMode</span>()) <span class="kw">return</span> <span class="kw">false</span>      <span class="com">// 与 coordinator 互斥</span>
+    <span class="kw">if</span> (<span class="fn">getIsNonInteractiveSession</span>()) <span class="kw">return</span> <span class="kw">false</span>  <span class="com">// SDK 不用</span>
+    <span class="kw">return</span> <span class="kw">true</span>
+  }
+  <span class="kw">return</span> <span class="kw">false</span>
+}</code></pre>
+
+      <h3>12.2 buildForkedMessages 如何构造继承上下文</h3>
+      <figure>
+        <svg viewBox="0 0 920 380" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/>
+            </marker>
+          </defs>
+
+          <!-- parent state -->
+          <rect x="40" y="30" width="380" height="160" rx="10" fill="#E5E8FE" stroke="#5769F7" stroke-width="1.5"/>
+          <text x="60" y="55" font-size="13" font-weight="700" fill="#5769F7">父 agent 当前状态</text>
+          <text x="60" y="78" font-size="11" font-family="monospace" fill="#1F1B17">[user] 用户问题</text>
+          <text x="60" y="94" font-size="11" font-family="monospace" fill="#1F1B17">[assistant] 思考...</text>
+          <text x="60" y="110" font-size="11" font-family="monospace" fill="#1F1B17">[user] 工具结果</text>
+          <text x="60" y="126" font-size="11" font-family="monospace" fill="#1F1B17">[assistant] thinking + 几个 tool_use</text>
+          <text x="60" y="146" font-size="11" font-family="monospace" fill="#1F1B17">  - tool_use(Read, id:t1)</text>
+          <text x="60" y="162" font-size="11" font-family="monospace" fill="#1F1B17">  - tool_use(Agent, id:t2) ← fork 的 tool_use</text>
+          <text x="60" y="178" font-size="11" font-family="monospace" fill="#1F1B17">  - tool_use(Bash, id:t3)</text>
+
+          <line x1="420" y1="120" x2="500" y2="120" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow4)"/>
+          <text x="460" y="110" text-anchor="middle" font-size="11" fill="#4A413A">buildForkedMessages</text>
+
+          <!-- fork child state -->
+          <rect x="500" y="30" width="380" height="320" rx="10" fill="#F4E5DD" stroke="#D77757" stroke-width="1.5"/>
+          <text x="520" y="55" font-size="13" font-weight="700" fill="#B0552F">子 fork agent 初始消息</text>
+
+          <text x="520" y="80" font-size="11" font-family="monospace" fill="#1F1B17">[user] 用户问题</text>
+          <text x="520" y="96" font-size="11" font-family="monospace" fill="#1F1B17">[assistant] 思考...</text>
+          <text x="520" y="112" font-size="11" font-family="monospace" fill="#1F1B17">[user] 工具结果</text>
+          <text x="520" y="128" font-size="11" font-family="monospace" fill="#1F1B17">[assistant] thinking + 全部 tool_use ←完整克隆</text>
+          <text x="520" y="148" font-size="11" font-family="monospace" fill="#1F1B17">  - tool_use(Read, id:t1)</text>
+          <text x="520" y="164" font-size="11" font-family="monospace" fill="#1F1B17">  - tool_use(Agent, id:t2)</text>
+          <text x="520" y="180" font-size="11" font-family="monospace" fill="#1F1B17">  - tool_use(Bash, id:t3)</text>
+
+          <text x="520" y="206" font-size="11" font-family="monospace" fill="#5BA67A">[user]</text>
+          <text x="520" y="222" font-size="11" font-family="monospace" fill="#5BA67A">  - tool_result(t1, "Fork started — processing")</text>
+          <text x="520" y="238" font-size="11" font-family="monospace" fill="#5BA67A">  - tool_result(t2, "Fork started — processing")</text>
+          <text x="520" y="254" font-size="11" font-family="monospace" fill="#5BA67A">  - tool_result(t3, "Fork started — processing")</text>
+          <text x="520" y="270" font-size="11" font-family="monospace" fill="#5BA67A">  - text: ←per-child directive</text>
+          <text x="520" y="286" font-size="10" font-family="monospace" fill="#87796F">    &lt;fork-boilerplate&gt;...规则...&lt;/fork-boilerplate&gt;</text>
+          <text x="520" y="300" font-size="10" font-family="monospace" fill="#87796F">    [DIRECTIVE]: 实际任务文本</text>
+
+          <text x="520" y="324" font-size="10" fill="#B0552F" font-style="italic">⚠ 唯一不同的就是最后这段 text — 前缀 100% cache 命中</text>
+        </svg>
+        <figcaption>fork 构造原则:历史完全克隆,所有 tool_use 都补占位 tool_result,只有最后的 directive 文本不同</figcaption>
+      </figure>
+
+      <h3>12.3 占位 tool_result 的关键</h3>
+      <pre><code><span class="com">// forkSubagent.ts:93</span>
+<span class="kw">const</span> FORK_PLACEHOLDER_RESULT = <span class="str">'Fork started — processing in background'</span>
+
+<span class="com">// 给 assistant message 里的每个 tool_use 都补一个占位 tool_result</span>
+<span class="kw">const</span> toolResultBlocks = toolUseBlocks.<span class="fn">map</span>(block =&gt; ({
+  type: <span class="str">'tool_result'</span>,
+  tool_use_id: block.id,
+  content: [{ type: <span class="str">'text'</span>, text: FORK_PLACEHOLDER_RESULT }],   <span class="com">// 字节相同</span>
+}))</code></pre>
+      <p>所有 fork 子 agent 看到的占位 tool_result 文本完全相同 → prompt cache 共享率最大化。</p>
+
+      <h3>12.4 fork-boilerplate directive 的 10 条铁律</h3>
+      <pre><code>STOP. READ THIS FIRST.
+
+You are a forked worker process. You are NOT the main agent.
+
+RULES (non-negotiable):
+1. Your system prompt says "default to forking." IGNORE IT — that's for the parent. You ARE the fork.
+2. Do NOT converse, ask questions, or suggest next steps
+3. Do NOT editorialize or add meta-commentary
+4. USE your tools directly: Bash, Read, Write, etc.
+5. If you modify files, commit your changes before reporting. Include the commit hash.
+6. Do NOT emit text between tool calls. Use tools silently, then report once at the end.
+7. Stay strictly within your directive's scope.
+8. Keep your report under 500 words unless the directive specifies otherwise.
+9. Your response MUST begin with "Scope:". No preamble.
+10. REPORT structured facts, then stop</code></pre>
+
+      <h3>12.5 递归 fork 防御</h3>
+      <pre><code><span class="com">// AgentTool.tsx:495</span>
+<span class="kw">if</span> (
+  toolUseContext.options.querySource === <span class="str">'agent:builtin:fork'</span> ||  <span class="com">// 主防线</span>
+  <span class="fn">isInForkChild</span>(toolUseContext.messages)                          <span class="com">// 备防线:扫描历史</span>
+) {
+  <span class="kw">throw new</span> <span class="ty">Error</span>(<span class="str">'Fork is not available inside a forked worker.'</span>)
+}</code></pre>
+      <p><strong>主防线</strong>:querySource 在 spawn 时设置,autocompact 不会改 options 只会改 messages,所以这个值<strong>抗压缩</strong>。
+      <strong>备防线</strong>:扫描消息历史找 fork-boilerplate 标签 —— 但 autocompact 可能压掉这条标签消息,所以是 fallback。</p>
+
+      <h3>12.6 useExactTools 的字节一致性</h3>
+      <pre><code><span class="com">// AgentTool.tsx:906</span>
+availableTools: isForkPath ? toolUseContext.options.tools : workerTools,
+...(isForkPath &amp;&amp; { useExactTools: <span class="kw">true</span> }),</code></pre>
+      <p>fork 子 agent 直接用<strong>父的 tools 数组引用</strong>,不重新组装。原因:即使工具集相同,
+      重新 assemble 出来的工具顺序、序列化字节都可能微小差异 → 破坏 prompt cache。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="worktree">
+      <h2><span class="num">13</span>Worktree 隔离</h2>
+      <p class="lead">isolation: 'worktree' 让子 agent 在<strong>独立 git worktree</strong> 工作 —— 同一个 repo,但不同的工作副本。这是"探索性修改"的最佳工具。</p>
+
+      <h3>13.1 工作流程</h3>
+      <pre><code><span class="com">// AgentTool.tsx:861</span>
+<span class="kw">if</span> (effectiveIsolation === <span class="str">'worktree'</span>) {
+  <span class="kw">const</span> slug = <span class="str">`agent-${earlyAgentId.slice(0, 8)}`</span>
+  worktreeInfo = <span class="kw">await</span> <span class="fn">createAgentWorktree</span>(slug)
+  <span class="com">// worktreeInfo = { worktreePath, worktreeBranch, headCommit, gitRoot }</span>
+}</code></pre>
+
+      <h3>13.2 cwd 自动切换</h3>
+      <pre><code><span class="kw">const</span> cwdOverridePath = cwd ?? worktreeInfo?.worktreePath
+<span class="kw">const</span> wrapWithCwd = (fn) =&gt; cwdOverridePath
+  ? <span class="fn">runWithCwdOverride</span>(cwdOverridePath, fn)
+  : <span class="fn">fn</span>()</code></pre>
+      <p><code>runWithCwdOverride</code> 用 AsyncLocalStorage 给 agent 整个生命周期注入新的 cwd。
+      所有 <code>getCwd()</code> 调用(file 工具、shell)都会拿到 worktree 路径。</p>
+
+      <h3>13.3 自动清理逻辑</h3>
+      <pre><code><span class="com">// AgentTool.tsx:921</span>
+<span class="kw">const</span> cleanupWorktreeIfNeeded = <span class="kw">async</span> () =&gt; {
+  <span class="kw">if</span> (!worktreeInfo) <span class="kw">return</span> {}
+  <span class="kw">const</span> { worktreePath, worktreeBranch, headCommit, gitRoot, hookBased } = worktreeInfo
+
+  <span class="kw">if</span> (hookBased) <span class="kw">return</span> { worktreePath }    <span class="com">// hook 创建的不自动删</span>
+
+  <span class="kw">if</span> (headCommit) {
+    <span class="kw">const</span> changed = <span class="kw">await</span> <span class="fn">hasWorktreeChanges</span>(worktreePath, headCommit)
+    <span class="kw">if</span> (!changed) {
+      <span class="kw">await</span> <span class="fn">removeAgentWorktree</span>(worktreePath, worktreeBranch, gitRoot)
+      <span class="kw">return</span> {}
+    }
+  }
+  <span class="kw">return</span> { worktreePath, worktreeBranch }    <span class="com">// 有改动:保留路径,通知父</span>
+}</code></pre>
+      <div class="box ok">
+        <div class="title">"无改动自动清理"的好处</div>
+        探索任务大部分会失败或得到结论但不需要保留代码。自动清理减少了用户手动 <code>git worktree remove</code> 的负担。
+        但如果<strong>有未提交改动</strong>,会自动保留 + 把路径返回给父 agent,让父决定怎么处理(merge / cherry-pick / 丢弃)。
+      </div>
+
+      <h3>13.4 fork + worktree 组合</h3>
+      <pre><code><span class="com">// AgentTool.tsx:869</span>
+<span class="kw">if</span> (isForkPath &amp;&amp; worktreeInfo) {
+  promptMessages.<span class="fn">push</span>(<span class="fn">createUserMessage</span>({
+    content: <span class="fn">buildWorktreeNotice</span>(<span class="fn">getCwd</span>(), worktreeInfo.worktreePath),
+  }))
+}</code></pre>
+      <p>注入一条提示给 fork 子 agent:</p>
+      <blockquote style="border-left: 3px solid var(--orange); padding-left: 16px; color: var(--gray-700); font-size: 14px;">
+        You've inherited the conversation context above from a parent agent working in <code>{parentCwd}</code>.
+        You are operating in an isolated git worktree at <code>{worktreeCwd}</code> — same repository,
+        same relative file structure, separate working copy. <strong>Paths in the inherited context refer to the parent's
+        working directory; translate them to your worktree root.</strong> Re-read files before editing if the parent
+        may have modified them since they appear in the context. Your changes stay in this worktree and will not affect the parent's files.
+      </blockquote>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="swarm">
+      <h2><span class="num">14</span>Swarm 团队架构</h2>
+      <p class="lead">Swarm 是 swarm 模式 + 多 Claude 进程 + 文件系统的组合。它把"多 agent"从同进程协作扩展到<strong>跨进程、跨 pane、跨机器</strong>。</p>
+
+      <h3>14.1 创建团队 (TeamCreate)</h3>
+      <pre><code><span class="com">// TeamCreateTool.ts:155 — 创建团队的 5 步</span>
+
+<span class="com">// 1. 写团队配置文件</span>
+<span class="kw">const</span> teamFile: <span class="ty">TeamFile</span> = {
+  name: finalTeamName,
+  createdAt: <span class="ty">Date</span>.<span class="fn">now</span>(),
+  leadAgentId,
+  leadSessionId: <span class="fn">getSessionId</span>(),
+  members: [{
+    agentId: leadAgentId,
+    name: TEAM_LEAD_NAME,        <span class="com">// 'team-lead'</span>
+    agentType: leadAgentType,
+    model: leadModel,
+    joinedAt: <span class="ty">Date</span>.<span class="fn">now</span>(),
+    tmuxPaneId: <span class="str">''</span>,
+    cwd: <span class="fn">getCwd</span>(),
+    subscriptions: [],
+  }],
+}
+<span class="kw">await</span> <span class="fn">writeTeamFileAsync</span>(finalTeamName, teamFile)
+<span class="com">// → ~/.claude/teams/&lt;name&gt;/config.json</span>
+
+<span class="com">// 2. 注册 session-end 清理</span>
+<span class="fn">registerTeamForSessionCleanup</span>(finalTeamName)
+
+<span class="com">// 3. 重置任务列表(team = task list)</span>
+<span class="kw">const</span> taskListId = <span class="fn">sanitizeName</span>(finalTeamName)
+<span class="kw">await</span> <span class="fn">resetTaskList</span>(taskListId)
+<span class="kw">await</span> <span class="fn">ensureTasksDir</span>(taskListId)
+
+<span class="com">// 4. 设置 leader 的 teamName(让 getTaskListId 返回它)</span>
+<span class="fn">setLeaderTeamName</span>(<span class="fn">sanitizeName</span>(finalTeamName))
+
+<span class="com">// 5. 更新 AppState.teamContext</span>
+<span class="fn">setAppState</span>(prev =&gt; ({ ...prev, teamContext: { teamName, leadAgentId, teammates: ... } }))</code></pre>
+
+      <h3>14.2 TeamFile 完整结构</h3>
+      <pre><code><span class="kw">type</span> <span class="ty">TeamFile</span> = {
+  name: <span class="ty">string</span>
+  description?: <span class="ty">string</span>
+  createdAt: <span class="ty">number</span>
+  leadAgentId: <span class="ty">string</span>            <span class="com">// "team-lead@&lt;teamName&gt;"</span>
+  leadSessionId: <span class="ty">string</span>          <span class="com">// 实际 session ID,供 team discovery</span>
+  members: [{
+    agentId: <span class="ty">string</span>             <span class="com">// "name@teamName" 格式</span>
+    name: <span class="ty">string</span>                <span class="com">// 显示名,SendMessage 寻址用</span>
+    agentType?: <span class="ty">string</span>          <span class="com">// 角色,如 'researcher'</span>
+    model?: <span class="ty">string</span>
+    joinedAt: <span class="ty">number</span>
+    tmuxPaneId: <span class="ty">string</span>
+    cwd: <span class="ty">string</span>
+    subscriptions: <span class="ty">string[]</span>     <span class="com">// 订阅哪些 channel</span>
+  }]
+}</code></pre>
+
+      <h3>14.3 派 teammate (spawnTeammate)</h3>
+      <pre><code><span class="com">// AgentTool.tsx:441 — 当 teamName &amp;&amp; name 时</span>
+<span class="kw">const</span> result = <span class="kw">await</span> <span class="fn">spawnTeammate</span>({
+  name,                          <span class="com">// 比如 'researcher'</span>
+  prompt,
+  description,
+  team_name: teamName,
+  use_splitpane: <span class="kw">true</span>,
+  plan_mode_required: spawnMode === <span class="str">'plan'</span>,
+  model: model ?? agentDef?.model,
+  agent_type: subagent_type,
+}, toolUseContext)</code></pre>
+
+      <h3>14.4 平结构(no nested teammates)</h3>
+      <pre><code><span class="com">// AgentTool.tsx:425 — 防御</span>
+<span class="kw">if</span> (<span class="fn">isTeammate</span>() &amp;&amp; teamName &amp;&amp; name) {
+  <span class="kw">throw new</span> <span class="ty">Error</span>(
+    <span class="str">'Teammates cannot spawn other teammates — the team roster is flat.'</span>
+  )
+}</code></pre>
+      <div class="box warn">
+        <div class="title">为什么团队结构必须是平的</div>
+        TeamFile.members 是一个扁平数组,只有一个 leadAgentId。如果允许 teammate 再 spawn teammate,会出现:
+        <ul>
+          <li>新 teammate 不知道自己的"父 teammate" — 没有这个字段</li>
+          <li>leader 不知道这个新成员是谁派的</li>
+          <li>shutdown / re-assign 等操作的责任链断裂</li>
+        </ul>
+        简单的"flat 限制"避免了一整套层级管理逻辑。
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="backends">
+      <h2><span class="num">15</span>Backend 抽象层</h2>
+      <p class="lead">同样的 spawnTeammate API 在 4 种环境下有完全不同的实现:tmux / iTerm2 / Windows Terminal / 同进程。
+      <code>TeammateExecutor</code> 接口统一了它们。</p>
+
+      <h3>15.1 4 种 backend 对照</h3>
+      <table>
+        <thead><tr><th>Backend</th><th>载体</th><th>启动新 teammate</th><th>限制</th></tr></thead>
+        <tbody>
+        <tr>
+          <td><strong>tmux</strong></td>
+          <td>tmux pane(独立进程)</td>
+          <td>spawn 新 pane,在里面跑 claude 命令</td>
+          <td>需要 tmux 已安装</td>
+        </tr>
+        <tr>
+          <td><strong>iterm2</strong></td>
+          <td>iTerm2 split pane(独立进程)</td>
+          <td>通过 it2 CLI 创建 split + 运行 claude</td>
+          <td>需要 iTerm2 + it2 工具</td>
+        </tr>
+        <tr>
+          <td><strong>windows-terminal</strong></td>
+          <td>Windows Terminal pane/tab(独立进程)</td>
+          <td>wt.exe 命令行参数创建</td>
+          <td>需要 Windows Terminal</td>
+        </tr>
+        <tr>
+          <td><strong>in-process</strong></td>
+          <td>同 Node.js 进程,独立 context</td>
+          <td>fork worker(共享内存)</td>
+          <td>不能 spawn background;不能嵌套</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>15.2 PaneBackend 接口(tmux/iterm2/windows-terminal)</h3>
+      <pre><code><span class="kw">type</span> <span class="ty">PaneBackend</span> = {
+  type: <span class="ty">BackendType</span>
+  displayName: <span class="ty">string</span>
+  supportsHideShow: <span class="ty">boolean</span>
+
+  <span class="fn">isAvailable</span>(): <span class="ty">Promise</span>&lt;<span class="ty">boolean</span>&gt;
+  <span class="fn">isRunningInside</span>(): <span class="ty">Promise</span>&lt;<span class="ty">boolean</span>&gt;
+
+  <span class="fn">createTeammatePaneInSwarmView</span>(name, color): <span class="ty">Promise</span>&lt;<span class="ty">CreatePaneResult</span>&gt;
+  <span class="fn">sendCommandToPane</span>(paneId, command): <span class="ty">Promise</span>&lt;<span class="kw">void</span>&gt;
+  <span class="fn">setPaneBorderColor</span>(paneId, color): <span class="ty">Promise</span>&lt;<span class="kw">void</span>&gt;
+  <span class="fn">setPaneTitle</span>(paneId, name, color): <span class="ty">Promise</span>&lt;<span class="kw">void</span>&gt;
+  <span class="fn">enablePaneBorderStatus</span>(): <span class="ty">Promise</span>&lt;<span class="kw">void</span>&gt;
+  <span class="fn">rebalancePanes</span>(windowTarget, hasLeader): <span class="ty">Promise</span>&lt;<span class="kw">void</span>&gt;
+  <span class="fn">killPane</span>(paneId): <span class="ty">Promise</span>&lt;<span class="ty">boolean</span>&gt;
+  <span class="fn">hidePane</span>(paneId): <span class="ty">Promise</span>&lt;<span class="ty">boolean</span>&gt;
+  <span class="fn">showPane</span>(paneId, target): <span class="ty">Promise</span>&lt;<span class="ty">boolean</span>&gt;
+}</code></pre>
+
+      <h3>15.3 TeammateExecutor 接口(高层)</h3>
+      <pre><code><span class="kw">type</span> <span class="ty">TeammateExecutor</span> = {
+  type: <span class="ty">BackendType</span>
+  <span class="fn">setContext</span>?(context): <span class="kw">void</span>
+  <span class="fn">isAvailable</span>(): <span class="ty">Promise</span>&lt;<span class="ty">boolean</span>&gt;
+
+  <span class="fn">spawn</span>(config: <span class="ty">TeammateSpawnConfig</span>): <span class="ty">Promise</span>&lt;<span class="ty">TeammateSpawnResult</span>&gt;
+  <span class="fn">sendMessage</span>(agentId, message): <span class="ty">Promise</span>&lt;<span class="kw">void</span>&gt;
+  <span class="fn">terminate</span>(agentId, reason?): <span class="ty">Promise</span>&lt;<span class="ty">boolean</span>&gt;    <span class="com">// 优雅</span>
+  <span class="fn">kill</span>(agentId): <span class="ty">Promise</span>&lt;<span class="ty">boolean</span>&gt;                 <span class="com">// 强制</span>
+  <span class="fn">isActive</span>(agentId): <span class="ty">Promise</span>&lt;<span class="ty">boolean</span>&gt;
+}</code></pre>
+
+      <h3>15.4 detection 流程(<span class="path">backends/detection.ts</span>)</h3>
+      <ol>
+        <li>读 <code>CLAUDE_CODE_TEAMMATE_MODE</code> env(强制覆盖)</li>
+        <li>检查 <code>TMUX</code> env 变量 → tmux backend</li>
+        <li>检查 <code>TERM_PROGRAM === 'iTerm.app'</code> + it2 CLI 是否安装 → iterm2</li>
+        <li>检查 <code>WT_SESSION</code> env → windows-terminal</li>
+        <li>fallback → in-process</li>
+      </ol>
+
+      <h3>15.5 in-process 的特殊性</h3>
+      <pre><code><span class="com">// in-process teammate 在<strong>同 Node.js 进程</strong>跑 worker</span>
+<span class="com">// 但有自己的:</span>
+- AgentContext (AsyncLocalStorage)
+- agentId / agentName / teamName
+- abortController
+- AppState 视图(通过 ToolUseContext.getAppState 包装)
+
+<span class="com">// 共享的:</span>
+- 文件系统 / MCP 连接 / 配置
+- AppState 后端(通过 setAppStateForTasks 写)</code></pre>
+
+      <div class="box info">
+        <div class="title">in-process 的额外限制</div>
+        <ul>
+          <li><strong>不能 spawn background subagent</strong>(他们的生命周期跟 leader 进程绑定 — leader 死则 worker 死)</li>
+          <li><strong>不能再 spawn teammate</strong>(平结构限制)</li>
+          <li>但<strong>可以用</strong> TaskCreate / SendMessage / CronCreate(IN_PROCESS_TEAMMATE_ALLOWED_TOOLS)</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="mailbox">
+      <h2><span class="num">16</span>邮箱通信系统</h2>
+      <p class="lead">Swarm 模式下 teammates 之间通过<strong>文件邮箱</strong>异步通信。这是为什么 swarm 可以跨进程、跨 tmux 窗口工作的核心机制。</p>
+
+      <h3>16.1 邮箱目录结构</h3>
+      <pre><code>~/.claude/teams/&lt;teamName&gt;/
+├── config.json                            <span class="com">// TeamFile</span>
+└── inboxes/
+    ├── team-lead.json                     <span class="com">// leader 的收件箱</span>
+    ├── researcher.json                    <span class="com">// teammate "researcher" 的收件箱</span>
+    ├── researcher.json.lock               <span class="com">// 锁文件</span>
+    └── reviewer.json</code></pre>
+
+      <h3>16.2 邮箱消息结构</h3>
+      <pre><code><span class="kw">type</span> <span class="ty">TeammateMessage</span> = {
+  from: <span class="ty">string</span>            <span class="com">// 发件人 name</span>
+  text: <span class="ty">string</span>            <span class="com">// 消息正文</span>
+  timestamp: <span class="ty">string</span>       <span class="com">// ISO 8601</span>
+  read: <span class="ty">boolean</span>           <span class="com">// 收件人是否已读</span>
+  color?: <span class="ty">string</span>          <span class="com">// 发件人颜色(UI 显示用)</span>
+  summary?: <span class="ty">string</span>        <span class="com">// 5-10 词摘要(UI 预览)</span>
+}</code></pre>
+
+      <h3>16.3 写信(writeToMailbox)</h3>
+      <pre><code><span class="com">// teammateMailbox.ts:134</span>
+<span class="kw">async function</span> <span class="fn">writeToMailbox</span>(recipientName, message, teamName) {
+  <span class="kw">await</span> <span class="fn">ensureInboxDir</span>(teamName)
+  <span class="kw">const</span> inboxPath = <span class="fn">getInboxPath</span>(recipientName, teamName)
+
+  <span class="com">// 必须先创建文件(proper-lockfile 要求文件存在)</span>
+  <span class="com">// 'wx' = 不存在才写,存在抛 EEXIST(被忽略)</span>
+  <span class="kw">await</span> <span class="fn">writeFile</span>(inboxPath, <span class="str">'[]'</span>, { flag: <span class="str">'wx'</span> })
+
+  <span class="kw">try</span> {
+    release = <span class="kw">await</span> lockfile.<span class="fn">lock</span>(inboxPath, LOCK_OPTIONS)
+
+    <span class="com">// 拿锁后重读,避免覆盖期间收到的消息</span>
+    <span class="kw">const</span> messages = <span class="kw">await</span> <span class="fn">readMailbox</span>(recipientName, teamName)
+    messages.<span class="fn">push</span>({ ...message, read: <span class="kw">false</span> })
+    <span class="kw">await</span> <span class="fn">writeFile</span>(inboxPath, <span class="fn">jsonStringify</span>(messages, <span class="kw">null</span>, <span class="num">2</span>), <span class="str">'utf-8'</span>)
+  } <span class="kw">finally</span> {
+    <span class="kw">await</span> release?.()
+  }
+}</code></pre>
+
+      <h3>16.4 SendMessage 工具</h3>
+      <pre><code><span class="com">// SendMessageTool.ts</span>
+{
+  to: <span class="ty">string</span>,                       <span class="com">// teammate 名 / "*" 广播 / "uds:&lt;path&gt;"</span>
+  summary?: <span class="ty">string</span>,                 <span class="com">// UI 预览</span>
+  message: <span class="ty">string</span> | <span class="ty">StructuredMessage</span> <span class="com">// 文本或结构化消息</span>
+}
+
+<span class="com">// StructuredMessage(用于协议级通信)</span>
+{ type: <span class="str">'shutdown_request'</span>, reason? }
+{ type: <span class="str">'shutdown_response'</span>, request_id, approve, reason? }
+{ type: <span class="str">'plan_approval_response'</span>, request_id, approve, feedback? }</code></pre>
+
+      <h3>16.5 收信(getTeammateMailboxAttachments)</h3>
+      <p>这是邮箱系统跟 query loop 的连接点。每个 user turn 开始,attachment 管线会:</p>
+      <ol class="steps">
+        <li>
+          <strong>读未读消息</strong>
+          <p><code>readUnreadMessages(agentName, teamName)</code> 返回 <code>read: false</code> 的消息</p>
+        </li>
+        <li>
+          <strong>过滤掉协议消息</strong>
+          <p>shutdown_request 等结构化消息<strong>必须留在邮箱中</strong>等专门的 InboxPoller 处理,
+          否则 attachment 管线先消费掉,这些信号永远不会触发对应 UI handler。</p>
+        </li>
+        <li>
+          <strong>合并 AppState.inbox 中的待处理消息</strong>
+          <p>这些是 InboxPoller 已经从邮箱拉到内存但还没作为 turn 处理的消息。需要去重(file + AppState 都可能有同条)。</p>
+        </li>
+        <li>
+          <strong>构造为 attachment</strong>
+          <p>包成 <code>&lt;teammate-message&gt;</code> XML,作为 user message 注入下一个 turn。</p>
+        </li>
+        <li>
+          <strong>标记为已读</strong>
+          <p>从文件邮箱写回 read: true,从 AppState 标记 status: 'consumed'。</p>
+        </li>
+      </ol>
+
+      <h3>16.6 协议消息分流示意</h3>
+      <figure>
+        <svg viewBox="0 0 880 280" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/>
+            </marker>
+          </defs>
+
+          <rect x="350" y="20" width="180" height="50" rx="8" fill="#F4E5DD" stroke="#D77757" stroke-width="1.5"/>
+          <text x="440" y="40" text-anchor="middle" font-size="13" font-weight="700" fill="#B0552F">teammate 邮箱</text>
+          <text x="440" y="58" text-anchor="middle" font-size="10" fill="#1F1B17">researcher.json</text>
+
+          <line x1="440" y1="70" x2="200" y2="120" stroke="#5BA67A" stroke-width="1.5" marker-end="url(#arrow5)"/>
+          <line x1="440" y1="70" x2="680" y2="120" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#arrow5)"/>
+
+          <!-- text messages -->
+          <rect x="60" y="120" width="280" height="80" rx="8" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1.5"/>
+          <text x="200" y="145" text-anchor="middle" font-size="12" font-weight="700" fill="#5BA67A">普通文本消息</text>
+          <text x="200" y="165" text-anchor="middle" font-size="11" fill="#1F1B17">attachment 管线消费</text>
+          <text x="200" y="180" text-anchor="middle" font-size="11" fill="#1F1B17">→ 注入下个 user turn</text>
+          <text x="200" y="195" text-anchor="middle" font-size="10" fill="#87796F">writeToMailbox + getTeammateMailboxAttachments</text>
+
+          <!-- protocol messages -->
+          <rect x="540" y="120" width="280" height="80" rx="8" fill="#EDE7F8" stroke="#8B5CF6" stroke-width="1.5"/>
+          <text x="680" y="145" text-anchor="middle" font-size="12" font-weight="700" fill="#8B5CF6">结构化协议消息</text>
+          <text x="680" y="165" text-anchor="middle" font-size="11" fill="#1F1B17">InboxPoller 路由到</text>
+          <text x="680" y="180" text-anchor="middle" font-size="11" fill="#1F1B17">workerPermissions / shutdown queue</text>
+          <text x="680" y="195" text-anchor="middle" font-size="10" fill="#87796F">isStructuredProtocolMessage 判定</text>
+
+          <!-- key insight -->
+          <rect x="60" y="220" width="760" height="50" rx="6" fill="#F7ECD3" stroke="#D9A441" stroke-width="1"/>
+          <text x="80" y="244" font-size="12" font-weight="700" fill="#8a6520">关键设计:两条管线必须严格分流</text>
+          <text x="80" y="260" font-size="11" fill="#1F1B17">如果 attachment 管线先读到协议消息并标为已读,InboxPoller 就拿不到了 → shutdown 信号丢失,死锁</text>
+        </svg>
+        <figcaption>邮箱中两类消息走不同的处理通道,通过 isStructuredProtocolMessage 判定来分流</figcaption>
+      </figure>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="notification">
+      <h2><span class="num">17</span>任务通知回流</h2>
+      <p class="lead">这是异步 agent 跟父 agent 的通信机制 —— 子 agent 完成时不直接调用父,而是<strong>排队一条 message</strong>,让父在自己合适的回合消费。</p>
+
+      <h3>17.1 通知触发点</h3>
+      <pre><code><span class="com">// agentToolUtils.ts:625 — runAsyncAgentLifecycle 中</span>
+<span class="fn">enqueueAgentNotification</span>({
+  taskId,
+  description,
+  status: <span class="str">'completed'</span>,        <span class="com">// | 'failed' | 'killed'</span>
+  setAppState: rootSetAppState,
+  finalMessage,                <span class="com">// 子 agent 最后输出的文本</span>
+  usage: { totalTokens, toolUses, durationMs },
+  toolUseId,
+  worktreePath,
+  worktreeBranch,
+})</code></pre>
+
+      <h3>17.2 enqueueAgentNotification 内部</h3>
+      <pre><code><span class="com">// LocalAgentTask.tsx:272 — 防重复</span>
+<span class="kw">let</span> shouldEnqueue = <span class="kw">false</span>
+<span class="fn">updateTaskState</span>(taskId, setAppState, task =&gt; {
+  <span class="kw">if</span> (task.notified) <span class="kw">return</span> task           <span class="com">// 已通知过,跳过</span>
+  shouldEnqueue = <span class="kw">true</span>
+  <span class="kw">return</span> { ...task, notified: <span class="kw">true</span> }
+})
+<span class="kw">if</span> (!shouldEnqueue) <span class="kw">return</span>
+
+<span class="com">// 中止 prompt suggestion 推测,因为后台 task 状态变了</span>
+<span class="fn">abortSpeculation</span>(setAppState)
+
+<span class="com">// 拼 XML 消息</span>
+<span class="kw">const</span> message = <span class="str">`&lt;task-notification&gt;...&lt;/task-notification&gt;`</span>
+
+<span class="com">// 入队 priority='later'</span>
+<span class="fn">enqueuePendingNotification</span>({ value: message, mode: <span class="str">'task-notification'</span> })</code></pre>
+
+      <h3>17.3 priority 系统</h3>
+      <pre><code><span class="com">// messageQueueManager.ts:151</span>
+<span class="kw">const</span> PRIORITY_ORDER = {
+  now: <span class="num">0</span>,      <span class="com">// 立即处理(用户输入)</span>
+  next: <span class="num">1</span>,     <span class="com">// 下一个 turn 必处理(任务摘要)</span>
+  later: <span class="num">2</span>,    <span class="com">// 在自然 idle 时处理(task notifications)</span>
+}</code></pre>
+      <p>task-notification 用 'later' 优先级,不抢用户输入。dequeue 时同优先级 FIFO,不同优先级按上面顺序。</p>
+
+      <h3>17.4 完整通知生命周期</h3>
+      <figure>
+        <svg viewBox="0 0 920 360" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/>
+            </marker>
+          </defs>
+
+          <line x1="40" y1="180" x2="880" y2="180" stroke="#4A413A" stroke-width="2"/>
+
+          <g>
+            <circle cx="80" cy="180" r="6" fill="#5769F7"/>
+            <text x="80" y="160" text-anchor="middle" font-size="11">主 agent 调用</text>
+            <text x="80" y="148" text-anchor="middle" font-size="11">AgentTool</text>
+            <text x="80" y="200" text-anchor="middle" font-size="10" fill="#87796F">t=0</text>
+          </g>
+
+          <g>
+            <circle cx="200" cy="180" r="6" fill="#D77757"/>
+            <text x="200" y="160" text-anchor="middle" font-size="11">async_launched</text>
+            <text x="200" y="200" text-anchor="middle" font-size="10" fill="#87796F">t=0.1s</text>
+            <text x="200" y="215" text-anchor="middle" font-size="10" fill="#D77757">主 agent 继续</text>
+          </g>
+
+          <g>
+            <circle cx="350" cy="180" r="6" fill="#5BA67A"/>
+            <text x="350" y="160" text-anchor="middle" font-size="11">主 agent 做别的事</text>
+            <text x="350" y="200" text-anchor="middle" font-size="10" fill="#87796F">t=0~30s</text>
+          </g>
+
+          <g>
+            <circle cx="500" cy="180" r="6" fill="#5BA67A"/>
+            <text x="500" y="160" text-anchor="middle" font-size="11">子 agent 完成</text>
+            <text x="500" y="200" text-anchor="middle" font-size="10" fill="#87796F">t=30s</text>
+            <text x="500" y="215" text-anchor="middle" font-size="10" fill="#5BA67A">enqueueAgentNotification</text>
+          </g>
+
+          <g>
+            <circle cx="650" cy="180" r="6" fill="#D9A441"/>
+            <text x="650" y="160" text-anchor="middle" font-size="11">主 agent 完成本 turn</text>
+            <text x="650" y="200" text-anchor="middle" font-size="10" fill="#87796F">t=35s</text>
+          </g>
+
+          <g>
+            <circle cx="800" cy="180" r="6" fill="#8B5CF6"/>
+            <text x="800" y="160" text-anchor="middle" font-size="11">queryLoop 排空队列</text>
+            <text x="800" y="200" text-anchor="middle" font-size="10" fill="#87796F">t=35.1s</text>
+            <text x="800" y="215" text-anchor="middle" font-size="10" fill="#8B5CF6">作为 attachment 注入</text>
+            <text x="800" y="227" text-anchor="middle" font-size="10" fill="#8B5CF6">下个 turn</text>
+          </g>
+
+          <!-- background process -->
+          <rect x="200" y="240" width="430" height="40" rx="6" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1" stroke-dasharray="4 3"/>
+          <text x="415" y="262" text-anchor="middle" font-size="11" fill="#5BA67A">子 agent 后台跑(query loop) — 写 outputFile · 更新 progress</text>
+
+          <!-- final summary -->
+          <rect x="40" y="300" width="840" height="40" rx="6" fill="#F4E5DD" stroke="#D77757" stroke-width="1"/>
+          <text x="50" y="324" font-size="11" fill="#B0552F" font-weight="600">主 agent 在 t=35.1s 才"知道"子 agent 完成 — 这种延迟是有意的(priority='later'),保证用户输入不被通知抢占。</text>
+        </svg>
+        <figcaption>异步通知的完整生命周期:从 spawn → 后台跑 → 完成入队 → 主 agent 下个 turn 看到</figcaption>
+      </figure>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="hooks">
+      <h2><span class="num">18</span>SubagentStart / SubagentStop Hooks</h2>
+      <p class="lead">用户可以在 settings.json 配 hook,在每个 subagent 的关键生命周期点运行自定义脚本。</p>
+
+      <h3>18.1 触发点</h3>
+      <table>
+        <thead><tr><th>Hook 事件</th><th>时机</th><th>能力</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>SubagentStart</code></td>
+            <td>runAgent 进入 query() 之前</td>
+            <td>注入 additionalContexts(作为 user message),不能阻断启动</td>
+          </tr>
+          <tr>
+            <td><code>SubagentStop</code></td>
+            <td>子 agent 完成 / 失败 / 中止时</td>
+            <td>由 frontmatter Stop hook 转换;能阻断"标记为完成"</td>
+          </tr>
+          <tr>
+            <td><code>PreToolUse</code></td>
+            <td>子 agent 内每个 tool 调用前</td>
+            <td>能阻断、改输入</td>
+          </tr>
+          <tr>
+            <td><code>PostToolUseFailure</code></td>
+            <td>子 agent 内 tool 失败后</td>
+            <td>提示恢复策略</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>18.2 frontmatter 注册的 Stop hook 自动转换</h3>
+      <pre><code><span class="com">// runAgent.ts:573 — 关键 isAgent 参数</span>
+<span class="kw">if</span> (agentDefinition.hooks &amp;&amp; hooksAllowedForThisAgent) {
+  <span class="fn">registerFrontmatterHooks</span>(
+    rootSetAppState,
+    agentId,
+    agentDefinition.hooks,
+    <span class="str">`agent '${agentDefinition.agentType}'`</span>,
+    <span class="kw">true</span>,                    <span class="com">// ← isAgent: 把 Stop 转成 SubagentStop</span>
+  )
+}</code></pre>
+      <div class="box info">
+        <div class="title">为什么要做这种转换</div>
+        agent 的 frontmatter 里写 <code>hooks.Stop</code> 时,用户期望"这个 agent 结束时跑"。
+        但 hook 系统的 'Stop' 事件是"主对话 Stop"。如果不转换,主线程结束才会触发,语义错位。
+        所以注册时自动改名为 SubagentStop,精确匹配语义。
+      </div>
+
+      <h3>18.3 admin-trusted gate</h3>
+      <pre><code><span class="kw">const</span> hooksAllowedForThisAgent =
+  !<span class="fn">isRestrictedToPluginOnly</span>(<span class="str">'hooks'</span>) ||
+  <span class="fn">isSourceAdminTrusted</span>(agentDefinition.source)</code></pre>
+      <p>跟 MCP 一样:企业策略可以"只允许 plugin 提供的 hooks"。
+      built-in / plugin / policy agent 算 admin-trusted,放行;user/project 自定义 agent 的 frontmatter hooks 被屏蔽。</p>
+
+      <h3>18.4 SubagentStart hook 的 additionalContexts</h3>
+      <pre><code><span class="com">// runAgent.ts:537</span>
+<span class="kw">const</span> additionalContexts = []
+<span class="kw">for await</span> (<span class="kw">const</span> hookResult <span class="kw">of</span> <span class="fn">executeSubagentStartHooks</span>(
+  agentId, agentDefinition.agentType, agentAbortController.signal,
+)) {
+  <span class="kw">if</span> (hookResult.additionalContexts?.length) {
+    additionalContexts.<span class="fn">push</span>(...hookResult.additionalContexts)
+  }
+}
+
+<span class="kw">if</span> (additionalContexts.length &gt; <span class="num">0</span>) {
+  <span class="kw">const</span> contextMessage = <span class="fn">createAttachmentMessage</span>({
+    type: <span class="str">'hook_additional_context'</span>,
+    content: additionalContexts,
+    hookName: <span class="str">'SubagentStart'</span>,
+    hookEvent: <span class="str">'SubagentStart'</span>,
+  })
+  initialMessages.<span class="fn">push</span>(contextMessage)
+}</code></pre>
+      <p>典型用法:hook 脚本输出 <code>{"additionalContexts": ["当前 PR 是 #1234", "测试套件已锁定"]}</code>,这些会作为子 agent 第一个用户消息出现。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="e2e">
+      <h2><span class="num">19</span>端到端示例</h2>
+      <p class="lead">用一个真实场景串起所有机制。</p>
+
+      <h3>场景:用户让模型"重构 auth 模块,做完跑测试 + 安全 review"</h3>
+
+      <ol class="steps">
+        <li>
+          <strong>用户输入</strong>
+          <pre><code>"把 auth 模块重构成基于 JWT,做完后跑测试,然后让安全专家 review"</code></pre>
+        </li>
+        <li>
+          <strong>主 agent 决策</strong>
+          <p>模型识别这是个并行任务:重构和测试可以串行,但 review 可以跟测试并行。它决定:</p>
+          <ul>
+            <li>主 agent 自己做重构</li>
+            <li>派 <code>security-reviewer</code>(用户自定义 agent)做 review,<strong>异步后台跑</strong></li>
+            <li>主 agent 跑测试</li>
+            <li>等通知回来再总结</li>
+          </ul>
+        </li>
+        <li>
+          <strong>主 agent 调用 AgentTool(后台 review)</strong>
+          <pre><code>{
+  description: <span class="str">"Security review of auth refactor"</span>,
+  prompt: <span class="str">"Review the JWT-based auth refactor in src/auth/. Check OWASP top 10..."</span>,
+  subagent_type: <span class="str">"security-reviewer"</span>,
+  run_in_background: <span class="kw">true</span>,
+  isolation: <span class="str">"worktree"</span>            <span class="com">// 在隔离副本里看,不污染主分支</span>
+}</code></pre>
+        </li>
+        <li>
+          <strong>AgentTool.call() 走普通路径</strong>
+          <ul>
+            <li>findActiveAgent → 找到 security-reviewer (CustomAgentDefinition, source: 'userSettings')</li>
+            <li>权限过滤通过,MCP 不需要</li>
+            <li>isolation: 'worktree' → createAgentWorktree → <code>/tmp/agent-abc12345</code></li>
+            <li>shouldRunAsync = true → registerAsyncAgent + runAsyncAgentLifecycle</li>
+            <li>立即返回 <code>{ status: 'async_launched', agentId: 'agent_xyz', outputFile: '...' }</code></li>
+          </ul>
+        </li>
+        <li>
+          <strong>子 agent 在后台进入 runAgent 流水线</strong>
+          <ul>
+            <li>用 opus 模型(agentDef.model = 'opus')</li>
+            <li>permissionMode: 'plan' → toolPermissionContext.mode 切换</li>
+            <li>readFileState 全新空缓存(不是 fork)</li>
+            <li>tools 经 resolveAgentTools 收窄成 [Read, Bash, Grep] minus Bash(rm:*)</li>
+            <li>system prompt = security-reviewer 自己的 + 环境注入 + cwd = worktree path</li>
+            <li>SubagentStart hook 跑了一遍,注入 "在 worktree X 上工作"</li>
+            <li>进入 query loop</li>
+          </ul>
+        </li>
+        <li>
+          <strong>主 agent 同时跑测试</strong>
+          <p><code>Bash("npm test")</code> 阻塞 60s 跑完测试。期间子 agent 在后台读代码、检查 OWASP 项。</p>
+        </li>
+        <li>
+          <strong>主 agent 完成测试,结束当前 turn</strong>
+          <p>queryLoop 准备进入下一 turn。检查 message queue,发现还没有 task-notification(子 agent 还没完成)。
+          主 agent 给用户回了一个"测试通过"的中间答复。</p>
+        </li>
+        <li>
+          <strong>子 agent 完成</strong>
+          <p>runAsyncAgentLifecycle 调:</p>
+          <ul>
+            <li>completeAsyncAgent(标 task 状态 completed)</li>
+            <li>classifyHandoffIfNeeded(没问题,跳过)</li>
+            <li>cleanupWorktreeIfNeeded → reviewer 没改文件 → 自动清理 worktree</li>
+            <li>enqueueAgentNotification(priority='later')</li>
+          </ul>
+        </li>
+        <li>
+          <strong>用户问"安全 review 怎么样了?"</strong>
+          <p>queryLoop 进入新 user turn。<strong>排空</strong> queue 时拿到 task-notification,作为附件注入。</p>
+          <pre><code>&lt;task-notification&gt;
+  &lt;task-id&gt;agent_xyz&lt;/task-id&gt;
+  &lt;status&gt;completed&lt;/status&gt;
+  &lt;summary&gt;Agent "Security review" completed&lt;/summary&gt;
+  &lt;result&gt;Found 2 issues: missing CSRF token, JWT secret in env file&lt;/result&gt;
+  &lt;usage&gt;
+    &lt;total-tokens&gt;8500&lt;/total-tokens&gt;
+    &lt;tool-uses&gt;15&lt;/tool-uses&gt;
+    &lt;duration-ms&gt;45000&lt;/duration-ms&gt;
+  &lt;/usage&gt;
+&lt;/task-notification&gt;</code></pre>
+          <p>主 agent 看到这条通知 + 用户问题,综合回答:"重构完成,测试 12/12 通过。安全 review 发现 2 个问题:..."</p>
+        </li>
+      </ol>
+
+      <h3>关键时间线</h3>
+      <figure>
+        <svg viewBox="0 0 880 240" xmlns="http://www.w3.org/2000/svg">
+          <line x1="40" y1="100" x2="840" y2="100" stroke="#4A413A" stroke-width="2"/>
+
+          <g>
+            <circle cx="60" cy="100" r="6" fill="#5BA67A"/>
+            <text x="60" y="80" text-anchor="middle" font-size="10">用户输入</text>
+            <text x="60" y="125" text-anchor="middle" font-size="10" fill="#87796F">t=0</text>
+          </g>
+          <g>
+            <circle cx="160" cy="100" r="6" fill="#D77757"/>
+            <text x="160" y="80" text-anchor="middle" font-size="10">spawn reviewer</text>
+            <text x="160" y="125" text-anchor="middle" font-size="10" fill="#87796F">t=2s</text>
+            <text x="160" y="138" text-anchor="middle" font-size="10" fill="#D77757">async_launched</text>
+          </g>
+          <g>
+            <circle cx="280" cy="100" r="6" fill="#5769F7"/>
+            <text x="280" y="80" text-anchor="middle" font-size="10">主 agent 重构</text>
+            <text x="280" y="125" text-anchor="middle" font-size="10" fill="#87796F">t=2-30s</text>
+          </g>
+          <g>
+            <circle cx="420" cy="100" r="6" fill="#5769F7"/>
+            <text x="420" y="80" text-anchor="middle" font-size="10">主 agent 跑测试</text>
+            <text x="420" y="125" text-anchor="middle" font-size="10" fill="#87796F">t=30-90s</text>
+          </g>
+          <g>
+            <circle cx="540" cy="100" r="6" fill="#5BA67A"/>
+            <text x="540" y="80" text-anchor="middle" font-size="10">主 agent 中间答复</text>
+            <text x="540" y="125" text-anchor="middle" font-size="10" fill="#87796F">t=90s</text>
+          </g>
+          <g>
+            <circle cx="660" cy="100" r="6" fill="#8B5CF6"/>
+            <text x="660" y="80" text-anchor="middle" font-size="10">reviewer 完成</text>
+            <text x="660" y="125" text-anchor="middle" font-size="10" fill="#87796F">t=95s</text>
+            <text x="660" y="138" text-anchor="middle" font-size="10" fill="#8B5CF6">入队 later</text>
+          </g>
+          <g>
+            <circle cx="800" cy="100" r="6" fill="#5BA67A"/>
+            <text x="800" y="80" text-anchor="middle" font-size="10">用户问 + 通知排空</text>
+            <text x="800" y="125" text-anchor="middle" font-size="10" fill="#87796F">t=130s</text>
+          </g>
+
+          <!-- background bar -->
+          <rect x="160" y="155" width="500" height="20" rx="4" fill="#EDE7F8" stroke="#8B5CF6" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="410" y="170" text-anchor="middle" font-size="11" fill="#8B5CF6">reviewer 在隔离 worktree 后台跑 — 不污染主分支</text>
+
+          <rect x="40" y="195" width="800" height="40" rx="6" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1"/>
+          <text x="50" y="215" font-size="11" fill="#5BA67A" font-weight="600">两个 agent 并行工作 95 秒,主 agent 不阻塞,通知通过 priority='later' 在合适时机喂给主 agent。</text>
+          <text x="50" y="230" font-size="11" fill="#5BA67A">Worktree 自动清理,因为 reviewer 没改文件。</text>
+        </svg>
+        <figcaption>多 agent 并发 + 异步通知 + worktree 隔离的完整端到端示例</figcaption>
+      </figure>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="principles">
+      <h2><span class="num">20</span>核心设计原则</h2>
+      <p class="lead">从这套实现中可以提炼出 8 条可迁移到其他 agent 系统的设计原则。</p>
+
+      <ol class="steps">
+        <li>
+          <strong>把 agent 当一等公民</strong>
+          <p>用结构化 <code>AgentDefinition</code> 表达,而不是把"调用 LLM"当作一个 RPC。
+          每个 agent 有独立的 system prompt、tool 集合、permission mode、model、MCP server。
+          这样才能精确控制其能力边界。</p>
+        </li>
+        <li>
+          <strong>静态发现 + 动态注册</strong>
+          <p>built-in 在源码里,user/project 在 .md 文件,plugin 在插件包。
+          按优先级合并(plugin &lt; user &lt; project &lt; flag &lt; policy),让"系统提供安全默认 + 用户覆盖 + 企业兜底"成为标准模式。</p>
+        </li>
+        <li>
+          <strong>显式声明工具范围</strong>
+          <p>三层过滤(<code>filterToolsForAgent</code> + agent 自己的 <code>tools/disallowedTools</code> + 权限规则)让每个 agent 只看到必要的工具。
+          这<strong>同时降低 prompt 成本</strong>(token 数)<strong>和安全风险</strong>(误用的可能性)。</p>
+        </li>
+        <li>
+          <strong>同步 vs 异步是不同的语义,不是性能选项</strong>
+          <p>同步阻塞父 turn,共享 abortController 和 setAppState;异步独立生命周期,通过 task-notification 异步通信。
+          两条路径有不同的 tool 白名单(异步不能 AskUserQuestion 等交互工具)。<strong>把它们当作两套独立的执行模式</strong>,而不是"同步 + 后台 flag"。</p>
+        </li>
+        <li>
+          <strong>Fork 是为缓存而生的</strong>
+          <p>fork 子 agent 完整继承父的<strong>字节级</strong> system prompt、tools、history。
+          所有 fork 子用同一占位 tool_result,只有 directive 不同 → 前缀 100% cache 命中。
+          这是把"启动一个新 agent"的成本从~5k token 降到 ~50 token。</p>
+        </li>
+        <li>
+          <strong>消息队列 + priority 优先级</strong>
+          <p>异步通知用 priority='later',永远不抢用户输入。这种"排队 + 自然消费"模式比同步回调简单得多,
+          也避免了"通知洪水"问题。同时支持多个 agent 同时完成时的有序处理。</p>
+        </li>
+        <li>
+          <strong>文件系统作为 swarm 的真理来源</strong>
+          <p>TeamFile / 邮箱 / 任务列表都用 JSON 文件 + proper-lockfile。
+          这让 swarm 模式天然支持 tmux / iTerm2 / Windows Terminal / 远端机器 —— 只要能访问同一文件系统就能协作。
+          没有任何 IPC、daemon、或网络协议。</p>
+        </li>
+        <li>
+          <strong>双管线分流邮箱中的不同消息类型</strong>
+          <p>普通文本走 attachment 管线,变成下个 turn 的 user message;协议消息(shutdown/permission)走 InboxPoller,
+          路由到专门的 handler。两条管线有<strong>不能交叉</strong>的硬约束 —— 否则信号会被错误消费导致死锁。</p>
+        </li>
+      </ol>
+
+      <div class="box note">
+        <div class="title">最重要的一条:让多 agent 协作"看起来像一个 agent"</div>
+        从用户视角,Claude Code 看起来是一个 agent —— 接受任务、回答、完成。
+        实际上幕后可能是 5 个并行子 agent + 2 个 swarm teammate + 1 个 fork 子 agent。
+        实现这种<strong>抽象</strong>的关键是:
+        <ul>
+          <li>统一的工具入口(AgentTool / SendMessage)</li>
+          <li>统一的通信协议(task-notification 附件 + 文件邮箱)</li>
+          <li>统一的状态管理(AppState.tasks + teamContext)</li>
+          <li>独立但统一的隔离机制(worktree + permissionMode)</li>
+        </ul>
+        这种"复杂藏在内部"的设计是 agent 系统能否规模化的根本因素。
+      </div>
+    </section>
+
+    <footer style="margin-top:80px; padding-top:32px; border-top:1px solid var(--gray-300); color:var(--gray-500); font-size:13px;">
+      <p>本文基于 Claude Code 反编译版源码(commit 1173a62)。
+      关键文件:
+      <span class="path">packages/builtin-tools/src/tools/AgentTool/{AgentTool.tsx, runAgent.ts, agentToolUtils.ts, loadAgentsDir.ts, forkSubagent.ts, builtInAgents.ts}</span>、
+      <span class="path">packages/builtin-tools/src/tools/{TeamCreateTool, SendMessageTool}/</span>、
+      <span class="path">src/utils/swarm/</span>、
+      <span class="path">src/utils/teammateMailbox.ts</span>、
+      <span class="path">src/utils/forkedAgent.ts</span>、
+      <span class="path">src/tasks/LocalAgentTask/LocalAgentTask.tsx</span>、
+      <span class="path">src/utils/messageQueueManager.ts</span>。</p>
+    </footer>
+  </main>
+</div>
+</body>
+</html>

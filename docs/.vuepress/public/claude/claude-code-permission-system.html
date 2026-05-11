@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code Permission 决策系统详解</title>
+<style>
+  :root {
+    --orange: #D77757; --orange-soft: #F4E5DD; --orange-deep: #B0552F;
+    --blue: #5769F7; --blue-soft: #E5E8FE;
+    --green: #5BA67A; --green-soft: #E2F0E8;
+    --red: #C9534D; --red-soft: #F5DEDC;
+    --yellow: #D9A441; --yellow-soft: #F7ECD3;
+    --purple: #8B5CF6; --purple-soft: #EDE7F8;
+    --gray-900: #1F1B17; --gray-700: #4A413A; --gray-500: #87796F;
+    --gray-300: #D9D0C7; --gray-100: #F6F1EC; --gray-50: #FBF8F4;
+    --bg: #FBF8F4;
+  }
+  * { box-sizing: border-box; } html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif; color: var(--gray-900); background: var(--bg); line-height: 1.7; }
+  .layout { display: grid; grid-template-columns: 280px 1fr; max-width: 1400px; margin: 0 auto; }
+  nav.toc { position: sticky; top: 0; height: 100vh; overflow-y: auto; padding: 32px 20px; border-right: 1px solid var(--gray-300); background: var(--gray-50); font-size: 14px; }
+  nav.toc h3 { margin: 0 0 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray-500); }
+  nav.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: section; }
+  nav.toc ol li { counter-increment: section; margin-bottom: 6px; }
+  nav.toc ol li a { display: block; padding: 6px 10px; color: var(--gray-700); text-decoration: none; border-radius: 6px; border-left: 2px solid transparent; transition: all 0.15s; }
+  nav.toc ol li a::before { content: counter(section, decimal-leading-zero) "  "; color: var(--gray-500); font-variant-numeric: tabular-nums; font-size: 12px; }
+  nav.toc ol li a:hover { background: var(--orange-soft); color: var(--orange-deep); border-left-color: var(--orange); }
+  main { padding: 56px 56px 120px; max-width: 980px; }
+  header.hero { margin-bottom: 56px; padding-bottom: 32px; border-bottom: 1px solid var(--gray-300); }
+  header.hero .eyebrow { color: var(--orange); font-size: 13px; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px; font-weight: 600; }
+  header.hero h1 { font-size: 40px; margin: 0 0 12px; letter-spacing: -0.01em; }
+  header.hero p { font-size: 17px; color: var(--gray-700); max-width: 720px; }
+  section { margin-bottom: 64px; scroll-margin-top: 24px; }
+  section > h2 { font-size: 28px; margin: 0 0 8px; padding-top: 16px; border-top: 3px solid var(--orange); display: inline-block; padding-right: 64px; }
+  section > h2 .num { color: var(--orange); font-variant-numeric: tabular-nums; margin-right: 12px; }
+  section > .lead { color: var(--gray-700); font-size: 16px; margin-bottom: 28px; max-width: 760px; }
+  h3 { font-size: 20px; margin: 32px 0 12px; } h4 { font-size: 16px; margin: 20px 0 8px; color: var(--gray-700); }
+  code { font-family: "SF Mono", "Menlo", monospace; font-size: 13px; background: var(--gray-100); padding: 1px 6px; border-radius: 4px; color: var(--orange-deep); }
+  pre { background: #1F1B17; color: #E8E1D9; padding: 18px 22px; border-radius: 10px; overflow-x: auto; font-size: 13px; line-height: 1.6; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; font-size: 13px; }
+  pre .kw { color: #E5A77B; } pre .str { color: #C8E0B4; } pre .com { color: #6F665D; font-style: italic; }
+  pre .fn { color: #93B5E0; } pre .num { color: #E5A77B; } pre .ty { color: #D7B5E5; }
+  .box { border-left: 4px solid var(--gray-300); padding: 16px 20px; border-radius: 6px; margin: 18px 0; background: white; box-shadow: 0 1px 2px rgba(31,27,23,0.04); }
+  .box.info { border-color: var(--blue); background: var(--blue-soft); }
+  .box.warn { border-color: var(--yellow); background: var(--yellow-soft); }
+  .box.error { border-color: var(--red); background: var(--red-soft); }
+  .box.ok { border-color: var(--green); background: var(--green-soft); }
+  .box.note { border-color: var(--orange); background: var(--orange-soft); }
+  .box.purple { border-color: var(--purple); background: var(--purple-soft); }
+  .box .title { font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .box.info .title { color: var(--blue); } .box.warn .title { color: var(--yellow); }
+  .box.error .title { color: var(--red); } .box.ok .title { color: var(--green); }
+  .box.note .title { color: var(--orange-deep); } .box.purple .title { color: var(--purple); }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; background: white; box-shadow: 0 1px 2px rgba(31,27,23,0.04); border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--gray-300); vertical-align: top; }
+  th { background: var(--gray-100); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-700); }
+  tr:last-child td { border-bottom: none; } td code { font-size: 12px; }
+  figure { margin: 24px 0; padding: 24px; background: white; border: 1px solid var(--gray-300); border-radius: 12px; text-align: center; }
+  figure svg { max-width: 100%; height: auto; }
+  figcaption { margin-top: 14px; font-size: 13px; color: var(--gray-500); font-style: italic; }
+  .steps { list-style: none; padding: 0; counter-reset: step; }
+  .steps li { counter-increment: step; position: relative; padding: 14px 18px 14px 56px; background: white; border: 1px solid var(--gray-300); border-radius: 8px; margin-bottom: 10px; }
+  .steps li::before { content: counter(step); position: absolute; left: 14px; top: 12px; width: 30px; height: 30px; border-radius: 50%; background: var(--orange); color: white; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .steps li strong { display: block; margin-bottom: 4px; }
+  .path { font-family: "SF Mono", monospace; font-size: 12px; color: var(--blue); background: var(--blue-soft); padding: 2px 8px; border-radius: 4px; }
+  .lbl { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; margin-right: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .lbl.ok { background: var(--green-soft); color: var(--green); }
+  .lbl.fail { background: var(--red-soft); color: var(--red); }
+  .lbl.warn { background: var(--yellow-soft); color: #8a6520; }
+  .lbl.info { background: var(--blue-soft); color: var(--blue); }
+  @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } nav.toc { display: none; } main { padding: 32px 24px 80px; } }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h3>目录</h3>
+    <ol>
+      <li><a href="#intro">引言:安全是企业可用性的门槛</a></li>
+      <li><a href="#modes">6 种 PermissionMode</a></li>
+      <li><a href="#rule-syntax">规则语法三级</a></li>
+      <li><a href="#sources">7 层规则来源</a></li>
+      <li><a href="#flow">核心决策流程 5 步</a></li>
+      <li><a href="#can-use">canUseTool 调用链</a></li>
+      <li><a href="#filesystem">Filesystem 特殊决策树</a></li>
+      <li><a href="#path">pathValidation</a></li>
+      <li><a href="#shadowed">规则冲突检测</a></li>
+      <li><a href="#yolo">YOLO 分类器</a></li>
+      <li><a href="#fusion">分类器融合</a></li>
+      <li><a href="#flags">特殊 flags 语义</a></li>
+      <li><a href="#child">子 agent 权限继承</a></li>
+      <li><a href="#result">PermissionResult 数据流</a></li>
+      <li><a href="#plan">Plan Mode 耦合</a></li>
+      <li><a href="#e2e">rm -rf 在 5 种模式下的命运</a></li>
+      <li><a href="#principles">可迁移设计原则</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="hero">
+      <div class="eyebrow">Claude Code 源码深度讲解 · 必修篇 3/5</div>
+      <h1>Permission 决策系统</h1>
+      <p>Permission 决定 agent 能否进企业。Claude Code 用<strong>6 种模式 × 7 层规则 × 多分类器融合</strong>构造了一套精细的决策机制,
+      同时把"安全不变量"(如"子 agent 只能提升限制")直接编码进了代码。</p>
+    </header>
+
+    <section id="intro">
+      <h2><span class="num">01</span>引言:安全是企业可用性的门槛</h2>
+      <p class="lead">agent 能改文件、跑命令、调网络。如果没有权限系统,一个误用就能擦库、删分支、泄漏凭证。</p>
+      <h3>1.1 Permission 要回答的 4 个问题</h3>
+      <table>
+        <thead><tr><th>问题</th><th>Claude Code 机制</th></tr></thead>
+        <tbody>
+          <tr><td>这个操作现在能不能做?</td><td>canUseTool → PermissionResult</td></tr>
+          <tr><td>是谁做的决策?</td><td>rule 的 source 字段(7 层之一)</td></tr>
+          <tr><td>用户能否改变决策?</td><td>PermissionMode 提供快速调整</td></tr>
+          <tr><td>能不能事前预审?</td><td>Plan Mode + 分类器</td></tr>
+        </tbody>
+      </table>
+      <h3>1.2 两个核心设计哲学</h3>
+      <div class="box note">
+        <div class="title">Fail-closed(默认拒绝)</div>
+        没有明确规则匹配时,<strong>默认进人工对话框</strong>,而不是默认放行。这是把"出了事谁背锅"的风险从用户转到设计层。
+      </div>
+      <div class="box warn">
+        <div class="title">Layered by policy authority(按权威分层)</div>
+        企业策略(managed/policy)权威最高,用户配置其次,session 临时决策最低。权威层可以强制覆盖,用户无法越过。
+      </div>
+    </section>
+
+    <section id="modes">
+      <h2><span class="num">02</span>6 种 PermissionMode</h2>
+      <p class="lead">PermissionMode 是整个决策的"上下文开关" — 同样一个 Edit 操作,在不同 mode 下结果完全不同。</p>
+      <h3>2.1 完整 6 种模式(<span class="path">PermissionMode.ts:44</span>)</h3>
+      <table>
+        <thead><tr><th>Mode</th><th>符号</th><th>语义</th><th>谁设置</th></tr></thead>
+        <tbody>
+          <tr><td><code>default</code></td><td>(无)</td><td>标准:按规则 → 分类器 → 对话框</td><td>启动默认</td></tr>
+          <tr><td><code>plan</code></td><td><code>⏸</code></td><td>禁止所有写操作,只能 Read / Grep / Glob</td><td>/plan 或 EnterPlanMode</td></tr>
+          <tr><td><code>acceptEdits</code></td><td><code>⏵⏵</code></td><td>Edit/Write/NotebookEdit 自动通过,其他仍需问</td><td>/accept-edits 或 Shift+Tab</td></tr>
+          <tr><td><code>bypassPermissions</code></td><td><code>⏵⏵</code></td><td>一切工具自动通过(危险)</td><td><code>--dangerously-skip-permissions</code> CLI</td></tr>
+          <tr><td><code>dontAsk</code></td><td><code>⏵⏵</code></td><td>类似 bypass,但仅主线程,子 agent 仍问</td><td>特殊场景</td></tr>
+          <tr><td><code>auto</code>(ant-only)</td><td><code>⏵⏵</code></td><td>自动模式:TRANSCRIPT_CLASSIFIER 做决策</td><td>/auto</td></tr>
+          <tr><td><code>bubble</code>(内部)</td><td>—</td><td>子 agent 的提示"冒泡"到父终端处理</td><td>子 agent 自动</td></tr>
+        </tbody>
+      </table>
+      <h3>2.2 模式转换状态机</h3>
+      <figure>
+        <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg">
+          <defs><marker id="arpm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/></marker></defs>
+          <circle cx="450" cy="150" r="50" fill="white" stroke="#5769F7" stroke-width="2"/><text x="450" y="155" text-anchor="middle" font-size="13" font-weight="700" fill="#5769F7">default</text>
+
+          <rect x="100" y="50" width="130" height="50" rx="8" fill="#F7ECD3" stroke="#D9A441" stroke-width="2"/><text x="165" y="70" text-anchor="middle" font-size="12" font-weight="700" fill="#8a6520">plan</text><text x="165" y="88" text-anchor="middle" font-size="10">只读探索</text>
+          <rect x="700" y="50" width="140" height="50" rx="8" fill="#E2F0E8" stroke="#5BA67A" stroke-width="2"/><text x="770" y="70" text-anchor="middle" font-size="12" font-weight="700" fill="#5BA67A">acceptEdits</text><text x="770" y="88" text-anchor="middle" font-size="10">自动编辑</text>
+          <rect x="100" y="230" width="140" height="50" rx="8" fill="#F5DEDC" stroke="#C9534D" stroke-width="2"/><text x="170" y="250" text-anchor="middle" font-size="12" font-weight="700" fill="#C9534D">bypassPermissions</text><text x="170" y="268" text-anchor="middle" font-size="10">一切自动</text>
+          <rect x="700" y="230" width="140" height="50" rx="8" fill="#EDE7F8" stroke="#8B5CF6" stroke-width="2"/><text x="770" y="250" text-anchor="middle" font-size="12" font-weight="700" fill="#8B5CF6">auto</text><text x="770" y="268" text-anchor="middle" font-size="10">分类器托管</text>
+
+          <g stroke="#4A413A" fill="none">
+            <line x1="405" y1="130" x2="232" y2="85" marker-end="url(#arpm)"/>
+            <line x1="230" y1="75" x2="400" y2="140" marker-end="url(#arpm)"/>
+            <line x1="495" y1="130" x2="698" y2="85" marker-end="url(#arpm)"/>
+            <line x1="700" y1="75" x2="498" y2="140" marker-end="url(#arpm)"/>
+            <line x1="410" y1="180" x2="240" y2="240" marker-end="url(#arpm)"/>
+            <line x1="240" y1="250" x2="405" y2="170" marker-end="url(#arpm)"/>
+            <line x1="490" y1="180" x2="700" y2="240" marker-end="url(#arpm)"/>
+          </g>
+          <text x="295" y="105" font-size="10">/plan</text>
+          <text x="295" y="60" font-size="10">ExitPlanMode</text>
+          <text x="595" y="105" font-size="10">Shift+Tab</text>
+          <text x="160" y="220" font-size="10" fill="#C9534D">--dangerously-skip-permissions</text>
+          <text x="595" y="220" font-size="10">/auto</text>
+        </svg>
+        <figcaption>PermissionMode 状态机,default 是中枢,其他模式都通过 default 跳转</figcaption>
+      </figure>
+      <h3>2.3 Plan Mode 的特殊规则</h3>
+      <pre><code><span class="com">// Plan mode 下,filterToolsForAgent 会特殊放行 ExitPlanMode</span>
+<span class="kw">if</span> (<span class="fn">toolMatchesName</span>(tool, EXIT_PLAN_MODE_V2_TOOL_NAME) &amp;&amp; permissionMode === <span class="str">'plan'</span>) {
+  <span class="kw">return</span> <span class="kw">true</span>   <span class="com">// 即使不在允许工具里也放行</span>
+}
+<span class="com">// 否则 Plan mode 下 Edit/Write/Bash(writing 命令)都被拒</span></code></pre>
+    </section>
+
+    <section id="rule-syntax">
+      <h2><span class="num">03</span>规则语法三级</h2>
+      <p class="lead">权限规则用同一种字符串语法表达,从粗粒度到细粒度三级。</p>
+      <h3>3.1 三种形式</h3>
+      <pre><code><span class="com">// 1. 工具级 — 最粗</span>
+<span class="str">"Read"</span>            <span class="com">// 允许所有 Read 调用</span>
+<span class="str">"Bash"</span>            <span class="com">// 允许所有 Bash 调用</span>
+
+<span class="com">// 2. 工具 + pattern — 中粒度</span>
+<span class="str">"Bash(npm:*)"</span>     <span class="com">// 允许 npm 开头的命令</span>
+<span class="str">"Bash(git status)"</span>  <span class="com">// 精确命令</span>
+<span class="str">"Read(/src/**)"</span>   <span class="com">// 只允许读 src 目录</span>
+
+<span class="com">// 3. 工具 + 规则内容 — 最细</span>
+<span class="str">"Agent(researcher,reviewer)"</span>   <span class="com">// 只能派这两种 agent</span>
+<span class="str">"Edit(*.md)"</span>                    <span class="com">// 只能编辑 markdown</span></code></pre>
+      <h3>3.2 permissionRuleValueFromString 解析</h3>
+      <pre><code><span class="com">// permissionRuleParser.ts</span>
+<span class="fn">permissionRuleValueFromString</span>(<span class="str">"Bash(npm:*)"</span>)
+<span class="com">// → { toolName: "Bash", ruleContent: "npm:*" }</span>
+
+<span class="fn">permissionRuleValueFromString</span>(<span class="str">"Read"</span>)
+<span class="com">// → { toolName: "Read", ruleContent: undefined }</span></code></pre>
+      <h3>3.3 allow vs deny vs ask</h3>
+      <table>
+        <thead><tr><th>类别</th><th>作用</th><th>优先级</th></tr></thead>
+        <tbody>
+          <tr><td><code>allow</code></td><td>绕过对话框直接放行</td><td>中(被 deny 覆盖)</td></tr>
+          <tr><td><code>deny</code></td><td>直接拒绝,不显示对话框</td><td>高(覆盖 allow)</td></tr>
+          <tr><td><code>ask</code></td><td>强制显示对话框(即使有 allow)</td><td>最高</td></tr>
+        </tbody>
+      </table>
+      <h3>3.4 pattern 匹配语法</h3>
+      <pre><code><span class="com">// Bash pattern — 基于 shell-quote 解析</span>
+<span class="str">"npm:*"</span>            <span class="com">// npm 开头,含子命令</span>
+<span class="str">"git commit"</span>       <span class="com">// 精确匹配</span>
+<span class="str">"*.test.ts"</span>        <span class="com">// glob</span>
+
+<span class="com">// Path pattern — 基于 picomatch</span>
+<span class="str">"/src/**/*.ts"</span>     <span class="com">// 递归 glob</span>
+<span class="str">"!/node_modules/**"</span>   <span class="com">// 排除</span></code></pre>
+    </section>
+
+    <section id="sources">
+      <h2><span class="num">04</span>7 层规则来源</h2>
+      <p class="lead">每条规则都有来源层,决定它的权威性。冲突时按权威合并。</p>
+      <h3>4.1 7 层优先级(由低到高)</h3>
+      <figure>
+        <svg viewBox="0 0 800 380" xmlns="http://www.w3.org/2000/svg">
+          <rect x="50" y="20" width="700" height="40" rx="6" fill="#F4E5DD" stroke="#D77757"/>
+          <text x="70" y="45" font-size="13" font-weight="700" fill="#B0552F">7. policy(企业级)</text>
+          <text x="420" y="45" font-size="11">不可被用户覆盖</text>
+
+          <rect x="50" y="70" width="700" height="40" rx="6" fill="#F4E5DD" stroke="#D77757" opacity="0.9"/>
+          <text x="70" y="95" font-size="13" font-weight="700" fill="#B0552F">6. managed(managed-settings.json)</text>
+          <text x="420" y="95" font-size="11">MDM 推送</text>
+
+          <rect x="50" y="120" width="700" height="40" rx="6" fill="#F7ECD3" stroke="#D9A441"/>
+          <text x="70" y="145" font-size="13" font-weight="700" fill="#8a6520">5. flag(--allowedTools CLI)</text>
+          <text x="420" y="145" font-size="11">本次启动的临时授权</text>
+
+          <rect x="50" y="170" width="700" height="40" rx="6" fill="#E2F0E8" stroke="#5BA67A"/>
+          <text x="70" y="195" font-size="13" font-weight="700" fill="#5BA67A">4. project(.claude/settings.json)</text>
+          <text x="420" y="195" font-size="11">团队共享,git 管理</text>
+
+          <rect x="50" y="220" width="700" height="40" rx="6" fill="#E2F0E8" stroke="#5BA67A" opacity="0.9"/>
+          <text x="70" y="245" font-size="13" font-weight="700" fill="#5BA67A">3. user(~/.claude/settings.json)</text>
+          <text x="420" y="245" font-size="11">用户全局</text>
+
+          <rect x="50" y="270" width="700" height="40" rx="6" fill="#E5E8FE" stroke="#5769F7"/>
+          <text x="70" y="295" font-size="13" font-weight="700" fill="#5769F7">2. session(/allow 临时命令)</text>
+          <text x="420" y="295" font-size="11">对话中加的临时规则</text>
+
+          <rect x="50" y="320" width="700" height="40" rx="6" fill="#EDE7F8" stroke="#8B5CF6"/>
+          <text x="70" y="345" font-size="13" font-weight="700" fill="#8B5CF6">1. cliArg(SDK --allowedTools)</text>
+          <text x="420" y="345" font-size="11">SDK 消费者传入</text>
+        </svg>
+        <figcaption>7 层规则来源按权威从下往上递增,合并时高层覆盖低层</figcaption>
+      </figure>
+      <h3>4.2 ToolPermissionContext 结构</h3>
+      <pre><code><span class="kw">type</span> <span class="ty">ToolPermissionContext</span> = {
+  mode: <span class="ty">PermissionMode</span>
+  alwaysAllowRules: {
+    cliArg: <span class="ty">string[]</span>,
+    session: <span class="ty">string[]</span>,
+    localSettings: <span class="ty">string[]</span>,
+    projectSettings: <span class="ty">string[]</span>,
+    userSettings: <span class="ty">string[]</span>,
+    flagSettings: <span class="ty">string[]</span>,
+    managedSettings: <span class="ty">string[]</span>,
+    policySettings: <span class="ty">string[]</span>,
+  },
+  alwaysDenyRules: { ...same 7 layers }
+  additionalWorkingDirectories: <span class="ty">Map</span>&lt;<span class="ty">string</span>, <span class="ty">WorkingDir</span>&gt;
+  shouldAvoidPermissionPrompts?: <span class="ty">boolean</span>
+  awaitAutomatedChecksBeforeDialog?: <span class="ty">boolean</span>
+}</code></pre>
+      <h3>4.3 来源追溯的实际用处</h3>
+      <pre><code><span class="com">// 当 deny 发生时,能告诉用户"是哪一层禁止的"</span>
+<span class="kw">const</span> denyRule = <span class="fn">getDenyRuleForAgent</span>(context, AGENT_TOOL_NAME, agentType)
+<span class="kw">throw new</span> <span class="ty">Error</span>(
+  <span class="str">`Agent type '${agentType}' has been denied by permission rule '${denyRule.value}'
+   from ${denyRule.source}.`</span>
+)
+<span class="com">// 显示:from managedSettings → 用户知道要联系 IT</span>
+<span class="com">// 显示:from projectSettings → 用户知道是项目规则</span></code></pre>
+    </section>
+
+    <section id="flow">
+      <h2><span class="num">05</span>核心决策流程 5 步</h2>
+      <p class="lead">canUseTool 判断一个工具调用能否进行时,按这 5 步走,任一步命中即短路。</p>
+      <figure>
+        <svg viewBox="0 0 880 520" xmlns="http://www.w3.org/2000/svg">
+          <defs><marker id="arpf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/></marker></defs>
+          <rect x="340" y="20" width="200" height="40" rx="8" fill="#5769F7"/>
+          <text x="440" y="45" text-anchor="middle" font-size="14" font-weight="700" fill="white">canUseTool 调用</text>
+          <line x1="440" y1="60" x2="440" y2="85" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arpf)"/>
+
+          <polygon points="440,85 600,130 440,175 280,130" fill="#F5DEDC" stroke="#C9534D" stroke-width="1.5"/>
+          <text x="440" y="125" text-anchor="middle" font-size="12" font-weight="600">① 匹配 deny 规则?</text>
+          <text x="440" y="142" text-anchor="middle" font-size="10" fill="#87796F">任意 7 层</text>
+          <line x1="600" y1="130" x2="730" y2="130" stroke="#C9534D" stroke-width="1.5" marker-end="url(#arpf)"/>
+          <rect x="730" y="110" width="140" height="40" rx="6" fill="#F5DEDC" stroke="#C9534D" stroke-width="1.5"/>
+          <text x="800" y="135" text-anchor="middle" font-size="12" font-weight="600" fill="#C9534D">deny</text>
+
+          <line x1="440" y1="175" x2="440" y2="200" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arpf)"/>
+          <polygon points="440,200 600,245 440,290 280,245" fill="#F7ECD3" stroke="#D9A441" stroke-width="1.5"/>
+          <text x="440" y="240" text-anchor="middle" font-size="12" font-weight="600">② mode 短路?</text>
+          <text x="440" y="257" text-anchor="middle" font-size="10" fill="#87796F">bypass/acceptEdits/plan</text>
+          <line x1="600" y1="245" x2="730" y2="245" stroke="#D9A441" stroke-width="1.5" marker-end="url(#arpf)"/>
+          <rect x="730" y="225" width="140" height="40" rx="6" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1.5"/>
+          <text x="800" y="250" text-anchor="middle" font-size="12" font-weight="600" fill="#5BA67A">allow / deny</text>
+
+          <line x1="440" y1="290" x2="440" y2="315" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arpf)"/>
+          <polygon points="440,315 600,360 440,405 280,360" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1.5"/>
+          <text x="440" y="355" text-anchor="middle" font-size="12" font-weight="600">③ 匹配 allow 规则?</text>
+          <text x="440" y="372" text-anchor="middle" font-size="10" fill="#87796F">任意 7 层</text>
+          <line x1="600" y1="360" x2="730" y2="360" stroke="#5BA67A" stroke-width="1.5" marker-end="url(#arpf)"/>
+          <rect x="730" y="340" width="140" height="40" rx="6" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1.5"/>
+          <text x="800" y="365" text-anchor="middle" font-size="12" font-weight="600" fill="#5BA67A">allow</text>
+
+          <line x1="440" y1="405" x2="440" y2="430" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arpf)"/>
+          <polygon points="440,430 600,470 440,510 280,470" fill="#EDE7F8" stroke="#8B5CF6" stroke-width="1.5"/>
+          <text x="440" y="465" text-anchor="middle" font-size="12" font-weight="600">④ 分类器判定</text>
+          <text x="440" y="482" text-anchor="middle" font-size="10" fill="#87796F">yoloClassifier / bash classifier</text>
+          <line x1="600" y1="470" x2="700" y2="470" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#arpf)"/>
+          <rect x="700" y="450" width="170" height="40" rx="6" fill="white" stroke="#4A413A" stroke-width="1.5"/>
+          <text x="785" y="475" text-anchor="middle" font-size="11">⑤ 用户对话框</text>
+        </svg>
+        <figcaption>5 步决策:deny → mode → allow → 分类器 → 对话框。任一步短路即完成</figcaption>
+      </figure>
+      <h3>5.1 为什么 deny 在 allow 之前</h3>
+      <div class="box error">
+        <div class="title">安全第一原则</div>
+        即使用户在 session 里手滑加了 <code>allow: "Bash"</code>,managed 层的 <code>deny: "Bash(rm:*)"</code> 仍然会拦住。
+        <strong>deny 永远不会被 allow 覆盖</strong>。
+      </div>
+      <h3>5.2 mode 短路的特殊路径</h3>
+      <pre><code><span class="kw">switch</span> (mode) {
+  <span class="kw">case</span> <span class="str">'bypassPermissions'</span>:
+    <span class="kw">return</span> { behavior: <span class="str">'allow'</span>, updatedInput: input }
+  <span class="kw">case</span> <span class="str">'plan'</span>:
+    <span class="com">// Plan 模式下所有写工具 hard deny,除了 ExitPlanMode</span>
+    <span class="kw">if</span> (<span class="fn">isWriteTool</span>(tool)) <span class="kw">return</span> { behavior: <span class="str">'deny'</span>, message: <span class="str">'Plan mode is read-only'</span> }
+  <span class="kw">case</span> <span class="str">'acceptEdits'</span>:
+    <span class="com">// Edit/Write/NotebookEdit 直接通过,其他继续走流程</span>
+    <span class="kw">if</span> (<span class="fn">isEditTool</span>(tool)) <span class="kw">return</span> { behavior: <span class="str">'allow'</span>, updatedInput: input }
+  <span class="com">// default / dontAsk 不短路,继续 step 3</span>
+}</code></pre>
+    </section>
+
+    <section id="can-use">
+      <h2><span class="num">06</span>canUseTool 调用链</h2>
+      <p class="lead"><span class="path">src/hooks/useCanUseTool.ts</span> 定义的 <code>CanUseToolFn</code> 是整个决策入口。</p>
+      <h3>6.1 签名</h3>
+      <pre><code><span class="kw">type</span> <span class="ty">CanUseToolFn</span> = (
+  tool: <span class="ty">Tool</span>,
+  input: <span class="ty">unknown</span>,
+  toolUseContext: <span class="ty">ToolUseContext</span>,
+  assistantMessage: <span class="ty">AssistantMessage</span>,
+  requestPrompt?: (source, summary?) =&gt; <span class="ty">PromptResponse</span>,
+) =&gt; <span class="ty">Promise</span>&lt;<span class="ty">PermissionResult</span>&gt;</code></pre>
+      <h3>6.2 调用来源</h3>
+      <ul>
+        <li>checkPermissionsAndCallTool 在工具执行前</li>
+        <li>streamedCheckPermissionsAndCallTool 在流式执行器里</li>
+        <li>AgentTool 派子 agent 前检查 Agent 权限</li>
+      </ul>
+      <h3>6.3 通用流程</h3>
+      <pre><code><span class="kw">async function</span> <span class="fn">canUseTool</span>(tool, input, context, assistantMessage): <span class="ty">Promise</span>&lt;<span class="ty">PermissionResult</span>&gt; {
+  <span class="com">// 1. tool 内置 checkPermissions(每个工具可自定义)</span>
+  <span class="kw">const</span> toolDecision = <span class="kw">await</span> tool.<span class="fn">checkPermissions</span>?.(input, context)
+  <span class="kw">if</span> (toolDecision) <span class="kw">return</span> toolDecision
+
+  <span class="com">// 2. Filesystem 特殊规则(路径 + 黑白名单)</span>
+  <span class="kw">if</span> (<span class="fn">isFilesystemTool</span>(tool)) {
+    <span class="kw">return</span> <span class="fn">checkFilesystemPermission</span>(tool, input, context)
+  }
+
+  <span class="com">// 3. 常规规则匹配</span>
+  <span class="kw">const</span> ruleResult = <span class="fn">checkPermissionRules</span>(tool, input, context)
+  <span class="kw">if</span> (ruleResult) <span class="kw">return</span> ruleResult
+
+  <span class="com">// 4. 分类器</span>
+  <span class="kw">const</span> classifierResult = <span class="kw">await</span> <span class="fn">runClassifiers</span>(tool, input, context)
+  <span class="kw">if</span> (classifierResult.decision !== <span class="str">'prompt'</span>) <span class="kw">return</span> classifierResult
+
+  <span class="com">// 5. 用户对话框</span>
+  <span class="kw">return</span> <span class="kw">await</span> <span class="fn">showPermissionDialog</span>(tool, input, context)
+}</code></pre>
+    </section>
+
+    <section id="filesystem">
+      <h2><span class="num">07</span>Filesystem 特殊决策树</h2>
+      <p class="lead"><code>filesystem.ts</code> 单文件 62KB,处理读/写/执行三个维度的路径决策。</p>
+      <h3>7.1 决策树</h3>
+      <ol class="steps">
+        <li>
+          <strong>路径合法性</strong>
+          <p>必须是绝对路径;没有 null byte / shell 元字符的 escape 攻击</p>
+        </li>
+        <li>
+          <strong>dangerous path 黑名单</strong>
+          <p>~/.ssh、~/.aws、/etc/passwd、/etc/shadow 等硬编码</p>
+        </li>
+        <li>
+          <strong>additionalWorkingDirectories 白名单</strong>
+          <p>用户显式授权的额外目录(/add-dir 命令)</p>
+        </li>
+        <li>
+          <strong>cwd + worktree 自动允许</strong>
+          <p>当前工作目录总是被允许</p>
+        </li>
+        <li>
+          <strong>用户规则匹配</strong>
+          <p>Read("/src/**") 之类的自定义规则</p>
+        </li>
+      </ol>
+      <h3>7.2 例子</h3>
+      <pre><code><span class="com">// cwd = /Users/me/project</span>
+<span class="fn">Read</span>(<span class="str">'/Users/me/project/src/foo.ts'</span>)    → <span class="lbl ok">allow</span> (cwd 内)
+<span class="fn">Read</span>(<span class="str">'/Users/me/.ssh/id_rsa'</span>)              → <span class="lbl fail">deny</span> (dangerous 黑名单)
+<span class="fn">Read</span>(<span class="str">'/tmp/output.txt'</span>)                   → <span class="lbl info">prompt</span> (cwd 外,无规则)
+<span class="fn">Read</span>(<span class="str">'../other-project/config'</span>)           → <span class="lbl fail">deny</span> (非绝对)
+<span class="fn">Edit</span>(<span class="str">'/Users/me/project/src/foo.ts'</span>)    → <span class="lbl info">prompt</span> (default mode 下)
+<span class="fn">Edit</span>(<span class="str">'/Users/me/project/src/foo.ts'</span>)    → <span class="lbl ok">allow</span> (acceptEdits mode 下)</code></pre>
+    </section>
+
+    <section id="path">
+      <h2><span class="num">08</span>pathValidation</h2>
+      <p class="lead"><span class="path">pathValidation.ts</span> 专门处理路径安全校验,防止各种路径穿越攻击。</p>
+      <h3>8.1 检查项</h3>
+      <table>
+        <thead><tr><th>检查</th><th>攻击向量</th></tr></thead>
+        <tbody>
+          <tr><td>必须绝对路径</td><td>相对路径可绕过白名单</td></tr>
+          <tr><td>解析 <code>..</code> 规范化</td><td><code>/foo/../../etc/passwd</code></td></tr>
+          <tr><td>解析 symlink 后检查</td><td><code>/tmp/link → /etc/shadow</code></td></tr>
+          <tr><td>null byte 检查</td><td><code>/foo\0.txt</code> 截断</td></tr>
+          <tr><td>Windows UNC / drive letter</td><td>跨磁盘访问</td></tr>
+        </tbody>
+      </table>
+      <h3>8.2 additionalWorkingDirectories 白名单</h3>
+      <pre><code><span class="com">// 用户 /add-dir /path/to/workspace</span>
+<span class="com">// 把该目录加入 toolPermissionContext.additionalWorkingDirectories</span>
+
+<span class="com">// 之后该目录下的 Read/Edit 都 allow,跟 cwd 同级</span>
+additionalWorkingDirectories.<span class="fn">set</span>(<span class="str">'/path/to/workspace'</span>, {
+  mode: <span class="str">'full'</span>,    <span class="com">// or 'readonly'</span>
+  addedAt: <span class="fn">Date.now</span>(),
+  source: <span class="str">'session'</span>,
+})</code></pre>
+    </section>
+
+    <section id="shadowed">
+      <h2><span class="num">09</span>规则冲突检测</h2>
+      <p class="lead"><code>shadowedRuleDetection.ts</code> 在规则加载时警告"这条规则永远不会生效"。</p>
+      <h3>9.1 冲突类型</h3>
+      <pre><code><span class="com">// 冲突 1:同层 deny 覆盖 allow</span>
+allow: [<span class="str">"Bash(npm:*)"</span>]
+deny:  [<span class="str">"Bash"</span>]                  <span class="com">// ← allow 永远不生效</span>
+
+<span class="com">// 冲突 2:高层 deny 覆盖低层 allow</span>
+[projectSettings] allow: [<span class="str">"Bash(rm:*)"</span>]
+[managedSettings] deny:  [<span class="str">"Bash(rm:*)"</span>]    <span class="com">// ← project 的 allow 无效</span>
+
+<span class="com">// 冲突 3:重复规则</span>
+[projectSettings] allow: [<span class="str">"Read"</span>]
+[userSettings]    allow: [<span class="str">"Read"</span>]         <span class="com">// ← 冗余,不是错但警告</span></code></pre>
+      <h3>9.2 加载时的 warning</h3>
+      <pre><code><span class="com">// Claude Code 启动时输出</span>
+<span class="lbl warn">Warning</span> Rule <span class="str">'Bash(npm:*)'</span> in projectSettings is shadowed by
+  <span class="str">'Bash'</span> in same layer (deny). It will never apply.</code></pre>
+    </section>
+
+    <section id="yolo">
+      <h2><span class="num">10</span>YOLO 分类器</h2>
+      <p class="lead">bash 命令千变万化,写规则列完所有安全命令不现实。YOLO classifier 用 LLM 自动判断命令是否危险。</p>
+      <h3>10.1 classifier 流程</h3>
+      <ol class="steps">
+        <li><strong>构建 transcript</strong>:buildTranscriptForClassifier 把命令 + 上下文组装成 prompt</li>
+        <li><strong>调用 Haiku</strong>:用小模型分类(成本 &lt; 1/100 主模型)</li>
+        <li><strong>解析结果</strong>:输出 <code>YOLO</code> / <code>ASK</code> / <code>BLOCK</code></li>
+        <li><strong>缓存决策</strong>:同一命令不重复分类</li>
+      </ol>
+      <h3>10.2 分类 prompt(简化)</h3>
+      <pre><code><span class="com">// yolo-classifier-prompts/*.md</span>
+You are a security classifier. Decide if this command is safe:
+
+Command: <span class="str">{{command}}</span>
+Working dir: <span class="str">{{cwd}}</span>
+Recent context: <span class="str">{{recent_turns}}</span>
+
+Reply with one of:
+- YOLO: clearly safe (ls, cat, git status, npm test, ...)
+- ASK: requires human judgment (rm, curl, git push, ...)
+- BLOCK: known dangerous (rm -rf /, dd, mkfs, ...)</code></pre>
+      <h3>10.3 bash classifier 与 YOLO 不同</h3>
+      <p><code>bashClassifier.ts</code> 是纯<strong>规则引擎</strong>,用 shell-quote 解析命令,然后按黑白名单匹配。
+      YOLO 是 LLM-based,用于 bashClassifier 返回 ASK 时的二次判定。</p>
+    </section>
+
+    <section id="fusion">
+      <h2><span class="num">11</span>分类器融合</h2>
+      <p class="lead"><code>classifierDecision.ts</code> 把多个分类器的结果按权重融合。</p>
+      <h3>11.1 融合逻辑</h3>
+      <pre><code><span class="com">// 多分类器同时跑:</span>
+<span class="kw">const</span> bashRule = <span class="fn">bashClassifier</span>(command)          <span class="com">// rule-based</span>
+<span class="kw">const</span> yolo = <span class="kw">await</span> <span class="fn">yoloClassifier</span>(command, ctx)    <span class="com">// LLM-based</span>
+<span class="kw">const</span> dangerousPatterns = <span class="fn">matchDangerousPatterns</span>(command)  <span class="com">// regex</span>
+
+<span class="com">// 融合规则:最严格者胜</span>
+<span class="kw">if</span> (dangerousPatterns || bashRule === <span class="str">'BLOCK'</span> || yolo === <span class="str">'BLOCK'</span>) <span class="kw">return</span> <span class="str">'deny'</span>
+<span class="kw">if</span> (bashRule === <span class="str">'ASK'</span> || yolo === <span class="str">'ASK'</span>) <span class="kw">return</span> <span class="str">'prompt'</span>
+<span class="kw">if</span> (bashRule === <span class="str">'YOLO'</span> &amp;&amp; yolo === <span class="str">'YOLO'</span>) <span class="kw">return</span> <span class="str">'allow'</span>
+<span class="kw">return</span> <span class="str">'prompt'</span>   <span class="com">// 不确定就问</span></code></pre>
+      <h3>11.2 dangerous patterns 硬编码</h3>
+      <pre><code><span class="com">// dangerousPatterns.ts — 无论如何都不允许的命令</span>
+<span class="kw">const</span> DANGEROUS_PATTERNS = [
+  <span class="str">/rm\s+-rf\s+\//</span>,            <span class="com">// rm -rf /</span>
+  <span class="str">/:(){ :|:& };:/</span>,           <span class="com">// fork bomb</span>
+  <span class="str">/dd\s+if=.*of=\/dev\/(sd|nvme|hd)/</span>,   <span class="com">// dd 写盘</span>
+  <span class="str">/mkfs\./</span>,                  <span class="com">// 格式化</span>
+  <span class="str">/curl.*\|\s*(sh|bash)/</span>,    <span class="com">// curl pipe sh</span>
+  ...
+]</code></pre>
+    </section>
+
+    <section id="flags">
+      <h2><span class="num">12</span>特殊 flags 语义</h2>
+      <p class="lead">ToolPermissionContext 里几个 boolean flag 的细微语义。</p>
+      <h3>12.1 shouldAvoidPermissionPrompts</h3>
+      <pre><code><span class="com">// 默认值 = !isInteractive</span>
+<span class="com">// 含义:不能显示用户对话框 → "prompt" 决策直接变 "deny"</span>
+<span class="kw">if</span> (ctx.shouldAvoidPermissionPrompts &amp;&amp; result.behavior === <span class="str">'prompt'</span>) {
+  <span class="kw">return</span> { behavior: <span class="str">'deny'</span>, message: <span class="str">'Cannot prompt in non-interactive mode'</span> }
+}</code></pre>
+      <p>场景:SDK、异步 agent、后台任务。</p>
+      <h3>12.2 awaitAutomatedChecksBeforeDialog</h3>
+      <pre><code><span class="com">// 异步 agent 的特殊模式(bubble):</span>
+<span class="com">// 1. 先跑所有自动检查(分类器、hook)</span>
+<span class="com">// 2. 只有所有自动检查都返回 prompt 时才显示对话框</span>
+<span class="com">// 3. 保证用户不被"本来能自动决定的"频繁打扰</span></code></pre>
+      <h3>12.3 bypassPermissionsKillswitch</h3>
+      <pre><code><span class="com">// bypassPermissionsKillswitch.ts</span>
+<span class="com">// 企业可以硬关闭 bypassPermissions 模式</span>
+<span class="kw">function</span> <span class="fn">isBypassModeAvailable</span>() {
+  <span class="kw">if</span> (process.getuid?.() === <span class="num">0</span>) <span class="kw">return</span> <span class="kw">false</span>      <span class="com">// root 禁用</span>
+  <span class="kw">if</span> (<span class="fn">isInSandbox</span>()) <span class="kw">return</span> <span class="kw">false</span>
+  <span class="kw">if</span> (<span class="fn">isKilledByManagedSettings</span>()) <span class="kw">return</span> <span class="kw">false</span>
+  <span class="kw">return</span> <span class="kw">true</span>
+}</code></pre>
+    </section>
+
+    <section id="child">
+      <h2><span class="num">13</span>子 agent 权限继承</h2>
+      <p class="lead"><strong>安全不变量:子 agent 只能提升限制,不能降低限制。</strong></p>
+      <h3>13.1 模式继承规则(<span class="path">runAgent.ts:421</span>)</h3>
+      <pre><code><span class="kw">if</span> (
+  agentPermissionMode &amp;&amp;                              <span class="com">// agent 自己定义了 mode</span>
+  state.toolPermissionContext.mode !== <span class="str">'bypassPermissions'</span> &amp;&amp;
+  state.toolPermissionContext.mode !== <span class="str">'acceptEdits'</span> &amp;&amp;
+  !(<span class="fn">feature</span>(<span class="str">'TRANSCRIPT_CLASSIFIER'</span>) &amp;&amp; state.toolPermissionContext.mode === <span class="str">'auto'</span>)
+) {
+  <span class="com">// 允许覆盖 — 比如 agent 想进 plan 模式</span>
+  toolPermissionContext = { ...toolPermissionContext, mode: agentPermissionMode }
+}
+<span class="com">// 如果父是 bypass/acceptEdits/auto,子 agent 不能把它改严 — 保持父的"放行"属性</span></code></pre>
+      <h3>13.2 为什么这样设计</h3>
+      <div class="box note">
+        <div class="title">用户意图至上</div>
+        用户开了 bypass 意味着"我相信这个 session 全部操作"。如果子 agent 能"偷偷"把自己降到 plan,
+        会让用户期望的"全自动"工作流被打断。<strong>信任一旦给出,就不被子系统撤销</strong>。
+      </div>
+      <h3>13.3 allowedTools 独立授权</h3>
+      <pre><code><span class="com">// runAgent.ts:475 — agent 的工具可以单独授权</span>
+<span class="kw">if</span> (allowedTools !== <span class="kw">undefined</span>) {
+  toolPermissionContext = {
+    ...toolPermissionContext,
+    alwaysAllowRules: {
+      cliArg: state.toolPermissionContext.alwaysAllowRules.cliArg,   <span class="com">// 保留</span>
+      session: [...allowedTools],    <span class="com">// session 层换成 agent 专属</span>
+    },
+  }
+}</code></pre>
+      <p>目的:让 agent 只看到"SDK 给的 + agent 自己申请的"权限,父的 session 临时授权不会泄漏给它。</p>
+    </section>
+
+    <section id="result">
+      <h2><span class="num">14</span>PermissionResult 数据流</h2>
+      <pre><code><span class="kw">type</span> <span class="ty">PermissionResult</span> =
+  | { behavior: <span class="str">'allow'</span>, updatedInput: <span class="ty">unknown</span>, decisionReason?: <span class="ty">string</span> }
+  | { behavior: <span class="str">'deny'</span>, message: <span class="ty">string</span>, interrupt?: <span class="ty">boolean</span> }
+  | { behavior: <span class="str">'ask'</span>, message: <span class="ty">string</span> }   <span class="com">// 强制 prompt,即使有 allow</span></code></pre>
+      <h3>14.1 updatedInput 的关键语义</h3>
+      <p><code>allow</code> 结果里的 updatedInput 可以<strong>改变工具输入</strong>。典型用途:
+      <ul>
+        <li>PreToolUse hook 返回 <code>updatedInput: { path: "/safe/path" }</code> 修正参数</li>
+        <li>路径规范化:相对路径 → 绝对路径</li>
+        <li>敏感参数脱敏:API key 替换为 env 引用</li>
+      </ul></p>
+      <h3>14.2 interrupt flag</h3>
+      <pre><code><span class="com">// deny + interrupt: true → 不只拒绝这次调用,还要停掉整轮</span>
+{ behavior: <span class="str">'deny'</span>, message: <span class="str">'Security violation'</span>, interrupt: <span class="kw">true</span> }
+<span class="com">// 触发 abortController.abort(),整个 agent 回合终止</span></code></pre>
+    </section>
+
+    <section id="plan">
+      <h2><span class="num">15</span>Plan Mode 耦合</h2>
+      <p class="lead">Plan Mode 跟 permission 系统深度耦合 —— 进入 plan 模式本身就是权限决策的一部分。</p>
+      <h3>15.1 生命周期</h3>
+      <ol class="steps">
+        <li>
+          <strong>进入</strong>
+          <p>用户 Shift+Tab 或 EnterPlanMode tool → mode = 'plan'</p>
+        </li>
+        <li>
+          <strong>Plan 期</strong>
+          <p>模型只能 Read / Grep / Glob / WebFetch / Agent(仅 Explore/Plan 类只读 agent)</p>
+        </li>
+        <li>
+          <strong>产出计划</strong>
+          <p>ExitPlanModeV2Tool 生成计划文档 → 让用户 approve</p>
+        </li>
+        <li>
+          <strong>批准</strong>
+          <p>用户 approve → mode 回到 default/acceptEdits,计划附件作为后续 prompt 的一部分</p>
+        </li>
+      </ol>
+      <h3>15.2 allowedPrompts 预审</h3>
+      <pre><code><span class="com">// ExitPlanModeV2 可声明计划需要的权限</span>
+<span class="fn">ExitPlanMode</span>({
+  allowedPrompts: [
+    { tool: <span class="str">'Bash'</span>, prompt: <span class="str">'run tests'</span> },
+    { tool: <span class="str">'Bash'</span>, prompt: <span class="str">'install dependencies'</span> },
+  ]
+})
+<span class="com">// 用户 approve 时相当于一次性授权这些用途</span>
+<span class="com">// 后续 Bash 调用自动匹配,无需再 prompt</span></code></pre>
+    </section>
+
+    <section id="e2e">
+      <h2><span class="num">16</span>rm -rf 在 5 种模式下的命运</h2>
+      <p class="lead">用同一个操作串起整个系统,看各模式下的不同处理。</p>
+      <h3>16.1 Bash("rm -rf /tmp/foo")</h3>
+      <table>
+        <thead><tr><th>模式</th><th>结果</th><th>原因</th></tr></thead>
+        <tbody>
+          <tr><td><code>default</code></td><td><span class="lbl info">prompt</span></td><td>无 allow 规则 → classifier → ASK → 对话框</td></tr>
+          <tr><td><code>plan</code></td><td><span class="lbl fail">deny</span></td><td>plan 模式禁写</td></tr>
+          <tr><td><code>acceptEdits</code></td><td><span class="lbl info">prompt</span></td><td>acceptEdits 只对 Edit/Write 工具短路,Bash 不在其内</td></tr>
+          <tr><td><code>bypassPermissions</code></td><td><span class="lbl ok">allow</span></td><td>bypass 全放行(killswitch 未触发时)</td></tr>
+          <tr><td><code>auto</code></td><td>取决于 classifier</td><td>transcript classifier 判断,可能 allow 可能 prompt</td></tr>
+        </tbody>
+      </table>
+      <h3>16.2 Bash("rm -rf /")</h3>
+      <table>
+        <thead><tr><th>模式</th><th>结果</th><th>原因</th></tr></thead>
+        <tbody>
+          <tr><td>所有</td><td><span class="lbl fail">deny</span></td><td>匹配 <code>DANGEROUS_PATTERNS</code> 硬编码,即使 bypass 也拒</td></tr>
+        </tbody>
+      </table>
+      <div class="box error">
+        <div class="title">硬编码 deny 不可被任何模式覆盖</div>
+        这是整个系统唯一的"全局绝对 deny"层,在所有 mode / rule 之上。
+        <code>dangerousPatterns.ts</code> 就是这个系统的"安全网"。
+      </div>
+    </section>
+
+    <section id="principles">
+      <h2><span class="num">17</span>可迁移设计原则</h2>
+      <ol class="steps">
+        <li><strong>Fail-closed by default</strong> — 不明确就拒绝,比不明确就放行安全得多</li>
+        <li><strong>Layered authority</strong> — 企业 &gt; 用户 &gt; 会话,低层无法覆盖高层的 deny</li>
+        <li><strong>deny always beats allow</strong> — 即使同层,deny 永远胜</li>
+        <li><strong>硬编码危险模式</strong> — 某些命令应该无论规则怎么配都禁,作为最后安全网</li>
+        <li><strong>Mode 是快捷方式</strong> — plan/bypass 等 mode 是"快速调整一组规则"的语法糖</li>
+        <li><strong>分类器 + 规则融合</strong> — 规则精确但不全,分类器覆盖长尾;融合时取最严</li>
+        <li><strong>子 agent 只能提升限制</strong> — 用户的信任决策不被子系统撤销</li>
+        <li><strong>来源追溯</strong> — deny 时告诉用户"是哪一层禁的",便于沟通和修复</li>
+      </ol>
+      <div class="box note">
+        <div class="title">最大的启示</div>
+        permission 不是事后加的安全模块,而是<strong>跟 tool 系统共生</strong>的核心机制。
+        在 agent 系统设计之初就要把它纳入架构,否则"安全"永远是 bolt-on,永远有绕过路径。
+      </div>
+    </section>
+
+    <footer style="margin-top:80px;padding-top:32px;border-top:1px solid var(--gray-300);color:var(--gray-500);font-size:13px;">
+      <p>本文基于 Claude Code 反编译版源码(commit 1173a62)。
+      关键文件:<span class="path">src/utils/permissions/{permissions.ts, permissionRuleParser.ts, filesystem.ts, pathValidation.ts, yoloClassifier.ts, classifierDecision.ts, shadowedRuleDetection.ts, dangerousPatterns.ts, PermissionMode.ts, PermissionResult.ts}</span>、
+      <span class="path">src/hooks/useCanUseTool.ts</span>。</p>
+    </footer>
+  </main>
+</div>
+</body>
+</html>

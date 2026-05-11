@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code 任务管理系统详解 — TodoWrite & Tasks</title>
+<style>
+  :root {
+    --orange: #D77757;
+    --orange-soft: #F4E5DD;
+    --orange-deep: #B0552F;
+    --blue: #5769F7;
+    --blue-soft: #E5E8FE;
+    --green: #5BA67A;
+    --green-soft: #E2F0E8;
+    --red: #C9534D;
+    --red-soft: #F5DEDC;
+    --yellow: #D9A441;
+    --yellow-soft: #F7ECD3;
+    --purple: #8B5CF6;
+    --purple-soft: #EDE7F8;
+    --gray-900: #1F1B17;
+    --gray-700: #4A413A;
+    --gray-500: #87796F;
+    --gray-300: #D9D0C7;
+    --gray-100: #F6F1EC;
+    --gray-50: #FBF8F4;
+    --bg: #FBF8F4;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--gray-900);
+    background: var(--bg);
+    line-height: 1.7;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  nav.toc {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 32px 20px;
+    border-right: 1px solid var(--gray-300);
+    background: var(--gray-50);
+    font-size: 14px;
+  }
+  nav.toc h3 {
+    margin: 0 0 16px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gray-500);
+  }
+  nav.toc ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: section;
+  }
+  nav.toc ol li { counter-increment: section; margin-bottom: 6px; }
+  nav.toc ol li a {
+    display: block;
+    padding: 6px 10px;
+    color: var(--gray-700);
+    text-decoration: none;
+    border-radius: 6px;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  nav.toc ol li a::before {
+    content: counter(section, decimal-leading-zero) "  ";
+    color: var(--gray-500);
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+  }
+  nav.toc ol li a:hover {
+    background: var(--orange-soft);
+    color: var(--orange-deep);
+    border-left-color: var(--orange);
+  }
+  main {
+    padding: 56px 56px 120px;
+    max-width: 980px;
+  }
+  header.hero {
+    margin-bottom: 56px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--gray-300);
+  }
+  header.hero .eyebrow {
+    color: var(--orange);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  header.hero h1 {
+    font-size: 40px;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+  }
+  header.hero p {
+    font-size: 17px;
+    color: var(--gray-700);
+    max-width: 720px;
+  }
+  section {
+    margin-bottom: 64px;
+    scroll-margin-top: 24px;
+  }
+  section > h2 {
+    font-size: 28px;
+    margin: 0 0 8px;
+    padding-top: 16px;
+    border-top: 3px solid var(--orange);
+    display: inline-block;
+    padding-right: 64px;
+  }
+  section > h2 .num {
+    color: var(--orange);
+    font-variant-numeric: tabular-nums;
+    margin-right: 12px;
+  }
+  section > .lead {
+    color: var(--gray-700);
+    font-size: 16px;
+    margin-bottom: 28px;
+    max-width: 760px;
+  }
+  h3 { font-size: 20px; margin: 32px 0 12px; }
+  h4 { font-size: 16px; margin: 20px 0 8px; color: var(--gray-700); }
+
+  code {
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 13px;
+    background: var(--gray-100);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--orange-deep);
+  }
+  pre {
+    background: #1F1B17;
+    color: #E8E1D9;
+    padding: 18px 22px;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 16px 0;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-size: 13px;
+  }
+  pre .kw { color: #E5A77B; }
+  pre .str { color: #C8E0B4; }
+  pre .com { color: #6F665D; font-style: italic; }
+  pre .fn { color: #93B5E0; }
+  pre .num { color: #E5A77B; }
+  pre .ty { color: #D7B5E5; }
+
+  .box {
+    border-left: 4px solid var(--gray-300);
+    padding: 16px 20px;
+    border-radius: 6px;
+    margin: 18px 0;
+    background: white;
+    box-shadow: 0 1px 2px rgba(31,27,23,0.04);
+  }
+  .box.info { border-color: var(--blue); background: var(--blue-soft); }
+  .box.warn { border-color: var(--yellow); background: var(--yellow-soft); }
+  .box.error { border-color: var(--red); background: var(--red-soft); }
+  .box.ok { border-color: var(--green); background: var(--green-soft); }
+  .box.note { border-color: var(--orange); background: var(--orange-soft); }
+  .box.purple { border-color: var(--purple); background: var(--purple-soft); }
+  .box .title {
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .box.info .title { color: var(--blue); }
+  .box.warn .title { color: var(--yellow); }
+  .box.error .title { color: var(--red); }
+  .box.ok .title { color: var(--green); }
+  .box.note .title { color: var(--orange-deep); }
+  .box.purple .title { color: var(--purple); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+    background: white;
+    box-shadow: 0 1px 2px rgba(31,27,23,0.04);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  th, td {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--gray-300);
+    vertical-align: top;
+  }
+  th {
+    background: var(--gray-100);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-700);
+  }
+  tr:last-child td { border-bottom: none; }
+  td code { font-size: 12px; }
+
+  figure {
+    margin: 24px 0;
+    padding: 24px;
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 12px;
+    text-align: center;
+  }
+  figure svg { max-width: 100%; height: auto; }
+  figcaption {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--gray-500);
+    font-style: italic;
+  }
+
+  .pill {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 4px;
+  }
+  .pill.v1 { background: var(--blue-soft); color: var(--blue); }
+  .pill.v2 { background: var(--green-soft); color: var(--green); }
+  .pill.tool { background: var(--orange-soft); color: var(--orange-deep); }
+  .pill.swarm { background: var(--purple-soft); color: var(--purple); }
+
+  .steps {
+    list-style: none;
+    padding: 0;
+    counter-reset: step;
+  }
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 14px 18px 14px 56px;
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 14px;
+    top: 12px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--orange);
+    color: white;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+  .steps li strong { display: block; margin-bottom: 4px; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .two-col > div {
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .two-col h4 { margin-top: 0; }
+
+  .path {
+    font-family: "SF Mono", monospace;
+    font-size: 12px;
+    color: var(--blue);
+    background: var(--blue-soft);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .lbl {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-right: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .lbl.ok { background: var(--green-soft); color: var(--green); }
+  .lbl.fail { background: var(--red-soft); color: var(--red); }
+  .lbl.warn { background: var(--yellow-soft); color: #8a6520; }
+  .lbl.info { background: var(--blue-soft); color: var(--blue); }
+
+  .compare-table th { width: 33%; }
+  .compare-table td { font-size: 13px; }
+
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 1fr; }
+    nav.toc { display: none; }
+    main { padding: 32px 24px 80px; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h3>目录</h3>
+    <ol>
+      <li><a href="#overview">概览:为什么有两套系统</a></li>
+      <li><a href="#architecture">系统架构总览</a></li>
+      <li><a href="#v1-todos">V1 · TodoWrite 内存模型</a></li>
+      <li><a href="#v2-tasks">V2 · Tasks 文件持久化模型</a></li>
+      <li><a href="#five-tools">V2 五大工具详解</a></li>
+      <li><a href="#tasklistid">TaskListID 解析优先级</a></li>
+      <li><a href="#locking">文件锁与并发控制</a></li>
+      <li><a href="#highwatermark">High Water Mark · ID 单调递增</a></li>
+      <li><a href="#blocking">依赖关系 (blocks/blockedBy)</a></li>
+      <li><a href="#claim">Claim 任务的原子性</a></li>
+      <li><a href="#hooks">TaskCreated / TaskCompleted Hooks</a></li>
+      <li><a href="#reminder">惰性提醒机制</a></li>
+      <li><a href="#nudge">Verification Nudge</a></li>
+      <li><a href="#ui">UI 渲染与文件监听</a></li>
+      <li><a href="#defer">shouldDefer 与工具懒加载</a></li>
+      <li><a href="#swarm">Swarm 多人协作模式</a></li>
+      <li><a href="#e2e">端到端示例</a></li>
+      <li><a href="#principles">核心设计原则</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <div class="eyebrow">Claude Code 源码深度讲解 · 任务管理系统</div>
+      <h1>TodoWrite & Tasks 完整运行原理</h1>
+      <p>Claude Code 同时存在两套任务管理系统:轻量的 <strong>TodoWrite (V1)</strong> 用于单会话内存清单,
+      持久化的 <strong>Tasks (V2)</strong> 用于跨会话、跨进程、多 agent 协作。本文从工具定义、
+      存储模型、锁机制、Hook 系统、UI 渲染到惰性提醒,逐层解构两套系统的实现细节。</p>
+    </header>
+
+    <!-- ============================================================ -->
+    <section id="overview">
+      <h2><span class="num">01</span>概览:为什么有两套系统</h2>
+      <p class="lead">乍看之下 TodoWrite 和 Task* 工具做的是同一件事 —— 维护一个任务清单。但它们的<strong>存储位置、生命周期、并发模型、UI 表现、可观察性</strong>完全不同,设计目标也不同。</p>
+
+      <h3>1.1 V1 vs V2 对照</h3>
+      <table class="compare-table">
+        <thead>
+          <tr><th>维度</th><th>V1 · TodoWrite</th><th>V2 · Tasks (TaskCreate/Update/List/Get)</th></tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td><strong>存储位置</strong></td>
+          <td><code>AppState.todos[agentId]</code> — 进程内存</td>
+          <td><code>~/.claude/tasks/&lt;listId&gt;/&lt;id&gt;.json</code> — 磁盘 JSON 文件</td>
+        </tr>
+        <tr>
+          <td><strong>生命周期</strong></td>
+          <td>会话结束即丢失</td>
+          <td>跨会话持久,需要显式 reset 或全部 completed 5s 自动清理</td>
+        </tr>
+        <tr>
+          <td><strong>数据结构</strong></td>
+          <td>一次性整体替换:整个 <code>TodoList</code> 数组</td>
+          <td>原子操作:<code>create / update / delete / list / get</code></td>
+        </tr>
+        <tr>
+          <td><strong>核心字段</strong></td>
+          <td><code>content / activeForm / status</code></td>
+          <td><code>id / subject / description / activeForm / owner / status / blocks / blockedBy / metadata</code></td>
+        </tr>
+        <tr>
+          <td><strong>并发控制</strong></td>
+          <td>单线程,无锁</td>
+          <td>proper-lockfile 文件锁,30 次重试,~2.6s 总等待</td>
+        </tr>
+        <tr>
+          <td><strong>跨进程</strong></td>
+          <td><span class="lbl fail">不支持</span></td>
+          <td><span class="lbl ok">支持</span> 通过文件系统 + fs.watch 同步</td>
+        </tr>
+        <tr>
+          <td><strong>依赖关系</strong></td>
+          <td><span class="lbl fail">无</span></td>
+          <td><span class="lbl ok">有</span> blocks / blockedBy 双向引用</td>
+        </tr>
+        <tr>
+          <td><strong>所有权</strong></td>
+          <td><span class="lbl fail">无</span></td>
+          <td><span class="lbl ok">有</span> owner 字段,支持 swarm 多 agent</td>
+        </tr>
+        <tr>
+          <td><strong>启用条件</strong></td>
+          <td><code>!isTodoV2Enabled()</code><br>(SDK / 非交互模式默认)</td>
+          <td><code>isTodoV2Enabled()</code><br>(交互式 CLI 默认 + <code>CLAUDE_CODE_ENABLE_TASKS=1</code>)</td>
+        </tr>
+        <tr>
+          <td><strong>UI 表现</strong></td>
+          <td>简单 todo 列表</td>
+          <td>专门的 TaskListV2 组件,文件 watcher 驱动实时刷新</td>
+        </tr>
+        <tr>
+          <td><strong>Hook 支持</strong></td>
+          <td>无</td>
+          <td>TaskCreated / TaskCompleted hook,可阻断完成</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <div class="box note">
+        <div class="title">关键判定函数(<span class="path">utils/tasks.ts:133</span>)</div>
+        <pre><code><span class="kw">export function</span> <span class="fn">isTodoV2Enabled</span>(): <span class="ty">boolean</span> {
+  <span class="com">// SDK / 非交互模式可显式启用</span>
+  <span class="kw">if</span> (<span class="fn">isEnvTruthy</span>(process.env.CLAUDE_CODE_ENABLE_TASKS)) {
+    <span class="kw">return</span> <span class="kw">true</span>
+  }
+  <span class="com">// 交互式 CLI 默认启用 V2</span>
+  <span class="kw">return</span> !<span class="fn">getIsNonInteractiveSession</span>()
+}</code></pre>
+      </div>
+
+      <h3>1.2 工具注册逻辑(<span class="path">src/tools.ts:214-226</span>)</h3>
+      <pre><code><span class="com">// V1 TodoWriteTool 始终注册,但其 isEnabled 依赖 !isTodoV2Enabled()</span>
+TodoWriteTool,
+...
+<span class="com">// V2 Task* 工具:仅在 V2 启用时加入工具列表</span>
+...(<span class="fn">isTodoV2Enabled</span>()
+  ? [TaskCreateTool, TaskGetTool, TaskUpdateTool, TaskListTool]
+  : []),</code></pre>
+      <p>两套工具<strong>不会同时启用</strong>,模型在每个会话只能看到其中一套。<code>TodoWriteTool.isEnabled()</code> 返回 <code>!isTodoV2Enabled()</code>,从而和 Task* 工具自动互斥。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="architecture">
+      <h2><span class="num">02</span>系统架构总览</h2>
+      <p class="lead">把任务管理系统画成分层图,可以看到从工具调用到 UI 渲染的完整数据流。</p>
+
+      <figure>
+        <svg viewBox="0 0 920 580" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#87796F"/>
+            </marker>
+            <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#F4E5DD"/><stop offset="1" stop-color="#EFD5C5"/>
+            </linearGradient>
+            <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#E5E8FE"/><stop offset="1" stop-color="#D5DAFD"/>
+            </linearGradient>
+            <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#E2F0E8"/><stop offset="1" stop-color="#CFE5D9"/>
+            </linearGradient>
+            <linearGradient id="g4" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#F7ECD3"/><stop offset="1" stop-color="#F0DEB3"/>
+            </linearGradient>
+            <linearGradient id="g5" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#EDE7F8"/><stop offset="1" stop-color="#DACEF0"/>
+            </linearGradient>
+          </defs>
+
+          <text x="460" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#1F1B17">任务管理系统数据流</text>
+
+          <!-- Layer 1: Model -->
+          <rect x="50" y="50" width="820" height="50" rx="10" fill="url(#g1)" stroke="#D77757" stroke-width="1.5"/>
+          <text x="70" y="73" font-size="13" font-weight="700" fill="#B0552F">第 1 层 · 模型工具调用</text>
+          <text x="70" y="91" font-size="11" fill="#1F1B17">TodoWrite({todos:[...]}) · TaskCreate(subject, description) · TaskUpdate(taskId, status) · TaskList() · TaskGet(taskId)</text>
+
+          <line x1="460" y1="100" x2="460" y2="120" stroke="#87796F" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <!-- Layer 2: Tools -->
+          <rect x="50" y="120" width="820" height="80" rx="10" fill="url(#g2)" stroke="#5769F7" stroke-width="1.5"/>
+          <text x="70" y="143" font-size="13" font-weight="700" fill="#5769F7">第 2 层 · Tool 实现</text>
+          <text x="70" y="161" font-size="11" fill="#1F1B17">输入校验(Zod) · 权限检查(allow/deny) · 调用业务函数 · 触发 Hook · 转换为 tool_result</text>
+          <text x="70" y="179" font-size="11" fill="#4A413A" font-family="monospace">packages/builtin-tools/src/tools/{TodoWriteTool, TaskCreateTool, TaskUpdateTool, ...}/</text>
+
+          <!-- Two parallel branches -->
+          <line x1="220" y1="200" x2="220" y2="230" stroke="#87796F" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="700" y1="200" x2="700" y2="230" stroke="#87796F" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <!-- Layer 3a: Memory Store (V1) -->
+          <rect x="50" y="230" width="340" height="100" rx="10" fill="url(#g3)" stroke="#5BA67A" stroke-width="1.5"/>
+          <text x="70" y="253" font-size="13" font-weight="700" fill="#5BA67A">第 3a 层 · 内存存储(V1)</text>
+          <text x="70" y="271" font-size="11" fill="#1F1B17">AppState.todos[agentId] = TodoList</text>
+          <text x="70" y="287" font-size="11" fill="#4A413A">setAppState 触发 Zustand store 更新</text>
+          <text x="70" y="303" font-size="11" fill="#4A413A">订阅者直接 re-render</text>
+          <text x="70" y="320" font-size="10" fill="#87796F" font-family="monospace">state/AppStateStore.ts</text>
+
+          <!-- Layer 3b: File Store (V2) -->
+          <rect x="530" y="230" width="340" height="100" rx="10" fill="url(#g4)" stroke="#D9A441" stroke-width="1.5"/>
+          <text x="550" y="253" font-size="13" font-weight="700" fill="#8a6520">第 3b 层 · 文件存储(V2)</text>
+          <text x="550" y="271" font-size="11" fill="#1F1B17">~/.claude/tasks/&lt;listId&gt;/{N.json, .lock, .highwatermark}</text>
+          <text x="550" y="287" font-size="11" fill="#4A413A">proper-lockfile 文件锁 + JSON 序列化</text>
+          <text x="550" y="303" font-size="11" fill="#4A413A">notifyTasksUpdated() 进程内信号</text>
+          <text x="550" y="320" font-size="10" fill="#87796F" font-family="monospace">utils/tasks.ts</text>
+
+          <!-- Layer 4: Cross-process sync -->
+          <line x1="700" y1="330" x2="700" y2="360" stroke="#87796F" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <rect x="530" y="360" width="340" height="60" rx="10" fill="url(#g5)" stroke="#8B5CF6" stroke-width="1.5"/>
+          <text x="550" y="383" font-size="13" font-weight="700" fill="#8B5CF6">第 4 层 · 跨进程同步(仅 V2)</text>
+          <text x="550" y="401" font-size="11" fill="#1F1B17">fs.watch 监听目录 · 5s fallback poll · debounce 50ms</text>
+          <text x="550" y="416" font-size="10" fill="#87796F" font-family="monospace">hooks/useTasksV2.ts (TasksV2Store)</text>
+
+          <!-- Layer 5: Reminder pipeline -->
+          <line x1="220" y1="330" x2="220" y2="450" stroke="#87796F" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="700" y1="420" x2="700" y2="450" stroke="#87796F" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <rect x="50" y="450" width="820" height="60" rx="10" fill="white" stroke="#87796F" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <text x="70" y="473" font-size="13" font-weight="700">第 5 层 · 惰性提醒(注入到下一轮提示)</text>
+          <text x="70" y="491" font-size="11" fill="#4A413A">附件管线检查 turnsSinceLastTodoWrite ≥ 10 → 注入 todo_reminder / task_reminder 附件</text>
+          <text x="70" y="505" font-size="10" fill="#87796F" font-family="monospace">utils/attachments.ts:getTodoReminderAttachments / getTaskReminderAttachments</text>
+
+          <!-- UI -->
+          <line x1="220" y1="510" x2="220" y2="530" stroke="#87796F" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="700" y1="420" x2="700" y2="540" stroke="#87796F" stroke-width="1" stroke-dasharray="3 3"/>
+          <rect x="50" y="530" width="820" height="40" rx="10" fill="#FBF8F4" stroke="#1F1B17" stroke-width="1"/>
+          <text x="70" y="555" font-size="13" font-weight="700">第 6 层 · UI 渲染</text>
+          <text x="350" y="555" font-size="11" fill="#4A413A" font-family="monospace">components/TaskListV2.tsx · useTasksV2()</text>
+        </svg>
+        <figcaption>任务管理系统 6 层架构:工具 → 业务函数 → 存储 → (V2 跨进程同步) → 惰性提醒 → UI</figcaption>
+      </figure>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="v1-todos">
+      <h2><span class="num">03</span>V1 · TodoWrite 内存模型</h2>
+      <p class="lead">V1 是一个极简的内存清单。整个工具的核心逻辑只有 ~30 行,但有几个细节值得注意。</p>
+
+      <h3>3.1 数据 schema</h3>
+      <pre><code><span class="com">// utils/todo/types.ts</span>
+<span class="kw">const</span> <span class="ty">TodoStatusSchema</span> = z.<span class="fn">enum</span>([<span class="str">'pending'</span>, <span class="str">'in_progress'</span>, <span class="str">'completed'</span>])
+
+<span class="kw">export const</span> <span class="ty">TodoItemSchema</span> = z.<span class="fn">object</span>({
+  content: z.<span class="fn">string</span>().<span class="fn">min</span>(<span class="num">1</span>),       <span class="com">// 祈使句:"Run tests"</span>
+  status: <span class="ty">TodoStatusSchema</span>,
+  activeForm: z.<span class="fn">string</span>().<span class="fn">min</span>(<span class="num">1</span>),    <span class="com">// 进行时:"Running tests"</span>
+})
+<span class="kw">export const</span> <span class="ty">TodoListSchema</span> = z.<span class="fn">array</span>(<span class="ty">TodoItemSchema</span>)</code></pre>
+
+      <div class="box info">
+        <div class="title">为什么需要两个文本字段?</div>
+        <ul>
+          <li><strong>content</strong>(祈使句):<em>"Run tests"</em>、<em>"Build project"</em> —— 列表显示用</li>
+          <li><strong>activeForm</strong>(进行时):<em>"Running tests"</em>、<em>"Building project"</em> —— spinner 显示用</li>
+        </ul>
+        当任务进入 <code>in_progress</code> 时,UI spinner 显示 activeForm,让"思考中"的提示自然地变成"正在跑测试"。
+        强制要求两个字段虽然啰嗦,但显著提升用户感知的"具体进度"。
+      </div>
+
+      <h3>3.2 整体替换语义(<span class="path">TodoWriteTool.ts:65-94</span>)</h3>
+      <pre><code><span class="kw">async</span> <span class="fn">call</span>({ todos }, context) {
+  <span class="kw">const</span> appState = context.<span class="fn">getAppState</span>()
+  <span class="kw">const</span> todoKey = context.agentId ?? <span class="fn">getSessionId</span>()  <span class="com">// agent 隔离</span>
+  <span class="kw">const</span> oldTodos = appState.todos[todoKey] ?? []
+
+  <span class="com">// 全部完成时直接清空,而非保留历史</span>
+  <span class="kw">const</span> allDone = todos.<span class="fn">every</span>(_ =&gt; _.status === <span class="str">'completed'</span>)
+  <span class="kw">const</span> newTodos = allDone ? [] : todos
+
+  <span class="com">// 整体替换 -- 一次 setAppState 完成</span>
+  context.<span class="fn">setAppState</span>(prev =&gt; ({
+    ...prev,
+    todos: { ...prev.todos, [todoKey]: newTodos },
+  }))
+
+  <span class="kw">return</span> { data: { oldTodos, newTodos: todos, verificationNudgeNeeded } }
+}</code></pre>
+
+      <div class="box warn">
+        <div class="title">V1 的"整体替换"含义</div>
+        每次 TodoWrite 调用都<strong>必须传完整的清单</strong>。如果模型只想改一项,也得把所有项重新 yield 出来。
+        这是模型 prompt 里强调的"keep one in_progress at a time"难以执行的原因之一 —— 每次刷新整张表,容易漏改状态。
+      </div>
+
+      <h3>3.3 agent 隔离</h3>
+      <p><code>todoKey = context.agentId ?? getSessionId()</code> 决定了:</p>
+      <ul>
+        <li>主线程 agent → 用 sessionId 作为 key</li>
+        <li>每个子 agent(SubagentTask)→ 用各自的 agentId 作为 key</li>
+      </ul>
+      <p>同一进程里所有 agent 的 todos 都存在 <code>AppState.todos: { [agentId]: TodoList }</code> 这一个 map 里,但读写互不干扰。</p>
+
+      <h3>3.4 自动清理:全部 completed 即清空</h3>
+      <p>当传入 <code>allDone = true</code> 时,不仅返回值是空数组,<strong>实际写入的也是空数组</strong>。这避免了"昨天完成的 5 项任务"长期挂在状态里污染 UI。
+      但<code>oldTodos</code> 仍然返回真实的旧值,Hook 和 verification nudge 可以基于它判断"刚关闭了几项"。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="v2-tasks">
+      <h2><span class="num">04</span>V2 · Tasks 文件持久化模型</h2>
+      <p class="lead">V2 把每个 task 存成一个独立 JSON 文件,文件名就是 task ID。这种"一文件一任务"的设计是 swarm 多进程协作的基础。</p>
+
+      <h3>4.1 完整数据 schema</h3>
+      <pre><code><span class="com">// utils/tasks.ts:76</span>
+<span class="kw">export const</span> <span class="ty">TaskSchema</span> = z.<span class="fn">object</span>({
+  id: z.<span class="fn">string</span>(),                            <span class="com">// "1", "2", ... 单调递增数字</span>
+  subject: z.<span class="fn">string</span>(),                       <span class="com">// 任务标题(祈使句)</span>
+  description: z.<span class="fn">string</span>(),                   <span class="com">// 详细描述</span>
+  activeForm: z.<span class="fn">string</span>().<span class="fn">optional</span>(),         <span class="com">// 进行时(spinner 用)</span>
+  owner: z.<span class="fn">string</span>().<span class="fn">optional</span>(),              <span class="com">// agent ID / agent name</span>
+  status: <span class="ty">TaskStatusSchema</span>,                 <span class="com">// pending | in_progress | completed</span>
+  blocks: z.<span class="fn">array</span>(z.<span class="fn">string</span>()),               <span class="com">// 这个 task 阻塞了哪些 task ID</span>
+  blockedBy: z.<span class="fn">array</span>(z.<span class="fn">string</span>()),            <span class="com">// 这个 task 被哪些 task ID 阻塞</span>
+  metadata: z.<span class="fn">record</span>(z.<span class="fn">string</span>(), z.<span class="fn">unknown</span>()).<span class="fn">optional</span>(),  <span class="com">// 任意键值对</span>
+})</code></pre>
+
+      <h3>4.2 目录结构示意</h3>
+      <figure>
+        <svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg">
+          <!-- root -->
+          <text x="40" y="40" font-size="13" font-weight="700" fill="#1F1B17" font-family="monospace">~/.claude/tasks/</text>
+          <line x1="50" y1="50" x2="50" y2="350" stroke="#D9D0C7" stroke-width="1" stroke-dasharray="3 3"/>
+
+          <!-- listId 1 -->
+          <text x="60" y="80" font-size="13" font-weight="600" fill="#5769F7" font-family="monospace">├── &lt;sessionId-or-teamName&gt;/</text>
+          <line x1="80" y1="90" x2="80" y2="240" stroke="#D9D0C7" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="90" y="115" font-size="12" fill="#1F1B17" font-family="monospace">├── 1.json</text>
+          <text x="220" y="115" font-size="11" fill="#87796F">{"id":"1", "subject":"Add login", "status":"completed", "blocks":["3"], ...}</text>
+          <text x="90" y="140" font-size="12" fill="#1F1B17" font-family="monospace">├── 2.json</text>
+          <text x="220" y="140" font-size="11" fill="#87796F">{"id":"2", "subject":"Add tests", "status":"in_progress", ...}</text>
+          <text x="90" y="165" font-size="12" fill="#1F1B17" font-family="monospace">├── 3.json</text>
+          <text x="220" y="165" font-size="11" fill="#87796F">{"id":"3", "subject":"Deploy", "blockedBy":["1","2"], ...}</text>
+          <text x="90" y="190" font-size="12" fill="#1F1B17" font-family="monospace">├── .lock</text>
+          <text x="220" y="190" font-size="11" fill="#87796F">proper-lockfile 文件锁(空文件)</text>
+          <text x="90" y="215" font-size="12" fill="#1F1B17" font-family="monospace">└── .highwatermark</text>
+          <text x="220" y="215" font-size="11" fill="#87796F">"5"   ← 历史最高 ID,防止删除后 ID 复用</text>
+
+          <!-- listId 2 -->
+          <text x="60" y="265" font-size="13" font-weight="600" fill="#5769F7" font-family="monospace">├── &lt;another-team&gt;/</text>
+          <text x="90" y="290" font-size="12" fill="#1F1B17" font-family="monospace">└── ...</text>
+
+          <!-- shared lock -->
+          <text x="60" y="320" font-size="13" font-weight="600" fill="#8B5CF6" font-family="monospace">└── ...</text>
+
+          <!-- annotations -->
+          <rect x="40" y="345" width="640" height="30" rx="6" fill="#E5E8FE" stroke="#5769F7" stroke-width="1"/>
+          <text x="50" y="365" font-size="11" fill="#5769F7">每个 task 一个 JSON 文件,可被多个 Claude 进程同时打开,通过 .lock 文件协调写入</text>
+        </svg>
+        <figcaption>V2 任务列表的磁盘布局:每个 listId 一个目录,每个 task 一个 JSON 文件</figcaption>
+      </figure>
+
+      <h3>4.3 sanitizePathComponent 防止路径穿越</h3>
+      <pre><code><span class="com">// utils/tasks.ts:217</span>
+<span class="kw">export function</span> <span class="fn">sanitizePathComponent</span>(input: <span class="ty">string</span>): <span class="ty">string</span> {
+  <span class="kw">return</span> input.<span class="fn">replace</span>(<span class="str">/[^a-zA-Z0-9_-]/g</span>, <span class="str">'-'</span>)
+}</code></pre>
+      <p>因为 listId 来自用户配置(team 名、env 变量),必须做强清洗 —— 否则 <code>../../etc/passwd</code> 之类的输入会泄漏到任意路径。</p>
+
+      <h3>4.4 schema 迁移(ant-only)</h3>
+      <pre><code><span class="com">// utils/tasks.ts:319 — 读取时自动迁移旧字段</span>
+<span class="kw">if</span> (process.env.USER_TYPE === <span class="str">'ant'</span>) {
+  <span class="kw">if</span> (data.status === <span class="str">'open'</span>) data.status = <span class="str">'pending'</span>
+  <span class="kw">else if</span> (data.status === <span class="str">'resolved'</span>) data.status = <span class="str">'completed'</span>
+  <span class="kw">else if</span> ([<span class="str">'planning'</span>, <span class="str">'implementing'</span>, <span class="str">'reviewing'</span>, <span class="str">'verifying'</span>].<span class="fn">includes</span>(data.status))
+    data.status = <span class="str">'in_progress'</span>
+}</code></pre>
+      <p>Anthropic 内部用过更细的 status 枚举,后来收敛到 <code>pending/in_progress/completed</code> 三态。
+      读取时静默迁移,保证旧会话不丢失。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="five-tools">
+      <h2><span class="num">05</span>V2 五大工具详解</h2>
+      <p class="lead">V2 暴露了 4 个核心工具(TaskCreate / TaskUpdate / TaskList / TaskGet)+ 1 个 V1 兼容工具(TodoWrite)。每个工具都做严格的 input schema 校验和 output schema 绑定。</p>
+
+      <h3>5.1 工具职责对照</h3>
+      <table>
+        <thead>
+          <tr><th>工具</th><th>读/写</th><th>并发安全?</th><th>典型用途</th></tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td><span class="pill tool">TaskCreate</span></td>
+          <td><span class="lbl warn">写</span></td>
+          <td><span class="lbl ok">是</span></td>
+          <td>创建 pending 任务,模型规划新工作时调用</td>
+        </tr>
+        <tr>
+          <td><span class="pill tool">TaskUpdate</span></td>
+          <td><span class="lbl warn">写</span></td>
+          <td><span class="lbl ok">是</span></td>
+          <td>改 status / 改 owner / 加依赖 / 删除任务</td>
+        </tr>
+        <tr>
+          <td><span class="pill tool">TaskList</span></td>
+          <td><span class="lbl info">读</span></td>
+          <td><span class="lbl ok">是</span></td>
+          <td>看所有任务概要,寻找下一个可做的</td>
+        </tr>
+        <tr>
+          <td><span class="pill tool">TaskGet</span></td>
+          <td><span class="lbl info">读</span></td>
+          <td><span class="lbl ok">是</span></td>
+          <td>看单个任务的完整 description</td>
+        </tr>
+        <tr>
+          <td><span class="pill tool">TodoWrite</span></td>
+          <td><span class="lbl warn">写</span></td>
+          <td><span class="lbl fail">否</span></td>
+          <td>V1 兼容,SDK 模式默认</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>5.2 TaskCreate 详解</h3>
+      <p>除了写文件,还要触发 Hook、自动展开 UI、可能因 Hook 阻断而回滚:</p>
+      <pre><code><span class="kw">async</span> <span class="fn">call</span>({ subject, description, activeForm, metadata }, context) {
+  <span class="com">// 1. 写文件(获取 list 锁,分配新 ID)</span>
+  <span class="kw">const</span> taskId = <span class="kw">await</span> <span class="fn">createTask</span>(<span class="fn">getTaskListId</span>(), {
+    subject, description, activeForm,
+    status: <span class="str">'pending'</span>,
+    owner: <span class="kw">undefined</span>,
+    blocks: [], blockedBy: [],
+    metadata,
+  })
+
+  <span class="com">// 2. 触发 TaskCreated hook(可能多个 hook 同时跑)</span>
+  <span class="kw">const</span> blockingErrors = []
+  <span class="kw">for await</span> (<span class="kw">const</span> result <span class="kw">of</span> <span class="fn">executeTaskCreatedHooks</span>(taskId, subject, description, ...)) {
+    <span class="kw">if</span> (result.blockingError) blockingErrors.<span class="fn">push</span>(<span class="fn">getTaskCreatedHookMessage</span>(...))
+  }
+
+  <span class="com">// 3. 任一 Hook 阻断 → 删除刚创建的任务并抛错(原子回滚)</span>
+  <span class="kw">if</span> (blockingErrors.length &gt; <span class="num">0</span>) {
+    <span class="kw">await</span> <span class="fn">deleteTask</span>(<span class="fn">getTaskListId</span>(), taskId)
+    <span class="kw">throw new</span> <span class="ty">Error</span>(blockingErrors.<span class="fn">join</span>(<span class="str">'\n'</span>))
+  }
+
+  <span class="com">// 4. 自动展开 UI 任务面板</span>
+  context.<span class="fn">setAppState</span>(prev =&gt;
+    prev.expandedView === <span class="str">'tasks'</span> ? prev : { ...prev, expandedView: <span class="str">'tasks'</span> }
+  )
+
+  <span class="kw">return</span> { data: { task: { id: taskId, subject } } }
+}</code></pre>
+
+      <h3>5.3 TaskUpdate 详解(<span class="path">TaskUpdateTool.ts</span>)</h3>
+      <p>这是最复杂的工具,支持 8 种字段更新,每种都有专门处理:</p>
+      <table>
+        <thead><tr><th>字段</th><th>特殊行为</th></tr></thead>
+        <tbody>
+        <tr>
+          <td><code>status: 'deleted'</code></td>
+          <td>把"deleted"作为伪状态:实际调用 <code>deleteTask</code> 删除文件,并清理其他任务里指向它的 blocks/blockedBy</td>
+        </tr>
+        <tr>
+          <td><code>status: 'completed'</code></td>
+          <td>触发 TaskCompleted hook,任一阻断 → 不更新,返回 <code>success: false</code> + error 原文</td>
+        </tr>
+        <tr>
+          <td><code>status: 'in_progress'</code> 且无 owner(swarm 模式)</td>
+          <td>自动把 owner 设为当前 agentName(<code>getAgentName()</code>)</td>
+        </tr>
+        <tr>
+          <td><code>owner</code></td>
+          <td>swarm 模式下还会通过 mailbox 给新 owner 发任务分配通知</td>
+        </tr>
+        <tr>
+          <td><code>addBlocks / addBlockedBy</code></td>
+          <td>调用 <code>blockTask</code> 双向更新两端任务的引用</td>
+        </tr>
+        <tr>
+          <td><code>metadata</code></td>
+          <td>合并语义:<strong>value === null</strong> 删除该 key,否则覆盖。比 React 的 setState 更细粒度</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>5.4 TaskList 的"过滤已完成阻塞"细节</h3>
+      <pre><code><span class="com">// TaskListTool.ts:73-83</span>
+<span class="kw">const</span> resolvedTaskIds = <span class="kw">new</span> <span class="ty">Set</span>(
+  allTasks.<span class="fn">filter</span>(t =&gt; t.status === <span class="str">'completed'</span>).<span class="fn">map</span>(t =&gt; t.id),
+)
+
+<span class="kw">const</span> tasks = allTasks.<span class="fn">map</span>(task =&gt; ({
+  id: task.id,
+  subject: task.subject,
+  status: task.status,
+  owner: task.owner,
+  <span class="com">// 关键:blockedBy 只显示"未完成的阻塞者"</span>
+  blockedBy: task.blockedBy.<span class="fn">filter</span>(id =&gt; !resolvedTaskIds.<span class="fn">has</span>(id)),
+}))</code></pre>
+      <p>原因:<code>blockedBy</code> 是历史性的引用(永远存),但模型只关心"我现在能不能开始"。
+      已经 completed 的阻塞者对模型来说是"已解锁",所以 List 输出会自动过滤掉。</p>
+
+      <h3>5.5 _internal metadata 隐藏</h3>
+      <pre><code><span class="kw">const</span> allTasks = (<span class="kw">await</span> <span class="fn">listTasks</span>(taskListId)).<span class="fn">filter</span>(
+  t =&gt; !t.metadata?._internal,    <span class="com">// ← 内部任务对模型不可见</span>
+)</code></pre>
+      <p>系统可以创建带 <code>metadata: { _internal: true }</code> 的任务用作内部追踪(比如 BG sessions),这些不会出现在模型的 TaskList 输出里,但仍然在文件系统、UI 里存在。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="tasklistid">
+      <h2><span class="num">06</span>TaskListID 解析优先级</h2>
+      <p class="lead"><code>getTaskListId()</code> 决定任务存到哪个目录。这个函数有 <strong>5 级优先级</strong>,直接影响 swarm 多进程是否共享任务列表。</p>
+
+      <figure>
+        <svg viewBox="0 0 880 460" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/>
+            </marker>
+          </defs>
+
+          <!-- entry -->
+          <ellipse cx="440" cy="30" rx="180" ry="20" fill="#5769F7"/>
+          <text x="440" y="35" text-anchor="middle" font-size="13" font-weight="600" fill="white">getTaskListId() 调用</text>
+
+          <line x1="440" y1="50" x2="440" y2="80" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow6)"/>
+
+          <!-- 1 -->
+          <polygon points="440,80 600,115 440,150 280,115" fill="#F4E5DD" stroke="#D77757" stroke-width="1.5"/>
+          <text x="440" y="110" text-anchor="middle" font-size="12" font-weight="600">1. CLAUDE_CODE_TASK_LIST_ID</text>
+          <text x="440" y="126" text-anchor="middle" font-size="11" fill="#87796F">env var?</text>
+          <text x="610" y="115" font-size="11" fill="#5BA67A" font-weight="600">是 → 用 env 值</text>
+
+          <line x1="440" y1="150" x2="440" y2="170" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow6)"/>
+          <text x="455" y="165" font-size="11" fill="#C9534D">否</text>
+
+          <!-- 2 -->
+          <polygon points="440,170 620,205 440,240 260,205" fill="#F4E5DD" stroke="#D77757" stroke-width="1.5"/>
+          <text x="440" y="200" text-anchor="middle" font-size="12" font-weight="600">2. teammateContext (in-process teammate)</text>
+          <text x="440" y="216" text-anchor="middle" font-size="11" fill="#87796F">getTeammateContext() ?</text>
+          <text x="630" y="205" font-size="11" fill="#5BA67A" font-weight="600">是 → 用 leader.teamName</text>
+
+          <line x1="440" y1="240" x2="440" y2="260" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow6)"/>
+          <text x="455" y="255" font-size="11" fill="#C9534D">否</text>
+
+          <!-- 3 -->
+          <polygon points="440,260 600,295 440,330 280,295" fill="#F4E5DD" stroke="#D77757" stroke-width="1.5"/>
+          <text x="440" y="290" text-anchor="middle" font-size="12" font-weight="600">3. CLAUDE_CODE_TEAM_NAME</text>
+          <text x="440" y="306" text-anchor="middle" font-size="11" fill="#87796F">getTeamName() ?</text>
+          <text x="610" y="295" font-size="11" fill="#5BA67A" font-weight="600">是 → 用 team 名</text>
+
+          <line x1="440" y1="330" x2="440" y2="350" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow6)"/>
+          <text x="455" y="345" font-size="11" fill="#C9534D">否</text>
+
+          <!-- 4 -->
+          <polygon points="440,350 600,385 440,420 280,385" fill="#F4E5DD" stroke="#D77757" stroke-width="1.5"/>
+          <text x="440" y="380" text-anchor="middle" font-size="12" font-weight="600">4. leaderTeamName(由 TeamCreate 设置)</text>
+          <text x="440" y="396" text-anchor="middle" font-size="11" fill="#87796F">leaderTeamName ?</text>
+          <text x="610" y="385" font-size="11" fill="#5BA67A" font-weight="600">是 → 用 leader 名</text>
+
+          <line x1="440" y1="420" x2="440" y2="440" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow6)"/>
+
+          <!-- 5 -->
+          <rect x="320" y="440" width="240" height="20" rx="4" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1.5"/>
+          <text x="440" y="455" text-anchor="middle" font-size="12" font-weight="600" fill="#5BA67A">5. fallback: getSessionId()</text>
+        </svg>
+        <figcaption>5 级优先级,前 4 项都是为多进程协作设计,session ID 是单机 fallback</figcaption>
+      </figure>
+
+      <h3>6.1 实现(<span class="path">utils/tasks.ts:199</span>)</h3>
+      <pre><code><span class="kw">export function</span> <span class="fn">getTaskListId</span>(): <span class="ty">string</span> {
+  <span class="com">// 1. 显式 env 变量,最高优先级(测试/远程 agent 用)</span>
+  <span class="kw">if</span> (process.env.CLAUDE_CODE_TASK_LIST_ID) {
+    <span class="kw">return</span> process.env.CLAUDE_CODE_TASK_LIST_ID
+  }
+  <span class="com">// 2. 进程内 teammate(同 Node.js 进程 fork 出的子 agent)</span>
+  <span class="com">// 用 leader 的 teamName,这样 tmux/iTerm2 teammates 也能 resolve 到同一目录</span>
+  <span class="kw">const</span> teammateCtx = <span class="fn">getTeammateContext</span>()
+  <span class="kw">if</span> (teammateCtx) {
+    <span class="kw">return</span> teammateCtx.teamName
+  }
+  <span class="com">// 3-5. 按顺序回退</span>
+  <span class="kw">return</span> <span class="fn">getTeamName</span>() || leaderTeamName || <span class="fn">getSessionId</span>()
+}</code></pre>
+
+      <div class="box note">
+        <div class="title">为什么这么复杂?</div>
+        Claude Code 支持<strong>多 Claude 进程协作</strong>(swarm 模式)。它们可能跑在:
+        <ul>
+          <li>同一 Node.js 进程的不同 worker(in-process teammate)</li>
+          <li>同一机器的不同 tmux 窗口(每个 tmux pane 跑一个 claude)</li>
+          <li>iTerm2 的多个 split pane</li>
+        </ul>
+        <strong>它们必须看到同一个任务列表</strong>,否则协作不可能。所以 listId 不能用 sessionId(每个进程不同),
+        必须用一个共享标识 —— 团队名。优先级越高的来源越"靠近 leader"。
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="locking">
+      <h2><span class="num">07</span>文件锁与并发控制</h2>
+      <p class="lead">V2 用 <code>proper-lockfile</code> 实现跨进程互斥,而不是依赖系统调用(flock 在 macOS/NFS 上行为不一致)。
+      所有写操作都要先拿锁。</p>
+
+      <h3>7.1 锁配置</h3>
+      <pre><code><span class="com">// utils/tasks.ts:102</span>
+<span class="kw">const</span> LOCK_OPTIONS = {
+  retries: {
+    retries: <span class="num">30</span>,        <span class="com">// 最多重试 30 次</span>
+    minTimeout: <span class="num">5</span>,      <span class="com">// 5ms 起退避</span>
+    maxTimeout: <span class="num">100</span>,    <span class="com">// 最长 100ms 间隔</span>
+  },
+}</code></pre>
+      <div class="box info">
+        <div class="title">为什么是 30 次重试?</div>
+        注释里有数学计算:每个临界区做 <code>readdir + N×readFile + writeFile</code>,
+        慢盘上 ~50-100ms。10 个 swarm agent 同时抢锁,最后那个等约 900ms。
+        <strong>30 次重试 → 最长 ~2.6 秒等待</strong>,在并发上限和体感延迟之间取平衡。
+      </div>
+
+      <h3>7.2 两层锁机制</h3>
+      <p>V2 有<strong>两种粒度</strong>的锁,根据操作的影响范围选择:</p>
+
+      <table>
+        <thead><tr><th>锁文件</th><th>用途</th><th>获取者</th></tr></thead>
+        <tbody>
+        <tr>
+          <td><code>&lt;listDir&gt;/.lock</code></td>
+          <td><strong>列表级锁</strong>:任何会改变列表整体的操作</td>
+          <td>createTask, resetTaskList, claimTaskWithBusyCheck</td>
+        </tr>
+        <tr>
+          <td><code>&lt;listDir&gt;/&lt;id&gt;.json</code></td>
+          <td><strong>任务级锁</strong>:只改单个任务</td>
+          <td>updateTask, claimTask(无 busy 检查)</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>7.3 列表级锁的获取流程</h3>
+      <figure>
+        <svg viewBox="0 0 800 380" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/>
+            </marker>
+          </defs>
+
+          <!-- start -->
+          <ellipse cx="400" cy="30" rx="120" ry="20" fill="#5769F7"/>
+          <text x="400" y="35" text-anchor="middle" font-size="13" font-weight="600" fill="white">createTask 开始</text>
+
+          <line x1="400" y1="50" x2="400" y2="75" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow7)"/>
+
+          <!-- ensure dir -->
+          <rect x="280" y="75" width="240" height="40" rx="6" fill="white" stroke="#5769F7" stroke-width="1.5"/>
+          <text x="400" y="90" text-anchor="middle" font-size="12" font-weight="600">ensureTaskListLockFile</text>
+          <text x="400" y="105" text-anchor="middle" font-size="10" fill="#87796F">mkdir -p &amp; writeFile(.lock, '', { flag: 'wx' })</text>
+
+          <line x1="400" y1="115" x2="400" y2="140" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow7)"/>
+
+          <!-- lock -->
+          <rect x="280" y="140" width="240" height="40" rx="6" fill="#F4E5DD" stroke="#D77757" stroke-width="1.5"/>
+          <text x="400" y="155" text-anchor="middle" font-size="12" font-weight="600">lockfile.lock(.lock)</text>
+          <text x="400" y="170" text-anchor="middle" font-size="10" fill="#87796F">最多 30 次重试,~2.6s 总等</text>
+
+          <line x1="400" y1="180" x2="400" y2="205" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow7)"/>
+
+          <!-- find highest -->
+          <rect x="280" y="205" width="240" height="40" rx="6" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1.5"/>
+          <text x="400" y="220" text-anchor="middle" font-size="12" font-weight="600">findHighestTaskId</text>
+          <text x="400" y="235" text-anchor="middle" font-size="10" fill="#87796F">max(readdir, readHighWaterMark)</text>
+
+          <line x1="400" y1="245" x2="400" y2="270" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow7)"/>
+
+          <!-- write file -->
+          <rect x="280" y="270" width="240" height="40" rx="6" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1.5"/>
+          <text x="400" y="285" text-anchor="middle" font-size="12" font-weight="600">writeFile(&lt;id&gt;.json)</text>
+          <text x="400" y="300" text-anchor="middle" font-size="10" fill="#87796F">notifyTasksUpdated()</text>
+
+          <line x1="400" y1="310" x2="400" y2="335" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow7)"/>
+
+          <!-- release -->
+          <rect x="280" y="335" width="240" height="35" rx="6" fill="white" stroke="#4A413A" stroke-width="1.5"/>
+          <text x="400" y="358" text-anchor="middle" font-size="12" font-weight="600">finally: release()</text>
+
+          <!-- side note -->
+          <rect x="540" y="140" width="220" height="120" rx="6" fill="#F7ECD3" stroke="#D9A441" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="650" y="160" text-anchor="middle" font-size="11" font-weight="700" fill="#8a6520">提示:为什么需要 lockfile</text>
+          <text x="555" y="180" font-size="10" fill="#4A413A">writeFile 在 Node.js 里 ≈ 多个</text>
+          <text x="555" y="194" font-size="10" fill="#4A413A">syscall。两个进程可能同时</text>
+          <text x="555" y="208" font-size="10" fill="#4A413A">readHighest=5 → 都写 6.json,</text>
+          <text x="555" y="222" font-size="10" fill="#4A413A">后写覆盖前者。lockfile 把整个</text>
+          <text x="555" y="236" font-size="10" fill="#4A413A">"读最高 ID + 写新文件"做成</text>
+          <text x="555" y="250" font-size="10" fill="#4A413A">一个原子临界区。</text>
+        </svg>
+        <figcaption>createTask 的完整加锁流程,关键是"读最高 ID + 写新文件"必须在锁内</figcaption>
+      </figure>
+
+      <h3>7.4 锁文件创建技巧 — 'wx' flag</h3>
+      <pre><code><span class="com">// utils/tasks.ts:511</span>
+<span class="kw">async function</span> <span class="fn">ensureTaskListLockFile</span>(taskListId): <span class="ty">Promise</span>&lt;<span class="ty">string</span>&gt; {
+  <span class="kw">await</span> <span class="fn">ensureTasksDir</span>(taskListId)
+  <span class="kw">const</span> lockPath = <span class="fn">getTaskListLockPath</span>(taskListId)
+  <span class="kw">try</span> {
+    <span class="com">// 'wx' = write-exclusive: 文件不存在才创建,存在就抛 EEXIST</span>
+    <span class="kw">await</span> <span class="fn">writeFile</span>(lockPath, <span class="str">''</span>, { flag: <span class="str">'wx'</span> })
+  } <span class="kw">catch</span> {
+    <span class="com">// EEXIST 或其他 — 文件已存在,正常</span>
+  }
+  <span class="kw">return</span> lockPath
+}</code></pre>
+      <p>多个进程同时调用 <code>ensureTaskListLockFile</code> 时,只有第一个写入成功,其他的拿到 EEXIST。
+      这就完成了"原子创建锁文件"的语义,不需要再加更高一级的锁。</p>
+
+      <h3>7.5 内部 vs 外部 update 函数</h3>
+      <pre><code><span class="com">// utils/tasks.ts:354</span>
+<span class="com">// Internal: no lock. 调用方已经拿了锁就用这个,避免死锁(claimTask 等)。</span>
+<span class="kw">async function</span> <span class="fn">updateTaskUnsafe</span>(taskListId, taskId, updates) { ... }
+
+<span class="com">// External: 自己拿任务级锁后调用 unsafe。</span>
+<span class="kw">export async function</span> <span class="fn">updateTask</span>(taskListId, taskId, updates) {
+  <span class="kw">const</span> path = <span class="fn">getTaskPath</span>(taskListId, taskId)
+  <span class="com">// 提前检查存在,避免 lockfile 在不存在文件上抛错</span>
+  <span class="kw">if</span> (!(<span class="kw">await</span> <span class="fn">getTask</span>(taskListId, taskId))) <span class="kw">return</span> <span class="kw">null</span>
+  <span class="kw">try</span> {
+    release = <span class="kw">await</span> lockfile.<span class="fn">lock</span>(path, LOCK_OPTIONS)
+    <span class="kw">return await</span> <span class="fn">updateTaskUnsafe</span>(taskListId, taskId, updates)
+  } <span class="kw">finally</span> {
+    <span class="kw">await</span> release?.()
+  }
+}</code></pre>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="highwatermark">
+      <h2><span class="num">08</span>High Water Mark · ID 单调递增</h2>
+      <p class="lead">V2 task ID 是简单的递增整数,但<strong>必须保证全历史唯一</strong> —— 删除一个任务后,新建的任务不能复用它的 ID。这是为了防止 mailbox / blocks 引用悬挂。</p>
+
+      <h3>8.1 问题场景</h3>
+      <figure>
+        <svg viewBox="0 0 800 220" xmlns="http://www.w3.org/2000/svg">
+          <!-- timeline -->
+          <line x1="40" y1="80" x2="760" y2="80" stroke="#4A413A" stroke-width="2"/>
+
+          <g>
+            <circle cx="100" cy="80" r="6" fill="#5BA67A"/>
+            <text x="100" y="65" text-anchor="middle" font-size="11">create #1</text>
+            <text x="100" y="105" text-anchor="middle" font-size="10" fill="#87796F">tasks: [1]</text>
+          </g>
+          <g>
+            <circle cx="220" cy="80" r="6" fill="#5BA67A"/>
+            <text x="220" y="65" text-anchor="middle" font-size="11">create #2</text>
+            <text x="220" y="105" text-anchor="middle" font-size="10" fill="#87796F">tasks: [1,2]</text>
+            <text x="220" y="120" text-anchor="middle" font-size="10" fill="#87796F">#2.blockedBy=[1]</text>
+          </g>
+          <g>
+            <circle cx="360" cy="80" r="6" fill="#C9534D"/>
+            <text x="360" y="65" text-anchor="middle" font-size="11">delete #1</text>
+            <text x="360" y="105" text-anchor="middle" font-size="10" fill="#87796F">tasks: [2]</text>
+            <text x="360" y="120" text-anchor="middle" font-size="10" fill="#87796F">#2.blockedBy=[]</text>
+          </g>
+          <g>
+            <circle cx="500" cy="80" r="6" fill="#C9534D"/>
+            <text x="500" y="65" text-anchor="middle" font-size="11">create #?</text>
+            <text x="500" y="105" text-anchor="middle" font-size="10" fill="#C9534D" font-weight="600">如果复用 ID=1?</text>
+            <text x="500" y="120" text-anchor="middle" font-size="10" fill="#C9534D">#2.blockedBy 重新指向新 #1!</text>
+          </g>
+          <g>
+            <circle cx="660" cy="80" r="6" fill="#5BA67A"/>
+            <text x="660" y="65" text-anchor="middle" font-size="11">create #3</text>
+            <text x="660" y="105" text-anchor="middle" font-size="10" fill="#5BA67A" font-weight="600">正确:用 highwatermark</text>
+          </g>
+
+          <!-- annotation -->
+          <rect x="40" y="160" width="720" height="40" rx="6" fill="#F5DEDC" stroke="#C9534D" stroke-width="1"/>
+          <text x="50" y="180" font-size="11" fill="#C9534D" font-weight="600">问题:删除 #1 后,如果按 max(remaining files)+1 来分配,会分到 ID=3。</text>
+          <text x="50" y="194" font-size="11" fill="#C9534D">但如果删除 #2 和 #3 后再分配,会复用 ID=2,导致引用悬挂。</text>
+        </svg>
+        <figcaption>不用 high water mark 的潜在问题:删除任务后 ID 复用导致跨任务引用错位</figcaption>
+      </figure>
+
+      <h3>8.2 实现</h3>
+      <pre><code><span class="com">// utils/tasks.ts:271</span>
+<span class="kw">async function</span> <span class="fn">findHighestTaskId</span>(taskListId): <span class="ty">Promise</span>&lt;<span class="ty">number</span>&gt; {
+  <span class="kw">const</span> [fromFiles, fromMark] = <span class="kw">await</span> <span class="ty">Promise</span>.<span class="fn">all</span>([
+    <span class="fn">findHighestTaskIdFromFiles</span>(taskListId),    <span class="com">// 从 *.json 找</span>
+    <span class="fn">readHighWaterMark</span>(taskListId),              <span class="com">// 从 .highwatermark 读</span>
+  ])
+  <span class="kw">return</span> <span class="ty">Math</span>.<span class="fn">max</span>(fromFiles, fromMark)
+}
+
+<span class="com">// utils/tasks.ts:393 — 删除时更新 high water mark</span>
+<span class="kw">export async function</span> <span class="fn">deleteTask</span>(taskListId, taskId) {
+  <span class="kw">const</span> numericId = <span class="fn">parseInt</span>(taskId, <span class="num">10</span>)
+  <span class="kw">if</span> (!<span class="fn">isNaN</span>(numericId)) {
+    <span class="kw">const</span> currentMark = <span class="kw">await</span> <span class="fn">readHighWaterMark</span>(taskListId)
+    <span class="kw">if</span> (numericId &gt; currentMark) {
+      <span class="kw">await</span> <span class="fn">writeHighWaterMark</span>(taskListId, numericId)
+    }
+  }
+  <span class="kw">await</span> <span class="fn">unlink</span>(path)
+  ...
+}</code></pre>
+
+      <h3>8.3 resetTaskList:把 mark 抬到当前最大</h3>
+      <p><code>resetTaskList</code>(团队解散、自动清理)<strong>不会重置 mark</strong>,反而会把当前最大值<strong>记进 mark</strong>:</p>
+      <pre><code><span class="com">// utils/tasks.ts:147</span>
+<span class="kw">export async function</span> <span class="fn">resetTaskList</span>(taskListId): <span class="ty">Promise</span>&lt;<span class="kw">void</span>&gt; {
+  <span class="kw">const</span> release = <span class="kw">await</span> lockfile.<span class="fn">lock</span>(lockPath, LOCK_OPTIONS)
+  <span class="kw">const</span> currentHighest = <span class="kw">await</span> <span class="fn">findHighestTaskIdFromFiles</span>(taskListId)
+  <span class="kw">if</span> (currentHighest &gt; <span class="num">0</span>) {
+    <span class="kw">const</span> existingMark = <span class="kw">await</span> <span class="fn">readHighWaterMark</span>(taskListId)
+    <span class="kw">if</span> (currentHighest &gt; existingMark) {
+      <span class="kw">await</span> <span class="fn">writeHighWaterMark</span>(taskListId, currentHighest)
+    }
+  }
+  <span class="com">// 然后才 unlink 所有 *.json</span>
+  ...
+}</code></pre>
+      <p>这样新会话从 <code>currentHighest + 1</code> 开始计数,即使前一个会话留下来的 mailbox / log 引用了旧 task ID,也不会撞车。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="blocking">
+      <h2><span class="num">09</span>依赖关系 (blocks/blockedBy)</h2>
+      <p class="lead">V2 用<strong>双向引用</strong>(redundant edges)记录依赖,这样无论从哪一端查询都不需要遍历整个列表。</p>
+
+      <h3>9.1 数据模型</h3>
+      <pre><code><span class="com">// 任务 #2 由 #1 阻塞:</span>
+{ id: <span class="str">"1"</span>, blocks: [<span class="str">"2"</span>], blockedBy: [] }
+{ id: <span class="str">"2"</span>, blocks: [],    blockedBy: [<span class="str">"1"</span>] }
+                    ↑                  ↑
+              #1 阻塞了哪些?     #2 被谁阻塞?</code></pre>
+
+      <h3>9.2 blockTask:维护双向引用(<span class="path">tasks.ts:458</span>)</h3>
+      <pre><code><span class="kw">export async function</span> <span class="fn">blockTask</span>(taskListId, fromTaskId, toTaskId) {
+  <span class="kw">const</span> [fromTask, toTask] = <span class="kw">await</span> <span class="ty">Promise</span>.<span class="fn">all</span>([
+    <span class="fn">getTask</span>(taskListId, fromTaskId),
+    <span class="fn">getTask</span>(taskListId, toTaskId),
+  ])
+  <span class="kw">if</span> (!fromTask || !toTask) <span class="kw">return</span> <span class="kw">false</span>
+
+  <span class="com">// 1. fromTask.blocks 加入 toTaskId</span>
+  <span class="kw">if</span> (!fromTask.blocks.<span class="fn">includes</span>(toTaskId)) {
+    <span class="kw">await</span> <span class="fn">updateTask</span>(taskListId, fromTaskId, {
+      blocks: [...fromTask.blocks, toTaskId],
+    })
+  }
+  <span class="com">// 2. toTask.blockedBy 加入 fromTaskId</span>
+  <span class="kw">if</span> (!toTask.blockedBy.<span class="fn">includes</span>(fromTaskId)) {
+    <span class="kw">await</span> <span class="fn">updateTask</span>(taskListId, toTaskId, {
+      blockedBy: [...toTask.blockedBy, fromTaskId],
+    })
+  }
+  <span class="kw">return</span> <span class="kw">true</span>
+}</code></pre>
+
+      <div class="box warn">
+        <div class="title">不是事务的!</div>
+        两次 <code>updateTask</code> 没有放在同一个锁内 —— 如果第二次失败,第一次已经持久化,会出现单向引用残留。
+        但因为模型查询时只看 <code>blockedBy</code>(决定能不能 claim),单向残留只是显示问题,不会影响调度正确性。
+        <strong>这是有意的设计权衡:简单 &gt; 强一致性</strong>。
+      </div>
+
+      <h3>9.3 deleteTask 清理悬挂引用(<span class="path">tasks.ts:420</span>)</h3>
+      <pre><code><span class="com">// 删除一个 task 后,扫一遍其他所有 task,从 blocks/blockedBy 里去掉它</span>
+<span class="kw">const</span> allTasks = <span class="kw">await</span> <span class="fn">listTasks</span>(taskListId)
+<span class="kw">for</span> (<span class="kw">const</span> task <span class="kw">of</span> allTasks) {
+  <span class="kw">const</span> newBlocks = task.blocks.<span class="fn">filter</span>(id =&gt; id !== taskId)
+  <span class="kw">const</span> newBlockedBy = task.blockedBy.<span class="fn">filter</span>(id =&gt; id !== taskId)
+  <span class="kw">if</span> (newBlocks.length !== task.blocks.length ||
+      newBlockedBy.length !== task.blockedBy.length) {
+    <span class="kw">await</span> <span class="fn">updateTask</span>(taskListId, task.id, {
+      blocks: newBlocks,
+      blockedBy: newBlockedBy,
+    })
+  }
+}</code></pre>
+      <p>O(n) 扫描成本对小列表无所谓(典型 &lt; 50 tasks)。如果列表上万,这里会变瓶颈,但目前还没出现这种规模。</p>
+
+      <h3>9.4 TaskList 输出的"已解锁"语义</h3>
+      <p>前面 5.4 提到过,TaskList 返回的 <code>blockedBy</code> 已经过滤掉 completed 任务。
+      所以模型看到的 <code>blockedBy: []</code> 直接意味着"现在可做",不需要再去查每个阻塞者的状态。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="claim">
+      <h2><span class="num">10</span>Claim 任务的原子性</h2>
+      <p class="lead">在 swarm 模式下,多个 agent 可能同时尝试认领同一个 pending 任务。<code>claimTask</code> 提供了精细的原子性保证。</p>
+
+      <h3>10.1 五种失败原因</h3>
+      <pre><code><span class="kw">type</span> <span class="ty">ClaimTaskResult</span> = {
+  success: <span class="ty">boolean</span>
+  reason?: <span class="str">'task_not_found'</span>     <span class="com">// 任务文件不存在</span>
+        | <span class="str">'already_claimed'</span>      <span class="com">// 已被其他 agent 拿走</span>
+        | <span class="str">'already_resolved'</span>     <span class="com">// 已经 completed</span>
+        | <span class="str">'blocked'</span>              <span class="com">// 还有未完成的阻塞者</span>
+        | <span class="str">'agent_busy'</span>           <span class="com">// 当前 agent 还有别的任务在做(可选检查)</span>
+  task?: <span class="ty">Task</span>
+  busyWithTasks?: <span class="ty">string[]</span>
+  blockedByTasks?: <span class="ty">string[]</span>
+}</code></pre>
+
+      <h3>10.2 两种锁粒度的 claim 路径</h3>
+
+      <h4>场景 A:不需要 busy 检查</h4>
+      <p><code>claimTask(..., { checkAgentBusy: false })</code> → 只锁 <strong>单个 task 文件</strong>。</p>
+      <ol class="steps">
+        <li><strong>预检查存在</strong>:<code>getTask</code> 一次,不存在直接返回 <code>task_not_found</code>。proper-lockfile 在不存在文件上会抛错,先检查避免异常。</li>
+        <li><strong>拿任务级锁</strong>:<code>lockfile.lock(taskPath)</code></li>
+        <li><strong>重读任务状态</strong>:被锁前可能已被改</li>
+        <li><strong>检查 owner</strong>:已被别人占 → <code>already_claimed</code></li>
+        <li><strong>检查 status</strong>:已 completed → <code>already_resolved</code></li>
+        <li><strong>遍历 listTasks 查 blockedBy</strong>:有未完成阻塞者 → <code>blocked</code></li>
+        <li><strong>updateTaskUnsafe(owner = me)</strong>:已经持锁,用 unsafe 版本避免死锁</li>
+        <li><strong>finally release</strong></li>
+      </ol>
+
+      <h4>场景 B:需要 busy 检查(swarm)</h4>
+      <p><code>claimTaskWithBusyCheck</code> → 锁 <strong>整个列表</strong>(<code>.lock</code> 文件)。
+      原因:busy 检查需要原子地遍历"agent 拥有的所有未完成 task",这是<strong>跨多个 task 文件</strong>的查询。</p>
+
+      <pre><code><span class="com">// utils/tasks.ts:618</span>
+release = <span class="kw">await</span> lockfile.<span class="fn">lock</span>(lockPath, LOCK_OPTIONS)  <span class="com">// 列表级锁</span>
+
+<span class="kw">const</span> allTasks = <span class="kw">await</span> <span class="fn">listTasks</span>(taskListId)
+
+<span class="com">// 1. 找目标任务</span>
+<span class="com">// 2. 检查 owner / status / blockedBy</span>
+<span class="com">// 3. 检查 agent 自己是否 busy</span>
+<span class="kw">const</span> agentOpenTasks = allTasks.<span class="fn">filter</span>(t =&gt;
+  t.status !== <span class="str">'completed'</span> &amp;&amp;
+  t.owner === claimantAgentId &amp;&amp;
+  t.id !== taskId
+)
+<span class="kw">if</span> (agentOpenTasks.length &gt; <span class="num">0</span>) {
+  <span class="kw">return</span> { success: <span class="kw">false</span>, reason: <span class="str">'agent_busy'</span>, busyWithTasks: agentOpenTasks.<span class="fn">map</span>(t =&gt; t.id) }
+}
+<span class="com">// 4. 通过所有检查 → updateTask 设置 owner</span></code></pre>
+
+      <div class="box info">
+        <div class="title">为什么 busy 检查需要列表锁?</div>
+        如果只锁目标 task 文件,<strong>TOCTOU 漏洞</strong>会出现:
+        <ol>
+          <li>Agent A 拿着 task #5 的锁,扫描其他 tasks → 发现自己只拥有 #5,不 busy</li>
+          <li>同时 Agent A 在另一进程拿到 task #8 的锁,做同样检查 → 也不 busy</li>
+          <li>两个进程都成功 claim,Agent A 同时拥有 #5 和 #8</li>
+        </ol>
+        列表级锁让"扫描 + 写入"成为单一临界区,杜绝这种竞态。
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="hooks">
+      <h2><span class="num">11</span>TaskCreated / TaskCompleted Hooks</h2>
+      <p class="lead">V2 任务的关键生命周期点都暴露给用户配置的 hook。Hook 可以<strong>阻断任务创建/完成</strong>,常用于"完成前必须跑测试"这类工作流。</p>
+
+      <h3>11.1 触发点与时机</h3>
+      <table>
+        <thead><tr><th>Hook 事件</th><th>触发位置</th><th>阻断效果</th></tr></thead>
+        <tbody>
+        <tr>
+          <td><code>TaskCreated</code></td>
+          <td>TaskCreate.call() 内 — <strong>已写完文件之后</strong></td>
+          <td>阻断 → <code>deleteTask</code> 回滚 + 抛出错误,工具调用失败</td>
+        </tr>
+        <tr>
+          <td><code>TaskCompleted</code></td>
+          <td>TaskUpdate.call() 内 — <strong>更新前</strong></td>
+          <td>阻断 → 不写文件,返回 <code>success: false</code> + error 给模型</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>11.2 Hook 输入数据</h3>
+      <pre><code><span class="com">// hooks.ts:3907</span>
+<span class="kw">const</span> hookInput: <span class="ty">TaskCreatedHookInput</span> = {
+  ...createBaseHookInput(permissionMode),    <span class="com">// session_id, cwd, ...</span>
+  hook_event_name: <span class="str">'TaskCreated'</span>,
+  task_id: taskId,
+  task_subject: taskSubject,
+  task_description: taskDescription,
+  teammate_name: teammateName,                <span class="com">// 谁创建的</span>
+  team_name: teamName,
+}</code></pre>
+
+      <h3>11.3 阻断回滚示例</h3>
+      <p>用户在 settings.json 里配 TaskCreated hook 检查"任务标题不能是 TODO":</p>
+      <pre><code>{
+  <span class="str">"hooks"</span>: {
+    <span class="str">"TaskCreated"</span>: [{
+      <span class="str">"command"</span>: <span class="str">"bash -c 'jq -r .task_subject | grep -qv ^TODO || exit 2'"</span>
+    }]
+  }
+}</code></pre>
+      <p>当模型尝试创建 <code>{ subject: "TODO: implement" }</code>:</p>
+      <ol>
+        <li><code>createTask</code> 已写入 <code>~/.claude/tasks/&lt;listId&gt;/N.json</code></li>
+        <li>Hook 跑出 exit 2 → blockingError</li>
+        <li>TaskCreate 看到 blockingErrors.length &gt; 0 → 调用 <code>deleteTask(N)</code> 回滚</li>
+        <li>throw 错误 → 工具结果是 <code>tool_result(is_error: true, content: hook 错误信息)</code></li>
+        <li>模型读到错误,下一回合改 subject 再试</li>
+      </ol>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="reminder">
+      <h2><span class="num">12</span>惰性提醒机制</h2>
+      <p class="lead">系统会在<strong>模型连续 10 个 turn 没用 TodoWrite/TaskUpdate</strong> 时,自动注入一条 system-reminder,提示模型考虑用任务列表追踪进度。</p>
+
+      <h3>12.1 触发条件(<span class="path">utils/attachments.ts:3326</span>)</h3>
+      <pre><code><span class="kw">if</span> (
+  turnsSinceLastTodoWrite &gt;= TODO_REMINDER_CONFIG.TURNS_SINCE_WRITE &amp;&amp;     <span class="com">// 10</span>
+  turnsSinceLastReminder &gt;= TODO_REMINDER_CONFIG.TURNS_BETWEEN_REMINDERS  <span class="com">// 10</span>
+) {
+  <span class="kw">return</span> [{ type: <span class="str">'todo_reminder'</span>, content: todos, itemCount: todos.length }]
+}</code></pre>
+
+      <p>计数逻辑(<span class="path">attachments.ts:3238</span>):从消息列表<strong>反向</strong>遍历,跳过 thinking 消息,统计直到遇到上一个 TodoWrite 或上一个 todo_reminder 之间的 assistant turn 数。</p>
+
+      <h3>12.2 提醒文案</h3>
+      <pre><code><span class="com">// messages.ts:3629</span>
+<span class="kw">let</span> message = <span class="str">`The TodoWrite tool hasn't been used recently. ...
+This is just a gentle reminder - ignore if not applicable.
+Make sure that you NEVER mention this reminder to the user`</span>
+
+<span class="kw">if</span> (todoItems.length &gt; <span class="num">0</span>) {
+  message += <span class="str">`\n\nHere are the existing contents of your todo list:\n\n[${todoItems}]`</span>
+}
+
+<span class="kw">return</span> <span class="fn">wrapMessagesInSystemReminder</span>([
+  <span class="fn">createUserMessage</span>({ content: message, isMeta: <span class="kw">true</span> }),
+])</code></pre>
+
+      <div class="box note">
+        <div class="title">三个关键设计</div>
+        <ol>
+          <li><strong><code>isMeta: true</code></strong>:这条消息<strong>不会显示在 UI</strong> 给用户看</li>
+          <li><strong><code>&lt;system-reminder&gt;</code> 包裹</strong>:模型 prompt 里专门指导"反应这种格式但不要提起"</li>
+          <li><strong>"NEVER mention this reminder"</strong>:防止模型在回答里说"我看到一个提醒说..."</li>
+        </ol>
+      </div>
+
+      <h3>12.3 V2 task_reminder 路径</h3>
+      <pre><code><span class="com">// attachments.ts:910</span>
+<span class="fn">maybe</span>(<span class="str">'todo_reminders'</span>, () =&gt;
+  <span class="fn">isTodoV2Enabled</span>()
+    ? <span class="fn">getTaskReminderAttachments</span>(messages, toolUseContext)    <span class="com">// V2 走这条</span>
+    : <span class="fn">getTodoReminderAttachments</span>(messages, toolUseContext),
+)</code></pre>
+      <p>V2 提醒文案略有不同 —— 它检查 TaskCreate / TaskUpdate 这两种工具的最近使用,
+      并把 listTasks 的结果嵌入提醒,让模型直接看到当前任务清单。</p>
+
+      <h3>12.4 跳过条件</h3>
+      <table>
+        <thead><tr><th>条件</th><th>原因</th></tr></thead>
+        <tbody>
+        <tr>
+          <td>没有 TodoWrite/TaskUpdate 工具</td>
+          <td>tool 不可用就不要纠缠模型</td>
+        </tr>
+        <tr>
+          <td><code>BRIEF_TOOL_NAME</code> 工具存在(SendUserMessage)</td>
+          <td>brief 工作流下 TodoWrite 是边路通道,提醒会冲突</td>
+        </tr>
+        <tr>
+          <td>messages 为空</td>
+          <td>会话刚开始,无须提醒</td>
+        </tr>
+        <tr>
+          <td>USER_TYPE === 'ant' (V2 only)</td>
+          <td>内部用户已经熟悉工具,提醒变 spam</td>
+        </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="nudge">
+      <h2><span class="num">13</span>Verification Nudge</h2>
+      <p class="lead">这是一个更精细的"工作流补强"机制:当模型刚刚关闭一个 3+ 项的任务清单,而<strong>清单里没有任何 verification 步骤</strong>,系统会在 tool_result 末尾追加一段提醒,引导模型调用 verification agent。</p>
+
+      <h3>13.1 触发条件(<span class="path">TodoWriteTool.ts:77</span>)</h3>
+      <pre><code><span class="kw">let</span> verificationNudgeNeeded = <span class="kw">false</span>
+<span class="kw">if</span> (
+  <span class="fn">feature</span>(<span class="str">'VERIFICATION_AGENT'</span>) &amp;&amp;
+  <span class="fn">getFeatureValue_CACHED_MAY_BE_STALE</span>(<span class="str">'tengu_hive_evidence'</span>, <span class="kw">false</span>) &amp;&amp;
+  !context.agentId &amp;&amp;                                          <span class="com">// 仅主线程</span>
+  allDone &amp;&amp;                                                   <span class="com">// 所有任务都 completed</span>
+  todos.length &gt;= <span class="num">3</span> &amp;&amp;                                       <span class="com">// 清单 ≥ 3 项</span>
+  !todos.<span class="fn">some</span>(t =&gt; <span class="str">/verif/i</span>.<span class="fn">test</span>(t.content))                  <span class="com">// 没有 verify 步骤</span>
+) {
+  verificationNudgeNeeded = <span class="kw">true</span>
+}</code></pre>
+
+      <h3>13.2 注入文案</h3>
+      <pre><code><span class="com">// TodoWriteTool.ts:107</span>
+<span class="kw">const</span> nudge = verificationNudgeNeeded
+  ? <span class="str">`\n\nNOTE: You just closed out 3+ tasks and none of them was a verification step.
+Before writing your final summary, spawn the verification agent (subagent_type="${VERIFICATION_AGENT_TYPE}").
+You cannot self-assign PARTIAL by listing caveats in your summary —
+only the verifier issues a verdict.`</span>
+  : <span class="str">''</span>
+
+<span class="kw">return</span> {
+  tool_use_id: toolUseID,
+  type: <span class="str">'tool_result'</span>,
+  content: base + nudge,
+}</code></pre>
+
+      <div class="box purple">
+        <div class="title">为什么这种"边缘提示"很关键</div>
+        模型有"完成偏差"(completion bias):写完最后一个 task 后倾向于直接给出总结。
+        但很多任务实际上没真的完成 —— 测试没跑、构建没过、edge case 没覆盖。
+        <strong>"loop-exit moment"是最容易 skip 验证的瞬间</strong>,所以在这个时刻附加一条结构性提醒,
+        把"模型自我验证"变成"调用专门 verifier agent"。
+      </div>
+
+      <h3>13.3 TaskUpdate 镜像逻辑</h3>
+      <p>V2 在 TaskUpdate 里有同样的 nudge 实现(<span class="path">TaskUpdateTool.ts:333</span>),触发条件:
+      <code>updates.status === 'completed'</code> 且 <code>allDone</code> 且 <code>allTasks.length ≥ 3</code> 且没有 verification 任务。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="ui">
+      <h2><span class="num">14</span>UI 渲染与文件监听</h2>
+      <p class="lead">V2 的 UI 必须感知<strong>跨进程</strong>的任务变化。<code>TasksV2Store</code> 是一个 React 18 的 <code>useSyncExternalStore</code> 适配器,管理 fs.watch + 进程内信号 + 5s fallback poll。</p>
+
+      <h3>14.1 三种数据源</h3>
+      <figure>
+        <svg viewBox="0 0 880 320" xmlns="http://www.w3.org/2000/svg">
+          <!-- center store -->
+          <rect x="320" y="120" width="240" height="80" rx="12" fill="#F4E5DD" stroke="#D77757" stroke-width="2"/>
+          <text x="440" y="148" text-anchor="middle" font-size="14" font-weight="700" fill="#B0552F">TasksV2Store</text>
+          <text x="440" y="168" text-anchor="middle" font-size="11" fill="#1F1B17">单例 · 全 hook 实例共享</text>
+          <text x="440" y="186" text-anchor="middle" font-size="10" fill="#87796F">#tasks · #hidden · #subscriberCount</text>
+
+          <!-- source 1: fs.watch -->
+          <rect x="40" y="40" width="200" height="60" rx="10" fill="#E5E8FE" stroke="#5769F7" stroke-width="1.5"/>
+          <text x="140" y="62" text-anchor="middle" font-size="13" font-weight="700" fill="#5769F7">fs.watch</text>
+          <text x="140" y="80" text-anchor="middle" font-size="11" fill="#1F1B17">监听任务目录</text>
+          <text x="140" y="94" text-anchor="middle" font-size="10" fill="#87796F">跨进程信号</text>
+
+          <line x1="240" y1="80" x2="320" y2="140" stroke="#5769F7" stroke-width="1.5"/>
+          <text x="270" y="115" font-size="10" fill="#5769F7">debounce 50ms</text>
+
+          <!-- source 2: onTasksUpdated -->
+          <rect x="40" y="140" width="200" height="60" rx="10" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1.5"/>
+          <text x="140" y="162" text-anchor="middle" font-size="13" font-weight="700" fill="#5BA67A">onTasksUpdated</text>
+          <text x="140" y="180" text-anchor="middle" font-size="11" fill="#1F1B17">进程内信号</text>
+          <text x="140" y="194" text-anchor="middle" font-size="10" fill="#87796F">调 Tool 后立即触发</text>
+
+          <line x1="240" y1="170" x2="320" y2="160" stroke="#5BA67A" stroke-width="1.5"/>
+
+          <!-- source 3: poll -->
+          <rect x="40" y="240" width="200" height="60" rx="10" fill="#F7ECD3" stroke="#D9A441" stroke-width="1.5"/>
+          <text x="140" y="262" text-anchor="middle" font-size="13" font-weight="700" fill="#8a6520">5s fallback poll</text>
+          <text x="140" y="280" text-anchor="middle" font-size="11" fill="#1F1B17">仅有未完成任务时</text>
+          <text x="140" y="294" text-anchor="middle" font-size="10" fill="#87796F">兜底 fs.watch 漏事件</text>
+
+          <line x1="240" y1="270" x2="320" y2="190" stroke="#D9A441" stroke-width="1.5"/>
+
+          <!-- subscribers -->
+          <rect x="640" y="40" width="200" height="50" rx="10" fill="white" stroke="#1F1B17" stroke-width="1"/>
+          <text x="740" y="60" text-anchor="middle" font-size="12" font-weight="600">REPL.tsx</text>
+          <text x="740" y="78" text-anchor="middle" font-size="10" fill="#87796F">long-lived subscriber</text>
+
+          <rect x="640" y="100" width="200" height="50" rx="10" fill="white" stroke="#1F1B17" stroke-width="1"/>
+          <text x="740" y="120" text-anchor="middle" font-size="12" font-weight="600">Spinner.tsx</text>
+          <text x="740" y="138" text-anchor="middle" font-size="10" fill="#87796F">mount/unmount 每回合</text>
+
+          <rect x="640" y="160" width="200" height="50" rx="10" fill="white" stroke="#1F1B17" stroke-width="1"/>
+          <text x="740" y="180" text-anchor="middle" font-size="12" font-weight="600">PromptInputFooterLeftSide</text>
+
+          <rect x="640" y="220" width="200" height="50" rx="10" fill="white" stroke="#1F1B17" stroke-width="1"/>
+          <text x="740" y="240" text-anchor="middle" font-size="12" font-weight="600">TaskListV2</text>
+          <text x="740" y="258" text-anchor="middle" font-size="10" fill="#87796F">展开面板渲染</text>
+
+          <line x1="560" y1="140" x2="640" y2="65" stroke="#4A413A" stroke-width="1"/>
+          <line x1="560" y1="150" x2="640" y2="125" stroke="#4A413A" stroke-width="1"/>
+          <line x1="560" y1="170" x2="640" y2="185" stroke="#4A413A" stroke-width="1"/>
+          <line x1="560" y1="180" x2="640" y2="245" stroke="#4A413A" stroke-width="1"/>
+        </svg>
+        <figcaption>TasksV2Store 三源同步 + 多订阅者共享:避免 N 个组件各自起 fs.watch 的开销</figcaption>
+      </figure>
+
+      <h3>14.2 关键优化:为什么是单例 store</h3>
+      <pre><code><span class="com">// hooks/useTasksV2.ts:23 注释</span>
+<span class="com">// Multiple hook instances (REPL, Spinner, PromptInputFooterLeftSide)</span>
+<span class="com">// subscribe to one shared store instead of each setting up their own fs.watch</span>
+<span class="com">// on the same directory. The Spinner mounts/unmounts every turn —</span>
+<span class="com">// per-hook watchers caused constant watch/unwatch churn.</span></code></pre>
+
+      <h3>14.3 自动隐藏定时器</h3>
+      <pre><code><span class="com">// useTasksV2.ts:113</span>
+<span class="kw">const</span> hasIncomplete = current.<span class="fn">some</span>(t =&gt; t.status !== <span class="str">'completed'</span>)
+
+<span class="kw">if</span> (hasIncomplete || current.length === <span class="num">0</span>) {
+  <span class="com">// 有未完成任务 / 空清单 — 重置 hide 状态</span>
+  <span class="kw">this</span>.#hidden = current.length === <span class="num">0</span>
+  <span class="kw">this</span>.#clearHideTimer()
+} <span class="kw">else if</span> (<span class="kw">this</span>.#hideTimer === <span class="kw">null</span> &amp;&amp; !<span class="kw">this</span>.#hidden) {
+  <span class="com">// 全部刚刚 completed — 启动 5 秒倒计时</span>
+  <span class="kw">this</span>.#hideTimer = <span class="fn">setTimeout</span>(
+    <span class="kw">this</span>.#onHideTimerFired.<span class="fn">bind</span>(<span class="kw">this</span>, taskListId),
+    HIDE_DELAY_MS,    <span class="com">// 5000</span>
+  )
+}</code></pre>
+      <p>5 秒后,如果任务全部仍为 completed,调用 <code>resetTaskList</code> 删掉所有 JSON 文件,并把 store 标记为 hidden。
+      用户就能看到"任务列表 → 5 秒后自动消失"的效果。</p>
+
+      <h3>14.4 task list ID 可中途变化的处理</h3>
+      <pre><code><span class="com">// useTasksV2.ts:113 — 每次 fetch 都重新解析 listId</span>
+#fetch = <span class="kw">async</span> (): <span class="ty">Promise</span>&lt;<span class="kw">void</span>&gt; =&gt; {
+  <span class="kw">const</span> taskListId = <span class="fn">getTaskListId</span>()
+  <span class="com">// listId 可能变(例如 TeamCreateTool 设置 leaderTeamName)— 重新指 watcher</span>
+  <span class="kw">this</span>.#rewatch(<span class="fn">getTasksDir</span>(taskListId))
+  ...
+}</code></pre>
+      <p>当 leader 创建团队后,<code>setLeaderTeamName</code> 会调 <code>notifyTasksUpdated</code>,
+      触发 fetch 重新读 listId,把 fs.watch 切到新目录 —— 全程不需要重启进程。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="defer">
+      <h2><span class="num">15</span>shouldDefer 与工具懒加载</h2>
+      <p class="lead">所有 5 个任务工具都设置了 <code>shouldDefer: true</code>。这是 Claude Code 的"工具懒加载"机制,在工具数量增多时降低 prompt token 占用。</p>
+
+      <h3>15.1 deferred 工具的语义(<span class="path">src/Tool.ts:447</span>)</h3>
+      <pre><code><span class="com">/**
+ * When true, this tool is deferred (sent with defer_loading: true) and requires
+ * ToolSearch to be used before it can be called.
+ */</span>
+<span class="kw">readonly</span> shouldDefer?: <span class="ty">boolean</span></code></pre>
+      <p>带 <code>shouldDefer: true</code> 的工具:</p>
+      <ol>
+        <li>初始 prompt 里只发<strong>工具名 + searchHint</strong>,不发 schema</li>
+        <li>模型必须先用 <code>ToolSearch</code> 查找到这个工具</li>
+        <li>查到后 schema 才会被加入"已解锁"列表,模型才能调用它</li>
+      </ol>
+
+      <div class="box info">
+        <div class="title">为什么任务工具都是 deferred?</div>
+        TaskCreate / TaskUpdate / TaskList / TaskGet / TodoWrite 加起来的 prompt 大约 4-6k token。
+        <strong>大多数 query 根本不需要任务管理</strong>(单步小任务占绝大多数)。
+        延迟加载这些工具能在不损失功能的前提下,让 90%+ 的 query 节省 4-6k token。
+      </div>
+
+      <h3>15.2 searchHint:让 ToolSearch 能找到</h3>
+      <pre><code>TaskCreateTool: { name: <span class="str">'TaskCreate'</span>, searchHint: <span class="str">'create a task in the task list'</span> }
+TaskUpdateTool: { name: <span class="str">'TaskUpdate'</span>, searchHint: <span class="str">'update a task'</span> }
+TaskListTool:   { name: <span class="str">'TaskList'</span>,   searchHint: <span class="str">'list all tasks'</span> }
+TaskGetTool:    { name: <span class="str">'TaskGet'</span>,    searchHint: <span class="str">'retrieve a task by ID'</span> }
+TodoWriteTool:  { name: <span class="str">'TodoWrite'</span>,  searchHint: <span class="str">'manage the session task checklist'</span> }</code></pre>
+      <p>这些 hint 是模型决定"我现在需不需要查任务管理工具"的关键。simulating 时模型大致会这样推理:
+      "用户让我做一件复杂的事 → 我应该追踪进度 → 搜 'task' / 'checklist' → 找到这些工具 → 调用"。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="swarm">
+      <h2><span class="num">16</span>Swarm 多人协作模式</h2>
+      <p class="lead">V2 任务系统的最复杂场景:多个 Claude 进程作为 teammates 协作,一个 leader 分派任务,teammates 自主认领。</p>
+
+      <h3>16.1 swarm 流程</h3>
+      <figure>
+        <svg viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/>
+            </marker>
+          </defs>
+
+          <!-- File system center -->
+          <rect x="320" y="180" width="260" height="100" rx="12" fill="#F4E5DD" stroke="#D77757" stroke-width="2"/>
+          <text x="450" y="208" text-anchor="middle" font-size="14" font-weight="700" fill="#B0552F">~/.claude/tasks/&lt;teamName&gt;/</text>
+          <text x="450" y="228" text-anchor="middle" font-size="11" fill="#1F1B17">1.json (status:in_progress, owner:alice)</text>
+          <text x="450" y="244" text-anchor="middle" font-size="11" fill="#1F1B17">2.json (status:pending, owner:undefined)</text>
+          <text x="450" y="260" text-anchor="middle" font-size="11" fill="#1F1B17">3.json (blockedBy:[2])</text>
+          <text x="450" y="276" text-anchor="middle" font-size="10" fill="#87796F">.lock · .highwatermark</text>
+
+          <!-- Leader -->
+          <rect x="40" y="40" width="200" height="80" rx="10" fill="#E5E8FE" stroke="#5769F7" stroke-width="1.5"/>
+          <text x="140" y="62" text-anchor="middle" font-size="13" font-weight="700" fill="#5769F7">Leader</text>
+          <text x="140" y="80" text-anchor="middle" font-size="11" fill="#1F1B17">tmux pane 0</text>
+          <text x="140" y="96" text-anchor="middle" font-size="10" fill="#87796F">分配任务 · 监控进度</text>
+          <text x="140" y="110" text-anchor="middle" font-size="10" fill="#87796F" font-family="monospace">setLeaderTeamName('myteam')</text>
+
+          <line x1="200" y1="100" x2="320" y2="200" stroke="#5769F7" stroke-width="1.5" marker-end="url(#arrow8)"/>
+          <text x="220" y="145" font-size="11" fill="#5769F7" font-weight="600">TaskCreate · TaskUpdate(owner)</text>
+
+          <!-- Teammate Alice -->
+          <rect x="40" y="200" width="200" height="80" rx="10" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1.5"/>
+          <text x="140" y="222" text-anchor="middle" font-size="13" font-weight="700" fill="#5BA67A">Teammate · Alice</text>
+          <text x="140" y="240" text-anchor="middle" font-size="11" fill="#1F1B17">tmux pane 1</text>
+          <text x="140" y="256" text-anchor="middle" font-size="10" fill="#87796F">CLAUDE_CODE_TEAM_NAME=myteam</text>
+          <text x="140" y="270" text-anchor="middle" font-size="10" fill="#87796F">claimTask + 完成后 TaskList 找下一个</text>
+
+          <line x1="200" y1="240" x2="320" y2="230" stroke="#5BA67A" stroke-width="1.5" marker-end="url(#arrow8)"/>
+
+          <!-- Teammate Bob -->
+          <rect x="40" y="320" width="200" height="80" rx="10" fill="#EDE7F8" stroke="#8B5CF6" stroke-width="1.5"/>
+          <text x="140" y="342" text-anchor="middle" font-size="13" font-weight="700" fill="#8B5CF6">Teammate · Bob</text>
+          <text x="140" y="360" text-anchor="middle" font-size="11" fill="#1F1B17">tmux pane 2</text>
+          <text x="140" y="376" text-anchor="middle" font-size="10" fill="#87796F">空闲 → 等待 mailbox 或 claim</text>
+
+          <line x1="200" y1="360" x2="320" y2="270" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#arrow8)"/>
+
+          <!-- Right side: mailbox flow -->
+          <rect x="640" y="60" width="220" height="80" rx="10" fill="#F7ECD3" stroke="#D9A441" stroke-width="1.5"/>
+          <text x="750" y="82" text-anchor="middle" font-size="13" font-weight="700" fill="#8a6520">Mailbox 通知</text>
+          <text x="750" y="100" text-anchor="middle" font-size="11" fill="#1F1B17">writeToMailbox(newOwner, ...)</text>
+          <text x="750" y="116" text-anchor="middle" font-size="10" fill="#87796F">JSON: type=task_assignment</text>
+          <text x="750" y="130" text-anchor="middle" font-size="10" fill="#87796F">由 TaskUpdate 设 owner 时触发</text>
+
+          <line x1="580" y1="220" x2="640" y2="100" stroke="#D9A441" stroke-width="1.5" marker-end="url(#arrow8)"/>
+
+          <!-- File watcher trigger -->
+          <rect x="640" y="180" width="220" height="80" rx="10" fill="white" stroke="#1F1B17" stroke-width="1"/>
+          <text x="750" y="202" text-anchor="middle" font-size="13" font-weight="700">每个 teammate 的</text>
+          <text x="750" y="220" text-anchor="middle" font-size="13" font-weight="700">TasksV2Store</text>
+          <text x="750" y="240" text-anchor="middle" font-size="11" fill="#4A413A">fs.watch 监听同一目录</text>
+          <text x="750" y="254" text-anchor="middle" font-size="10" fill="#87796F">UI 实时刷新</text>
+
+          <line x1="580" y1="240" x2="640" y2="220" stroke="#1F1B17" stroke-width="1.5" marker-end="url(#arrow8)"/>
+
+          <!-- Death handling -->
+          <rect x="640" y="300" width="220" height="100" rx="10" fill="#F5DEDC" stroke="#C9534D" stroke-width="1.5"/>
+          <text x="750" y="322" text-anchor="middle" font-size="13" font-weight="700" fill="#C9534D">Teammate 死亡处理</text>
+          <text x="750" y="340" text-anchor="middle" font-size="11" fill="#1F1B17">unassignTeammateTasks</text>
+          <text x="750" y="356" text-anchor="middle" font-size="10" fill="#4A413A">扫描 owner === dead</text>
+          <text x="750" y="370" text-anchor="middle" font-size="10" fill="#4A413A">清空 owner + status=pending</text>
+          <text x="750" y="386" text-anchor="middle" font-size="10" fill="#87796F">可被其他 teammate 重新认领</text>
+
+          <line x1="580" y1="260" x2="640" y2="340" stroke="#C9534D" stroke-width="1.5" marker-end="url(#arrow8)"/>
+        </svg>
+        <figcaption>Swarm 协作:文件系统作为唯一的真理来源,锁机制保证多进程一致性</figcaption>
+      </figure>
+
+      <h3>16.2 自动 owner 设置</h3>
+      <pre><code><span class="com">// TaskUpdateTool.ts:188 — 标 in_progress 时若没传 owner,自动设为当前 agent</span>
+<span class="kw">if</span> (
+  <span class="fn">isAgentSwarmsEnabled</span>() &amp;&amp;
+  status === <span class="str">'in_progress'</span> &amp;&amp;
+  owner === <span class="kw">undefined</span> &amp;&amp;
+  !existingTask.owner
+) {
+  <span class="kw">const</span> agentName = <span class="fn">getAgentName</span>()
+  <span class="kw">if</span> (agentName) {
+    updates.owner = agentName
+    updatedFields.<span class="fn">push</span>(<span class="str">'owner'</span>)
+  }
+}</code></pre>
+
+      <h3>16.3 mailbox 任务分配通知</h3>
+      <pre><code><span class="com">// TaskUpdateTool.ts:277 — owner 变化时给新 owner 发邮箱通知</span>
+<span class="kw">if</span> (updates.owner &amp;&amp; <span class="fn">isAgentSwarmsEnabled</span>()) {
+  <span class="kw">const</span> assignmentMessage = <span class="ty">JSON</span>.<span class="fn">stringify</span>({
+    type: <span class="str">'task_assignment'</span>,
+    taskId,
+    subject: existingTask.subject,
+    description: existingTask.description,
+    assignedBy: senderName,
+    timestamp: <span class="kw">new</span> <span class="ty">Date</span>().<span class="fn">toISOString</span>(),
+  })
+  <span class="kw">await</span> <span class="fn">writeToMailbox</span>(updates.owner, { ...message }, taskListId)
+}</code></pre>
+
+      <h3>16.4 Agent 状态(idle/busy)派生</h3>
+      <pre><code><span class="com">// utils/tasks.ts:763 — 从 task ownership 推导 agent 状态</span>
+<span class="kw">export async function</span> <span class="fn">getAgentStatuses</span>(teamName) {
+  <span class="kw">const</span> teamData = <span class="kw">await</span> <span class="fn">readTeamMembers</span>(teamName)
+  <span class="kw">const</span> allTasks = <span class="kw">await</span> <span class="fn">listTasks</span>(<span class="fn">sanitizeName</span>(teamName))
+
+  <span class="com">// 按 owner 分组未完成任务</span>
+  <span class="kw">const</span> unresolvedByOwner = <span class="kw">new</span> <span class="ty">Map</span>()
+  <span class="kw">for</span> (<span class="kw">const</span> task <span class="kw">of</span> allTasks) {
+    <span class="kw">if</span> (task.status !== <span class="str">'completed'</span> &amp;&amp; task.owner) {
+      <span class="kw">const</span> existing = unresolvedByOwner.<span class="fn">get</span>(task.owner) || []
+      existing.<span class="fn">push</span>(task.id)
+      unresolvedByOwner.<span class="fn">set</span>(task.owner, existing)
+    }
+  }
+
+  <span class="com">// 同时按 name 和 agentId 查(向后兼容)</span>
+  <span class="kw">return</span> teamData.members.<span class="fn">map</span>(member =&gt; ({
+    ...member,
+    status: currentTasks.length === <span class="num">0</span> ? <span class="str">'idle'</span> : <span class="str">'busy'</span>,
+    currentTasks,
+  }))
+}</code></pre>
+
+      <h3>16.5 Teammate 死亡的优雅处理</h3>
+      <pre><code><span class="com">// utils/tasks.ts:818 — teammate 被 kill 或主动 shutdown 时</span>
+<span class="kw">export async function</span> <span class="fn">unassignTeammateTasks</span>(teamName, teammateId, teammateName, reason) {
+  <span class="kw">const</span> tasks = <span class="kw">await</span> <span class="fn">listTasks</span>(teamName)
+  <span class="kw">const</span> unresolvedAssigned = tasks.<span class="fn">filter</span>(t =&gt;
+    t.status !== <span class="str">'completed'</span> &amp;&amp;
+    (t.owner === teammateId || t.owner === teammateName)
+  )
+
+  <span class="com">// 把所有未完成、属于该 teammate 的任务重置回 pending + 清 owner</span>
+  <span class="kw">for</span> (<span class="kw">const</span> task <span class="kw">of</span> unresolvedAssigned) {
+    <span class="kw">await</span> <span class="fn">updateTask</span>(teamName, task.id, { owner: <span class="kw">undefined</span>, status: <span class="str">'pending'</span> })
+  }
+
+  <span class="com">// 给 leader 准备一条通知:N 个任务被解放,可重新分配</span>
+  <span class="kw">return</span> { unassignedTasks, notificationMessage }
+}</code></pre>
+      <p>这是 swarm 系统的<strong>容错机制</strong>:teammate 进程崩了,它的任务不会永远卡在 owner 字段上,会自动回流到 pending 池。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="e2e">
+      <h2><span class="num">17</span>端到端示例</h2>
+      <p class="lead">用一个具体场景串起所有机制。</p>
+
+      <h3>场景:用户让模型实现 "添加 dark mode 切换"</h3>
+
+      <ol class="steps">
+        <li>
+          <strong>用户输入</strong>
+          <pre><code>"给 settings 页面加一个 dark mode 切换,做完跑测试和 build"</code></pre>
+        </li>
+        <li>
+          <strong>模型识别为复杂任务,调用 TaskCreate × 5</strong>
+          <p>每次调用都会:</p>
+          <ul>
+            <li>获取 <code>~/.claude/tasks/&lt;sessionId&gt;/.lock</code></li>
+            <li>读 <code>findHighestTaskId</code>:首次返回 0,然后 1, 2, ...</li>
+            <li>写 <code>1.json</code>, <code>2.json</code>, ...</li>
+            <li>触发 TaskCreated hook(用户没配 → 不阻断)</li>
+            <li>设 <code>expandedView: 'tasks'</code> 让 UI 展开</li>
+          </ul>
+          <pre><code>~/.claude/tasks/abc-session/
+├── 1.json: {subject:"Create dark mode toggle component", status:"pending", ...}
+├── 2.json: {subject:"Add dark mode state management", status:"pending", ...}
+├── 3.json: {subject:"CSS-in-JS dark theme styles", status:"pending", ...}
+├── 4.json: {subject:"Update components to support theming", status:"pending", ...}
+├── 5.json: {subject:"Run tests and build", status:"pending", ...}</code></pre>
+          <p>同时,<code>notifyTasksUpdated</code> 触发 <code>TasksV2Store.#debouncedFetch</code>(50ms debounce),
+          UI 上的 TaskListV2 立即刷新显示这 5 项。</p>
+        </li>
+        <li>
+          <strong>模型 TaskUpdate(taskId:"1", status:"in_progress")</strong>
+          <p>swarm 关闭 → 不自动设 owner。仅状态变化。</p>
+          <p>UI 端 spinner 把"思考中"改成 task 1 的 activeForm("Creating dark mode toggle component")。</p>
+        </li>
+        <li>
+          <strong>模型连续调用 FileEdit / FileWrite 完成 task 1</strong>
+          <p>这些工具不影响任务状态,只是修改文件。</p>
+        </li>
+        <li>
+          <strong>TaskUpdate(taskId:"1", status:"completed")</strong>
+          <p>触发 TaskCompleted hook(无配置)→ 不阻断。</p>
+          <p>verification nudge 检查:5 个 task 还没全部完成,不触发。</p>
+          <p>tool_result content: <code>"Updated task #1 status"</code>。</p>
+        </li>
+        <li>
+          <strong>重复 step 3-5 处理 task 2-5</strong>
+        </li>
+        <li>
+          <strong>关键时刻:task 5 ("Run tests and build") 标 completed</strong>
+          <p>verification nudge 检查:</p>
+          <pre><code>feature('VERIFICATION_AGENT')          ✓
+GrowthBook tengu_hive_evidence         ✓
+!context.agentId (主线程)              ✓
+updates.status === 'completed'         ✓
+allTasks.every(completed)              ✓ (5/5)
+allTasks.length >= 3                   ✓
+no task subject matches /verif/i       ✓ (没有 verification 步骤)
+→ verificationNudgeNeeded = true</code></pre>
+          <p>tool_result 末尾追加:</p>
+          <pre><code>NOTE: You just closed out 3+ tasks and none of them was a verification step.
+Before writing your final summary, spawn the verification agent
+(subagent_type="verifier"). You cannot self-assign PARTIAL by listing
+caveats in your summary — only the verifier issues a verdict.</code></pre>
+        </li>
+        <li>
+          <strong>模型读到 nudge,主动调用 Agent 工具启动 verifier</strong>
+          <p>verifier 子 agent 跑测试、看代码,产出 PASS/PARTIAL/FAIL verdict。</p>
+        </li>
+        <li>
+          <strong>TasksV2Store 自动清理</strong>
+          <p>所有 task completed → 启动 5s 倒计时 → 时间到 → 调 <code>resetTaskList</code>:</p>
+          <ul>
+            <li>读最高 ID = 5</li>
+            <li>写 <code>.highwatermark = 5</code></li>
+            <li>unlink 所有 *.json</li>
+            <li><code>this.#hidden = true</code></li>
+            <li><code>notify()</code> → UI 任务面板淡出</li>
+          </ul>
+          <p>之后如果用户再发新任务 → 重新 TaskCreate → 从 ID = 6 开始,不复用旧 ID。</p>
+        </li>
+      </ol>
+
+      <h3>关键时间线</h3>
+      <figure>
+        <svg viewBox="0 0 880 200" xmlns="http://www.w3.org/2000/svg">
+          <line x1="40" y1="100" x2="840" y2="100" stroke="#4A413A" stroke-width="2"/>
+
+          <g>
+            <circle cx="60" cy="100" r="6" fill="#5BA67A"/>
+            <text x="60" y="80" text-anchor="middle" font-size="10">用户输入</text>
+            <text x="60" y="125" text-anchor="middle" font-size="10" fill="#87796F">t=0</text>
+          </g>
+          <g>
+            <circle cx="160" cy="100" r="6" fill="#5769F7"/>
+            <text x="160" y="80" text-anchor="middle" font-size="10">5× TaskCreate</text>
+            <text x="160" y="125" text-anchor="middle" font-size="10" fill="#87796F">t=2s</text>
+            <text x="160" y="138" text-anchor="middle" font-size="10" fill="#5769F7">UI 展开</text>
+          </g>
+          <g>
+            <circle cx="280" cy="100" r="6" fill="#D77757"/>
+            <text x="280" y="80" text-anchor="middle" font-size="10">task 1 in_progress</text>
+            <text x="280" y="125" text-anchor="middle" font-size="10" fill="#87796F">t=3s</text>
+          </g>
+          <g>
+            <circle cx="400" cy="100" r="6" fill="#5BA67A"/>
+            <text x="400" y="80" text-anchor="middle" font-size="10">task 1 completed</text>
+            <text x="400" y="125" text-anchor="middle" font-size="10" fill="#87796F">t=15s</text>
+          </g>
+          <g>
+            <circle cx="520" cy="100" r="6" fill="#5BA67A"/>
+            <text x="520" y="80" text-anchor="middle" font-size="10">task 2-4 完成</text>
+            <text x="520" y="125" text-anchor="middle" font-size="10" fill="#87796F">t=2min</text>
+          </g>
+          <g>
+            <circle cx="640" cy="100" r="6" fill="#8B5CF6"/>
+            <text x="640" y="80" text-anchor="middle" font-size="10">task 5 完成</text>
+            <text x="640" y="125" text-anchor="middle" font-size="10" fill="#87796F">t=3min</text>
+            <text x="640" y="138" text-anchor="middle" font-size="10" fill="#8B5CF6">触发 verifier</text>
+          </g>
+          <g>
+            <circle cx="780" cy="100" r="6" fill="#5BA67A"/>
+            <text x="780" y="80" text-anchor="middle" font-size="10">5s 后清理</text>
+            <text x="780" y="125" text-anchor="middle" font-size="10" fill="#87796F">t=3min+5s</text>
+            <text x="780" y="138" text-anchor="middle" font-size="10" fill="#5BA67A">面板淡出</text>
+          </g>
+
+          <rect x="40" y="160" width="800" height="30" rx="6" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1"/>
+          <text x="440" y="180" text-anchor="middle" font-size="11" fill="#5BA67A" font-weight="600">用户视角:任务列表自动出现 → 实时勾选 → 完成后 5s 自动消失</text>
+        </svg>
+        <figcaption>端到端时间线:文件系统是真理来源,UI 通过 fs.watch + 进程内信号实时同步</figcaption>
+      </figure>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="principles">
+      <h2><span class="num">18</span>核心设计原则</h2>
+      <p class="lead">从这套实现中可以提炼出 7 条可迁移到其他 agent 系统的设计原则。</p>
+
+      <ol class="steps">
+        <li>
+          <strong>双轨制 V1/V2 共存,而非一刀切迁移</strong>
+          <p>SDK 用户依赖纯内存清单(简单、无副作用),交互用户需要持久化 + 多进程协作。
+          通过 <code>isTodoV2Enabled()</code> 在工具注册阶段做<strong>排他启用</strong>,
+          模型每个会话只看到一套接口,不会混淆。这是"渐进式架构演进"的好范例。</p>
+        </li>
+        <li>
+          <strong>文件系统作为多进程的唯一真理来源</strong>
+          <p>不引入数据库、不依赖 IPC,直接用 <code>~/.claude/tasks/&lt;listId&gt;/&lt;id&gt;.json</code>
+          + proper-lockfile + fs.watch。<strong>这种设计天然兼容</strong> tmux/iTerm2/独立进程等任意运行形态,
+          只要能访问同一文件系统就能协作。</p>
+        </li>
+        <li>
+          <strong>双向引用 + 单向真理:权衡一致性与简单性</strong>
+          <p>blocks/blockedBy 双向冗余,但 blockTask 不是事务。模型只读 blockedBy 来决定能否 claim,
+          单向残留只影响显示。<strong>"哪一端是真理"比"两端绝对一致"更值得设计</strong>。</p>
+        </li>
+        <li>
+          <strong>High Water Mark:抗 ID 复用</strong>
+          <p>哪怕全部任务删除,新任务也从历史最大 + 1 开始。这种"单调递增不回头"的策略
+          让任意外部引用(mailbox、log、git commit message)都能保持稳定。</p>
+        </li>
+        <li>
+          <strong>惰性提醒 + 强约束:控制模型行为而非命令</strong>
+          <p>10 turn 没用 task 工具 → 注入 system-reminder;3+ 任务关闭无 verifier → 注入 nudge。
+          这些都是<strong>"行为推荐"</strong>而非<strong>"硬性中断"</strong>,
+          让模型保留判断权但减少漏掉关键步骤的概率。</p>
+        </li>
+        <li>
+          <strong>Hook 阻断必须可回滚</strong>
+          <p>TaskCreate 已经写文件再调 hook,如果阻断就 deleteTask 回滚 —— 任务<strong>从未存在过</strong>。
+          这给用户的 hook 提供了真正的"否决权",而不是"事后补救"。</p>
+        </li>
+        <li>
+          <strong>shouldDefer:工具数量与 prompt 成本的平衡</strong>
+          <p>5 个任务工具加起来 4-6k token,但 90% query 用不到。把它们标记为 deferred,
+          需要时由 ToolSearch 唤醒,既保留功能又避免 token 浪费。
+          <strong>这是大型工具集 agent 系统的标准模式</strong>。</p>
+        </li>
+      </ol>
+
+      <div class="box note">
+        <div class="title">最重要的一条:让任务系统成为"模型的工作记忆"</div>
+        TodoWrite 和 Tasks 表面上是给用户看进度,实际上更重要的功能是<strong>给模型提供结构化的工作记忆</strong>。
+        模型在长会话里容易"忘记接下来要做什么",任务列表本身就是 prompt 的一部分(通过 reminder 注入)。
+        verification nudge 直接干预完成偏差。这套机制的真正价值在于<strong>把"软推荐"做到产品级别</strong>:
+        既不强迫模型,又显著提升任务完成质量。
+      </div>
+    </section>
+
+    <footer style="margin-top:80px; padding-top:32px; border-top:1px solid var(--gray-300); color:var(--gray-500); font-size:13px;">
+      <p>本文基于 Claude Code 反编译版源码(commit 1173a62)。
+      关键文件:<span class="path">src/utils/tasks.ts</span>、
+      <span class="path">src/utils/todo/types.ts</span>、
+      <span class="path">src/hooks/useTasksV2.ts</span>、
+      <span class="path">src/utils/attachments.ts</span>、
+      <span class="path">packages/builtin-tools/src/tools/{TodoWriteTool, TaskCreateTool, TaskUpdateTool, TaskListTool, TaskGetTool}/</span>。</p>
+    </footer>
+  </main>
+</div>
+</body>
+</html>

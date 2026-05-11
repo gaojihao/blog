@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code Session 存储与 Resume 详解</title>
+<style>
+  :root { --orange: #D77757; --orange-soft: #F4E5DD; --orange-deep: #B0552F; --blue: #5769F7; --blue-soft: #E5E8FE; --green: #5BA67A; --green-soft: #E2F0E8; --red: #C9534D; --red-soft: #F5DEDC; --yellow: #D9A441; --yellow-soft: #F7ECD3; --purple: #8B5CF6; --purple-soft: #EDE7F8; --gray-900: #1F1B17; --gray-700: #4A413A; --gray-500: #87796F; --gray-300: #D9D0C7; --gray-100: #F6F1EC; --gray-50: #FBF8F4; --bg: #FBF8F4; }
+  * { box-sizing: border-box; } html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif; color: var(--gray-900); background: var(--bg); line-height: 1.7; }
+  .layout { display: grid; grid-template-columns: 280px 1fr; max-width: 1400px; margin: 0 auto; }
+  nav.toc { position: sticky; top: 0; height: 100vh; overflow-y: auto; padding: 32px 20px; border-right: 1px solid var(--gray-300); background: var(--gray-50); font-size: 14px; }
+  nav.toc h3 { margin: 0 0 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray-500); }
+  nav.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: section; }
+  nav.toc ol li { counter-increment: section; margin-bottom: 6px; }
+  nav.toc ol li a { display: block; padding: 6px 10px; color: var(--gray-700); text-decoration: none; border-radius: 6px; border-left: 2px solid transparent; transition: all 0.15s; }
+  nav.toc ol li a::before { content: counter(section, decimal-leading-zero) "  "; color: var(--gray-500); font-variant-numeric: tabular-nums; font-size: 12px; }
+  nav.toc ol li a:hover { background: var(--orange-soft); color: var(--orange-deep); border-left-color: var(--orange); }
+  main { padding: 56px 56px 120px; max-width: 980px; }
+  header.hero { margin-bottom: 56px; padding-bottom: 32px; border-bottom: 1px solid var(--gray-300); }
+  header.hero .eyebrow { color: var(--orange); font-size: 13px; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px; font-weight: 600; }
+  header.hero h1 { font-size: 40px; margin: 0 0 12px; letter-spacing: -0.01em; }
+  header.hero p { font-size: 17px; color: var(--gray-700); max-width: 720px; }
+  section { margin-bottom: 64px; scroll-margin-top: 24px; }
+  section > h2 { font-size: 28px; margin: 0 0 8px; padding-top: 16px; border-top: 3px solid var(--orange); display: inline-block; padding-right: 64px; }
+  section > h2 .num { color: var(--orange); font-variant-numeric: tabular-nums; margin-right: 12px; }
+  section > .lead { color: var(--gray-700); font-size: 16px; margin-bottom: 28px; max-width: 760px; }
+  h3 { font-size: 20px; margin: 32px 0 12px; } h4 { font-size: 16px; margin: 20px 0 8px; color: var(--gray-700); }
+  code { font-family: "SF Mono", "Menlo", monospace; font-size: 13px; background: var(--gray-100); padding: 1px 6px; border-radius: 4px; color: var(--orange-deep); }
+  pre { background: #1F1B17; color: #E8E1D9; padding: 18px 22px; border-radius: 10px; overflow-x: auto; font-size: 13px; line-height: 1.6; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; font-size: 13px; }
+  pre .kw { color: #E5A77B; } pre .str { color: #C8E0B4; } pre .com { color: #6F665D; font-style: italic; }
+  pre .fn { color: #93B5E0; } pre .num { color: #E5A77B; } pre .ty { color: #D7B5E5; }
+  .box { border-left: 4px solid var(--gray-300); padding: 16px 20px; border-radius: 6px; margin: 18px 0; background: white; box-shadow: 0 1px 2px rgba(31,27,23,0.04); }
+  .box.info { border-color: var(--blue); background: var(--blue-soft); }
+  .box.warn { border-color: var(--yellow); background: var(--yellow-soft); }
+  .box.error { border-color: var(--red); background: var(--red-soft); }
+  .box.ok { border-color: var(--green); background: var(--green-soft); }
+  .box.note { border-color: var(--orange); background: var(--orange-soft); }
+  .box.purple { border-color: var(--purple); background: var(--purple-soft); }
+  .box .title { font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .box.info .title { color: var(--blue); } .box.warn .title { color: var(--yellow); }
+  .box.error .title { color: var(--red); } .box.ok .title { color: var(--green); }
+  .box.note .title { color: var(--orange-deep); } .box.purple .title { color: var(--purple); }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; background: white; box-shadow: 0 1px 2px rgba(31,27,23,0.04); border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--gray-300); vertical-align: top; }
+  th { background: var(--gray-100); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-700); }
+  tr:last-child td { border-bottom: none; } td code { font-size: 12px; }
+  figure { margin: 24px 0; padding: 24px; background: white; border: 1px solid var(--gray-300); border-radius: 12px; text-align: center; }
+  figure svg { max-width: 100%; height: auto; }
+  figcaption { margin-top: 14px; font-size: 13px; color: var(--gray-500); font-style: italic; }
+  .steps { list-style: none; padding: 0; counter-reset: step; }
+  .steps li { counter-increment: step; position: relative; padding: 14px 18px 14px 56px; background: white; border: 1px solid var(--gray-300); border-radius: 8px; margin-bottom: 10px; }
+  .steps li::before { content: counter(step); position: absolute; left: 14px; top: 12px; width: 30px; height: 30px; border-radius: 50%; background: var(--orange); color: white; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .steps li strong { display: block; margin-bottom: 4px; }
+  .path { font-family: "SF Mono", monospace; font-size: 12px; color: var(--blue); background: var(--blue-soft); padding: 2px 8px; border-radius: 4px; }
+  .lbl { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; margin-right: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .lbl.ok { background: var(--green-soft); color: var(--green); }
+  .lbl.fail { background: var(--red-soft); color: var(--red); }
+  .lbl.warn { background: var(--yellow-soft); color: #8a6520; }
+  .lbl.info { background: var(--blue-soft); color: var(--blue); }
+  @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } nav.toc { display: none; } main { padding: 32px 24px 80px; } }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h3>目录</h3>
+    <ol>
+      <li><a href="#intro">引言:长会话必须持久化</a></li>
+      <li><a href="#jsonl">为什么是 JSONL</a></li>
+      <li><a href="#layout">transcript 文件布局</a></li>
+      <li><a href="#entry">Entry 类型体系</a></li>
+      <li><a href="#write">写入时机与原子性</a></li>
+      <li><a href="#sidechain">sidechain 子代理记录</a></li>
+      <li><a href="#metadata">agent metadata 持久化</a></li>
+      <li><a href="#content-replace">contentReplacement 持久化</a></li>
+      <li><a href="#resume-flow">Resume 流程总览</a></li>
+      <li><a href="#replay">Replay 时的状态重建</a></li>
+      <li><a href="#protocol-repair">协议配对修复</a></li>
+      <li><a href="#resume-agent">resumeAgentBackground 流程</a></li>
+      <li><a href="#cross-device">跨设备 resume</a></li>
+      <li><a href="#corruption">失败恢复</a></li>
+      <li><a href="#e2e">端到端示例</a></li>
+      <li><a href="#principles">可迁移设计原则</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="hero">
+      <div class="eyebrow">Claude Code 源码深度讲解 · 必修篇 5/5</div>
+      <h1>Session 存储 / Resume / Transcript</h1>
+      <p>长会话 agent 的存在本身依赖于持久化。Claude Code 用<strong>append-only JSONL + 冗余 metadata + 懒验证</strong>把"几百轮对话跨天跨设备恢复"做得像"打开上次的编辑器"一样丝滑。</p>
+    </header>
+
+    <section id="intro">
+      <h2><span class="num">01</span>引言:长会话必须持久化</h2>
+      <p class="lead">一个严肃的 coding agent 经常跑几十轮甚至上百轮,一次任务可能跨天。没有持久化就没有产品。</p>
+      <h3>1.1 持久化要解决的 4 个问题</h3>
+      <table>
+        <thead><tr><th>问题</th><th>Claude Code 机制</th></tr></thead>
+        <tbody>
+          <tr><td>Crash 后恢复</td><td>JSONL append 流式追加,任何时刻都是一致的前缀</td></tr>
+          <tr><td>关闭重开</td><td><code>claude --resume</code> 列出所有 session 让用户选</td></tr>
+          <tr><td>审计回溯</td><td>transcript 文件就是完整审计日志,可 grep</td></tr>
+          <tr><td>Prompt cache 保持</td><td>contentReplacementState 持久化,replay 后字节一致</td></tr>
+        </tbody>
+      </table>
+      <h3>1.2 为什么这个话题被低估</h3>
+      <div class="box info">
+        <div class="title">持久化是面试常被忽略的工程硬菜</div>
+        大多数 agent 教程只讲 tool loop,不讲"进程崩了怎么办"。
+        但<strong>生产环境 50% 的 bug 都跟持久化/恢复有关</strong>:
+        transcript 格式变更、replay 时的边缘情况、跨设备路径、prompt cache 失效 ...
+        搞清楚这个话题直接让你从"做 demo"晋升到"上生产"。
+      </div>
+    </section>
+
+    <section id="jsonl">
+      <h2><span class="num">02</span>为什么是 JSONL</h2>
+      <p class="lead">JSONL(JSON Lines)= 每行一个 JSON 对象。看似简单,但它是生产级持久化的最佳选择。</p>
+      <h3>2.1 JSONL vs JSON 数组对比</h3>
+      <table>
+        <thead><tr><th>特性</th><th>JSONL</th><th>JSON 数组</th></tr></thead>
+        <tbody>
+          <tr><td>写入方式</td><td><code>appendFile('line\n')</code></td><td>读 → push → 整体写</td></tr>
+          <tr><td>写入成本</td><td>O(1) — 只写新增部分</td><td>O(n) — 要重写整个文件</td></tr>
+          <tr><td>并发安全</td><td>系统调用原子写一行(&lt;4KB)</td><td>读-改-写窗口期易 race</td></tr>
+          <tr><td>损坏恢复</td><td>坏的行丢弃,其他行仍可读</td><td>一处损坏整个文件废</td></tr>
+          <tr><td>流式读取</td><td>逐行解析</td><td>必须整个 load</td></tr>
+          <tr><td>grep/sed</td><td>直接工作</td><td>需要 jq</td></tr>
+        </tbody>
+      </table>
+      <h3>2.2 写入的原子性</h3>
+      <pre><code><span class="com">// Node.js fs.writeSync 调 POSIX write(2) — 对 &lt;PIPE_BUF(4KB)原子</span>
+<span class="fn">writeSync</span>(fd, <span class="fn">jsonStringify</span>(entry) + <span class="str">'\n'</span>)
+
+<span class="com">// 但 Claude Code entry 可能超过 4KB(大 tool_result)</span>
+<span class="com">// 所以用 O_APPEND flag 确保每次 write 都 seek 到文件末尾</span>
+<span class="fn">openSync</span>(path, <span class="str">'a'</span>)   <span class="com">// 'a' = O_APPEND</span>
+<span class="com">// 即使多进程同时 append,kernel 保证顺序写(无交错)</span></code></pre>
+      <h3>2.3 损坏恢复的实战</h3>
+      <pre><code><span class="com">// 读取 transcript 时容错</span>
+<span class="kw">const</span> lines = content.<span class="fn">split</span>(<span class="str">'\n'</span>)
+<span class="kw">const</span> entries: <span class="ty">Entry[]</span> = []
+<span class="kw">for</span> (<span class="kw">const</span> line <span class="kw">of</span> lines) {
+  <span class="kw">if</span> (!line.<span class="fn">trim</span>()) <span class="kw">continue</span>
+  <span class="kw">try</span> {
+    entries.<span class="fn">push</span>(<span class="fn">jsonParse</span>(line))
+  } <span class="kw">catch</span> {
+    <span class="com">// 坏行静默跳过 — 可能是写一半 crash</span>
+    <span class="fn">logForDebugging</span>(<span class="str">`Skipping malformed transcript line`</span>)
+  }
+}</code></pre>
+    </section>
+
+    <section id="layout">
+      <h2><span class="num">03</span>transcript 文件布局</h2>
+      <h3>3.1 完整目录结构</h3>
+      <pre><code>~/.claude/projects/
+├── -Users-me-project-A/                      <span class="com"># 项目目录路径的 sanitize 版</span>
+│   ├── <span class="str">&lt;sessionId-1&gt;</span>.jsonl                   <span class="com"># 主 transcript</span>
+│   ├── <span class="str">&lt;sessionId-2&gt;</span>.jsonl
+│   ├── subagents/                             <span class="com"># 子代理记录</span>
+│   │   ├── <span class="str">&lt;agentId-a&gt;</span>.jsonl
+│   │   ├── <span class="str">&lt;agentId-b&gt;</span>.jsonl
+│   │   └── workflows/                         <span class="com"># 可选 subdir 分组</span>
+│   │       └── <span class="str">&lt;runId&gt;</span>/
+│   │           └── <span class="str">&lt;agentId&gt;</span>.jsonl
+│   ├── agent-metadata/                        <span class="com"># agent 元信息</span>
+│   │   └── <span class="str">&lt;agentId&gt;</span>.json
+│   ├── tool-results/                          <span class="com"># 落盘的大 tool_result</span>
+│   │   ├── <span class="str">&lt;toolUseId-1&gt;</span>.txt
+│   │   └── <span class="str">&lt;toolUseId-2&gt;</span>.txt
+│   └── content-replacements/                  <span class="com"># contentReplacement 状态</span>
+│       └── <span class="str">&lt;sessionId&gt;</span>.json
+└── -Users-me-project-B/                      <span class="com"># 另一个项目</span>
+    └── ...</code></pre>
+      <h3>3.2 sanitize 规则</h3>
+      <pre><code><span class="com">// 项目路径 "/Users/me/project" 被转换为</span>
+<span class="str">"-Users-me-project"</span>
+<span class="com">// 斜杠 → 连字符,其他非字母数字字符 → '-'</span>
+<span class="fn">getProjectDir</span>(cwd) === projectsDir + sanitize(cwd)</code></pre>
+      <h3>3.3 sessionId 的生成</h3>
+      <pre><code><span class="com">// bootstrap/state.ts:getSessionId</span>
+<span class="com">// UUID v4,会话唯一,写入 transcript 每一行</span>
+<span class="kw">let</span> sessionId = <span class="fn">randomUUID</span>()
+<span class="com">// --resume &lt;id&gt; 时覆盖为已有 session 的 id</span></code></pre>
+      <h3>3.4 MAX_TRANSCRIPT_READ_BYTES</h3>
+      <pre><code><span class="kw">export const</span> MAX_TRANSCRIPT_READ_BYTES = <span class="num">50</span> * <span class="num">1024</span> * <span class="num">1024</span>   <span class="com">// 50MB</span>
+<span class="com">// 超过这个大小的 transcript 不加载到内存</span>
+<span class="com">// 生产中极少达到(50MB = 数千轮对话)</span></code></pre>
+    </section>
+
+    <section id="entry">
+      <h2><span class="num">04</span>Entry 类型体系</h2>
+      <p class="lead">transcript 每一行是一个 Entry,有 5 种主要类型。</p>
+      <h3>4.1 完整类型</h3>
+      <pre><code><span class="kw">type</span> <span class="ty">Entry</span> =
+  | <span class="ty">UserMessageEntry</span>            <span class="com">// 用户输入 / tool_result</span>
+  | <span class="ty">AssistantMessageEntry</span>       <span class="com">// 模型响应</span>
+  | <span class="ty">SystemEntry</span>                 <span class="com">// compact boundary 等</span>
+  | <span class="ty">SnapshotEntry</span>               <span class="com">// 全局状态快照(少见)</span>
+  | <span class="ty">SummaryEntry</span>                <span class="com">// compact 产出的摘要</span>
+  | <span class="ty">ProgressEntry</span>               <span class="com">// (legacy,逐步移除)</span></code></pre>
+      <h3>4.2 UserMessageEntry 结构</h3>
+      <pre><code>{
+  <span class="str">"parentUuid"</span>: <span class="str">"prev-entry-uuid"</span>,    <span class="com">// 链上一条</span>
+  <span class="str">"sessionId"</span>: <span class="str">"abc..."</span>,
+  <span class="str">"type"</span>: <span class="str">"user"</span>,
+  <span class="str">"uuid"</span>: <span class="str">"entry-uuid"</span>,
+  <span class="str">"timestamp"</span>: <span class="str">"2026-05-01T12:00:00Z"</span>,
+  <span class="str">"message"</span>: {
+    <span class="str">"role"</span>: <span class="str">"user"</span>,
+    <span class="str">"content"</span>: [
+      { <span class="str">"type"</span>: <span class="str">"text"</span>, <span class="str">"text"</span>: <span class="str">"帮我看看 foo.ts"</span> }
+    ]
+  },
+  <span class="str">"isMeta"</span>: <span class="kw">false</span>,                  <span class="com">// isMeta: true 的 UI 不显示</span>
+  <span class="str">"cwd"</span>: <span class="str">"/Users/me/project"</span>,
+  <span class="str">"version"</span>: <span class="str">"2.1.888"</span>,              <span class="com">// Claude Code 版本</span>
+  <span class="str">"gitBranch"</span>: <span class="str">"main"</span>
+}</code></pre>
+      <h3>4.3 AssistantMessageEntry 结构</h3>
+      <pre><code>{
+  <span class="str">"parentUuid"</span>: <span class="str">"..."</span>,
+  <span class="str">"type"</span>: <span class="str">"assistant"</span>,
+  <span class="str">"message"</span>: {
+    <span class="str">"role"</span>: <span class="str">"assistant"</span>,
+    <span class="str">"content"</span>: [
+      { <span class="str">"type"</span>: <span class="str">"thinking"</span>, <span class="str">"thinking"</span>: <span class="str">"..."</span>, <span class="str">"signature"</span>: <span class="str">"..."</span> },
+      { <span class="str">"type"</span>: <span class="str">"text"</span>, <span class="str">"text"</span>: <span class="str">"我来帮你..."</span> },
+      { <span class="str">"type"</span>: <span class="str">"tool_use"</span>, <span class="str">"id"</span>: <span class="str">"toolu_X"</span>, <span class="str">"name"</span>: <span class="str">"Read"</span>, <span class="str">"input"</span>: {...} }
+    ],
+    <span class="str">"model"</span>: <span class="str">"claude-opus-4-7"</span>,
+    <span class="str">"usage"</span>: { <span class="str">"input_tokens"</span>: <span class="num">1234</span>, <span class="str">"output_tokens"</span>: <span class="num">567</span>, ... }
+  },
+  <span class="str">"requestId"</span>: <span class="str">"req_..."</span>          <span class="com">// API request id</span>
+}</code></pre>
+      <h3>4.4 SystemEntry 结构(compact boundary 等)</h3>
+      <pre><code>{
+  <span class="str">"type"</span>: <span class="str">"system"</span>,
+  <span class="str">"subtype"</span>: <span class="str">"compact_boundary"</span>,
+  <span class="str">"summary"</span>: <span class="str">"前面聊了 foo/bar 的重构..."</span>,
+  <span class="str">"preCompactTokenCount"</span>: <span class="num">187000</span>,
+  <span class="str">"postCompactTokenCount"</span>: <span class="num">28000</span>
+}</code></pre>
+      <h3>4.5 UUID 链</h3>
+      <pre><code><span class="com">// 每条 Entry 有 uuid,parentUuid 指向前一条</span>
+<span class="com">// 形成一条链,resume 时按这个链重建顺序</span>
+entry[<span class="num">0</span>] { uuid: <span class="str">'a'</span>, parentUuid: <span class="kw">null</span> }
+entry[<span class="num">1</span>] { uuid: <span class="str">'b'</span>, parentUuid: <span class="str">'a'</span> }
+entry[<span class="num">2</span>] { uuid: <span class="str">'c'</span>, parentUuid: <span class="str">'b'</span> }
+<span class="com">// 这让 fork / merge 变成可能</span></code></pre>
+    </section>
+
+    <section id="write">
+      <h2><span class="num">05</span>写入时机与原子性</h2>
+      <p class="lead">什么时候写?每次 yield 的消息都写吗?</p>
+      <h3>5.1 写入点</h3>
+      <table>
+        <thead><tr><th>写入点</th><th>触发</th></tr></thead>
+        <tbody>
+          <tr><td>每条 user message</td><td>processUserInput 阶段</td></tr>
+          <tr><td>每条 assistant message</td><td>从 query() stream 拿到 final message</td></tr>
+          <tr><td>每条 tool_result</td><td>工具执行完</td></tr>
+          <tr><td>system compact_boundary</td><td>autocompact 完成</td></tr>
+          <tr><td>attachment 消息</td><td>附件管线注入后</td></tr>
+        </tbody>
+      </table>
+      <h3>5.2 不写入的</h3>
+      <ul>
+        <li>stream_event 增量(只是流式碎片)</li>
+        <li>tombstone 消息(逻辑上"没发生过")</li>
+        <li>progress 消息(工具执行中间态)</li>
+      </ul>
+      <h3>5.3 同步 vs 异步写</h3>
+      <pre><code><span class="com">// Claude Code 用同步 writeSync — 违反 Node.js 常识</span>
+<span class="com">// 原因:保证 crash 前数据落盘</span>
+<span class="com">// 权衡:写 &lt; 10KB 的 JSON 很快(几毫秒)</span>
+
+<span class="kw">const</span> fd = <span class="fn">openSync</span>(transcriptPath, <span class="str">'a'</span>)
+<span class="kw">try</span> {
+  <span class="fn">writeSync</span>(fd, <span class="fn">jsonStringify</span>(entry) + <span class="str">'\n'</span>)
+} <span class="kw">finally</span> {
+  <span class="fn">closeSync</span>(fd)
+}</code></pre>
+      <h3>5.4 如果写失败怎么办</h3>
+      <pre><code><span class="com">// 写失败是严重问题 — 但不 crash 主流程</span>
+<span class="kw">try</span> {
+  <span class="fn">writeEntry</span>(entry)
+} <span class="kw">catch</span> (error) {
+  <span class="fn">logError</span>(<span class="str">`Failed to write transcript: ${error}`</span>)
+  <span class="com">// 继续执行,session 仍能使用,只是不能 resume</span>
+}</code></pre>
+    </section>
+
+    <section id="sidechain">
+      <h2><span class="num">06</span>sidechain 子代理记录</h2>
+      <p class="lead">子 agent(subagent/fork)有<strong>独立</strong>的 transcript 文件,不混入主 session。</p>
+      <h3>6.1 路径结构</h3>
+      <pre><code>~/.claude/projects/-Users-me-project/
+├── &lt;mainSessionId&gt;.jsonl              <span class="com"># 主 session transcript</span>
+└── subagents/
+    ├── &lt;agentId-1&gt;.jsonl              <span class="com"># 子 agent 1 transcript</span>
+    ├── &lt;agentId-2&gt;.jsonl
+    └── workflows/&lt;runId&gt;/              <span class="com"># 可选分组目录</span>
+        └── &lt;agentId-3&gt;.jsonl</code></pre>
+      <h3>6.2 recordSidechainTranscript</h3>
+      <pre><code><span class="com">// runAgent.ts:741 — agent 启动时记录初始消息</span>
+<span class="kw">void</span> <span class="fn">recordSidechainTranscript</span>(initialMessages, agentId).<span class="fn">catch</span>(err =&gt;
+  <span class="fn">logForDebugging</span>(<span class="str">`Failed to record sidechain: ${err}`</span>)
+)
+<span class="com">// 后续每条消息通过 isRecordableMessage 判断是否写入</span></code></pre>
+      <h3>6.3 为什么子 agent 独立存</h3>
+      <div class="box info">
+        <div class="title">两个核心原因</div>
+        <ul>
+          <li><strong>可独立 resume</strong>:可以单独恢复一个子 agent,继续它的工作(见 6.4)</li>
+          <li><strong>避免主 transcript 膨胀</strong>:fork 子 agent 可能跑几十轮,把那些 tool_use 都塞主 transcript 会让 resume 时 replay 爆炸</li>
+        </ul>
+      </div>
+      <h3>6.4 resumeAgentBackground</h3>
+      <pre><code><span class="com">// 用户:"那个 security-reviewer 的结果你看看"</span>
+<span class="com">// 但子 agent 已经结束了 — 怎么让它继续?</span>
+<span class="kw">await</span> <span class="fn">resumeAgentBackground</span>({
+  agentId,
+  prompt: <span class="str">"继续你上次的审查,再加一点..."</span>,
+  setAppState,
+})
+<span class="com">// 1. 从 subagents/&lt;agentId&gt;.jsonl 读出完整历史</span>
+<span class="com">// 2. 重建 agent context</span>
+<span class="com">// 3. 追加新 user message 继续跑</span></code></pre>
+      <h3>6.5 transcriptSubdir 分组</h3>
+      <pre><code><span class="com">// 工作流里多个子 agent 归到同一目录,方便管理</span>
+<span class="fn">setAgentTranscriptSubdir</span>(agentId, <span class="str">`workflows/${runId}`</span>)
+<span class="com">// → ~/.claude/projects/.../subagents/workflows/&lt;runId&gt;/&lt;agentId&gt;.jsonl</span></code></pre>
+    </section>
+
+    <section id="metadata">
+      <h2><span class="num">07</span>agent metadata 持久化</h2>
+      <p class="lead">除了 transcript,还要单独存一些"快速查询"的 metadata。</p>
+      <h3>7.1 AgentMetadata 字段</h3>
+      <pre><code><span class="kw">type</span> <span class="ty">AgentMetadata</span> = {
+  agentType: <span class="ty">string</span>              <span class="com">// "general-purpose" / "security-reviewer" ...</span>
+  description?: <span class="ty">string</span>           <span class="com">// 任务描述</span>
+  worktreePath?: <span class="ty">string</span>          <span class="com">// 如果 isolation: 'worktree'</span>
+  createdAt?: <span class="ty">number</span>            <span class="com">// 时间戳</span>
+  parentAgentId?: <span class="ty">string</span>        <span class="com">// 父 agent(用于链路追踪)</span>
+  status?: <span class="str">'running'</span> | <span class="str">'completed'</span> | <span class="str">'failed'</span>
+}</code></pre>
+      <h3>7.2 为什么要独立 metadata 文件</h3>
+      <div class="box note">
+        <div class="title">性能考量</div>
+        列出所有子 agent 时,如果每个都要 parse 整个 transcript 拿 agentType,就是 N×读文件。
+        独立 metadata 文件(小 JSON)让 <code>ls</code> 就能拿到关键信息。
+      </div>
+      <h3>7.3 写入</h3>
+      <pre><code><span class="com">// runAgent.ts:744</span>
+<span class="kw">void</span> <span class="fn">writeAgentMetadata</span>(agentId, {
+  agentType: agentDefinition.agentType,
+  ...(worktreePath &amp;&amp; { worktreePath }),
+  ...(description &amp;&amp; { description }),
+}).<span class="fn">catch</span>(err =&gt; <span class="fn">logForDebugging</span>(err))
+<span class="com">// 路径:~/.claude/projects/.../agent-metadata/&lt;agentId&gt;.json</span></code></pre>
+      <h3>7.4 RemoteAgent metadata</h3>
+      <pre><code><span class="com">// 远端 agent(CCR)的 metadata 单独目录</span>
+~/.claude/remote-agents/
+├── &lt;taskId-1&gt;.json
+└── &lt;taskId-2&gt;.json
+
+<span class="com">// 字段</span>
+<span class="kw">type</span> <span class="ty">RemoteAgentMetadata</span> = {
+  taskId: <span class="ty">string</span>
+  sessionId: <span class="ty">string</span>              <span class="com">// 远端 session</span>
+  sessionUrl: <span class="ty">string</span>             <span class="com">// claude.ai URL</span>
+  description?: <span class="ty">string</span>
+  command?: <span class="ty">string</span>
+  createdAt: <span class="ty">number</span>
+  status: <span class="str">'running'</span> | <span class="str">'completed'</span> | ...
+}</code></pre>
+    </section>
+
+    <section id="content-replace">
+      <h2><span class="num">08</span>contentReplacement 持久化</h2>
+      <p class="lead">这是个不起眼但关键的设计 — 保证 resume 后 prompt cache 仍能命中。</p>
+      <h3>8.1 问题</h3>
+      <p>工具结果预算(applyToolResultBudget)会把大 tool_result 落盘替换成预览。
+      这个"替换决策"是有状态的:<strong>同一个 tool_use_id 必须每次都替换为同一字符串</strong>,否则 prompt 字节会变,cache 失效。</p>
+      <h3>8.2 ContentReplacementState</h3>
+      <pre><code><span class="kw">type</span> <span class="ty">ContentReplacementState</span> = {
+  seenIds: <span class="ty">Set</span>&lt;<span class="ty">string</span>&gt;               <span class="com">// 见过的 tool_use_id</span>
+  replacements: <span class="ty">Map</span>&lt;<span class="ty">string</span>, <span class="ty">string</span>&gt;   <span class="com">// id → 替换后的字符串</span>
+}</code></pre>
+      <h3>8.3 持久化</h3>
+      <pre><code><span class="com">// 只对可 resume 的 querySource 持久化</span>
+<span class="kw">const</span> persistReplacements =
+  querySource.<span class="fn">startsWith</span>(<span class="str">'agent:'</span>) ||
+  querySource.<span class="fn">startsWith</span>(<span class="str">'repl_main_thread'</span>)
+
+<span class="kw">if</span> (persistReplacements) {
+  <span class="kw">void</span> <span class="fn">recordContentReplacement</span>(records, agentId).<span class="fn">catch</span>(logError)
+}
+<span class="com">// 写到 ~/.claude/projects/.../content-replacements/&lt;sessionId&gt;.json</span></code></pre>
+      <h3>8.4 Resume 时重建</h3>
+      <pre><code><span class="com">// 恢复时先读持久化的替换决策</span>
+<span class="kw">const</span> replacements = <span class="kw">await</span> <span class="fn">loadContentReplacementState</span>(sessionId)
+
+<span class="com">// 创建 subagent context 时传入</span>
+<span class="fn">createSubagentContext</span>(parent, {
+  contentReplacementState: replacements,   <span class="com">// ← 不是克隆,是加载的</span>
+  ...
+})
+<span class="com">// 这样下轮 applyToolResultBudget 会用同样的替换字符串 → 前缀字节一致 → cache 命中</span></code></pre>
+      <div class="box note">
+        <div class="title">这个细节的价值</div>
+        没有这个持久化,resume 之后第一次请求<strong>总是</strong>完全 cache miss,一次请求多花 ~5s。
+        用户感受:"resume 打开后为什么响应这么慢?"
+        这个~300 行的小系统,直接决定 resume 体验。
+      </div>
+    </section>
+
+    <section id="resume-flow">
+      <h2><span class="num">09</span>Resume 流程总览</h2>
+      <figure>
+        <svg viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg">
+          <defs><marker id="arre" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/></marker></defs>
+          <rect x="340" y="20" width="220" height="40" rx="8" fill="#5769F7"/>
+          <text x="450" y="45" text-anchor="middle" font-size="14" font-weight="700" fill="white">claude --resume</text>
+          <line x1="450" y1="60" x2="450" y2="85" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arre)"/>
+
+          <rect x="300" y="85" width="300" height="45" rx="6" fill="#E5E8FE" stroke="#5769F7"/>
+          <text x="450" y="105" text-anchor="middle" font-size="12" font-weight="700" fill="#5769F7">① 扫描 ~/.claude/projects/</text>
+          <text x="450" y="122" text-anchor="middle" font-size="10">列出该项目的所有 sessionId + 首条用户消息</text>
+          <line x1="450" y1="130" x2="450" y2="155" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arre)"/>
+
+          <rect x="300" y="155" width="300" height="45" rx="6" fill="#F4E5DD" stroke="#D77757"/>
+          <text x="450" y="175" text-anchor="middle" font-size="12" font-weight="700" fill="#B0552F">② 用户选择要恢复哪个</text>
+          <text x="450" y="192" text-anchor="middle" font-size="10">通过 FuzzyPicker 搜索 + 时间排序</text>
+          <line x1="450" y1="200" x2="450" y2="225" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arre)"/>
+
+          <rect x="300" y="225" width="300" height="45" rx="6" fill="#E2F0E8" stroke="#5BA67A"/>
+          <text x="450" y="245" text-anchor="middle" font-size="12" font-weight="700" fill="#5BA67A">③ 读取 transcript 文件</text>
+          <text x="450" y="262" text-anchor="middle" font-size="10">流式按行 JSON.parse,容错坏行</text>
+          <line x1="450" y1="270" x2="450" y2="295" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arre)"/>
+
+          <rect x="300" y="295" width="300" height="45" rx="6" fill="#F7ECD3" stroke="#D9A441"/>
+          <text x="450" y="315" text-anchor="middle" font-size="12" font-weight="700" fill="#8a6520">④ 重建 state</text>
+          <text x="450" y="332" text-anchor="middle" font-size="10">messages / fileStateCache / contentReplacement</text>
+          <line x1="450" y1="340" x2="450" y2="365" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arre)"/>
+
+          <rect x="300" y="365" width="300" height="45" rx="6" fill="#EDE7F8" stroke="#8B5CF6"/>
+          <text x="450" y="385" text-anchor="middle" font-size="12" font-weight="700" fill="#8B5CF6">⑤ 协议修复</text>
+          <text x="450" y="402" text-anchor="middle" font-size="10">孤儿 tool_use → 补占位 tool_result</text>
+          <line x1="450" y1="410" x2="450" y2="435" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arre)"/>
+
+          <rect x="300" y="435" width="300" height="25" rx="4" fill="#5BA67A"/>
+          <text x="450" y="453" text-anchor="middle" font-size="12" font-weight="700" fill="white">⑥ 进入 REPL,等待用户继续</text>
+        </svg>
+        <figcaption>6 步从"我按了 --resume"到"可以继续对话"</figcaption>
+      </figure>
+      <h3>9.1 关键细节</h3>
+      <ul>
+        <li><strong>FuzzyPicker</strong>:用首条用户消息(前 80 字符)作为 session 预览,按时间倒序</li>
+        <li><strong>sessionIdExists</strong>:先确认 sessionId 对应文件存在,避免路径穿越</li>
+        <li><strong>懒加载</strong>:超过 MAX_TRANSCRIPT_READ_BYTES(50MB)的不加载</li>
+      </ul>
+    </section>
+
+    <section id="replay">
+      <h2><span class="num">10</span>Replay 时的状态重建</h2>
+      <p class="lead">读完 transcript 只是一半,要把它"变回活的 agent state"还有一堆工作。</p>
+      <h3>10.1 需要重建的 state</h3>
+      <table>
+        <thead><tr><th>状态</th><th>来源</th><th>重建方法</th></tr></thead>
+        <tbody>
+          <tr><td>messages[]</td><td>直接从 entries 转</td><td>filter isTranscriptMessage + map</td></tr>
+          <tr><td>readFileState</td><td>扫描 Read / Edit tool_use</td><td>重建 file state cache</td></tr>
+          <tr><td>contentReplacementState</td><td>独立文件</td><td>直接 load JSON</td></tr>
+          <tr><td>todos / tasks</td><td>独立 V1 内存 / V2 文件</td><td>V1 丢失 / V2 仍在</td></tr>
+          <tr><td>appState.tasks</td><td>关联的 sub task metadata</td><td>重新扫 agent-metadata/</td></tr>
+          <tr><td>MCP 连接</td><td>无,每次重新连</td><td>connectToServer 按配置重连</td></tr>
+        </tbody>
+      </table>
+      <h3>10.2 readFileState 重建</h3>
+      <pre><code><span class="com">// 遍历所有 Read / Edit / Write tool_use,重建"Claude 读过/改过哪些文件"</span>
+<span class="kw">for</span> (<span class="kw">const</span> entry <span class="kw">of</span> entries) {
+  <span class="kw">if</span> (entry.type !== <span class="str">'assistant'</span>) <span class="kw">continue</span>
+  <span class="kw">for</span> (<span class="kw">const</span> block <span class="kw">of</span> entry.message.content) {
+    <span class="kw">if</span> (block.type === <span class="str">'tool_use'</span>) {
+      <span class="kw">if</span> (block.name === <span class="str">'Read'</span>) {
+        readFileState.<span class="fn">set</span>(block.input.file_path, { readAt: entry.timestamp, ... })
+      }
+      <span class="kw">if</span> (block.name === <span class="str">'Edit'</span> || block.name === <span class="str">'Write'</span>) {
+        readFileState.<span class="fn">set</span>(block.input.file_path, { modifiedAt: entry.timestamp, ... })
+      }
+    }
+  }
+}</code></pre>
+      <h3>10.3 丢失的状态</h3>
+      <div class="box warn">
+        <div class="title">不可恢复的部分</div>
+        <ul>
+          <li><strong>V1 Todos</strong>:内存存储,resume 后空</li>
+          <li><strong>MCP 运行时状态</strong>:比如 server 缓存的 session,重连后丢</li>
+          <li><strong>工具并发 state</strong>:例如跑了一半的 Bash 命令,不 resume</li>
+          <li><strong>子 agent 运行状态</strong>:异步 agent 如果还在跑,resume 会让它<strong>独立</strong>继续,不跟主 session 自动 reconnect</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="protocol-repair">
+      <h2><span class="num">11</span>协议配对修复</h2>
+      <p class="lead">Resume 时可能遇到"tool_use 有但对应 tool_result 没有"(上次 crash 在工具执行中)。直接发给 API 会 400。</p>
+      <h3>11.1 修复逻辑</h3>
+      <pre><code><span class="com">// 扫描 messages,找出没有配对 tool_result 的 tool_use</span>
+<span class="kw">function</span> <span class="fn">filterIncompleteToolCalls</span>(messages: <span class="ty">Message[]</span>): <span class="ty">Message[]</span> {
+  <span class="kw">const</span> resultsForIds = <span class="kw">new</span> <span class="ty">Set</span>&lt;<span class="ty">string</span>&gt;()
+  <span class="kw">for</span> (<span class="kw">const</span> msg <span class="kw">of</span> messages) {
+    <span class="kw">if</span> (msg.type === <span class="str">'user'</span> &amp;&amp; Array.<span class="fn">isArray</span>(msg.message.content)) {
+      <span class="kw">for</span> (<span class="kw">const</span> block <span class="kw">of</span> msg.message.content) {
+        <span class="kw">if</span> (block.type === <span class="str">'tool_result'</span>) resultsForIds.<span class="fn">add</span>(block.tool_use_id)
+      }
+    }
+  }
+
+  <span class="com">// 去掉对应 tool_use 没 result 的消息(或补占位)</span>
+  <span class="kw">return</span> messages.<span class="fn">filter</span>(msg =&gt; { ... })
+}</code></pre>
+      <h3>11.2 补占位 tool_result</h3>
+      <pre><code><span class="com">// 如果模型上次发了 tool_use 但 crash 了</span>
+<span class="com">// resume 时给每个孤儿 tool_use 补一条 tool_result(is_error, "Session resumed; task interrupted")</span>
+<span class="kw">for</span> (<span class="kw">const</span> orphanId <span class="kw">of</span> orphanToolUseIds) {
+  messages.<span class="fn">push</span>(<span class="fn">createUserMessage</span>({
+    content: [{ type: <span class="str">'tool_result'</span>, tool_use_id: orphanId,
+      content: <span class="str">"Session resumed; previous task was interrupted. You can retry."</span>,
+      is_error: <span class="kw">true</span> }],
+  }))
+}</code></pre>
+      <p>这让模型知道"上次这个工具没完成,现在要么重试要么换方法"。</p>
+    </section>
+
+    <section id="resume-agent">
+      <h2><span class="num">12</span>resumeAgentBackground 流程</h2>
+      <p class="lead">不只是主 session,单独的子 agent 也可恢复。</p>
+      <h3>12.1 用例</h3>
+      <pre><code><span class="com">// 场景 1:主 agent 派的后台 agent 已经完成,用户想跟它"对话"</span>
+<span class="com">// 场景 2:长 workflow 里某步失败,想只恢复失败那一步</span>
+<span class="com">// 场景 3:用户关闭 Claude 后,后台 agent 仍然完成了(通过 LocalAgentTask),</span>
+<span class="com">// 下次启动想继续用它的输出</span></code></pre>
+      <h3>12.2 流程</h3>
+      <ol class="steps">
+        <li>从 <code>agent-metadata/&lt;agentId&gt;.json</code> 读 agentType, worktreePath 等</li>
+        <li>从 <code>subagents/&lt;agentId&gt;.jsonl</code> 读完整历史</li>
+        <li>用 AgentDefinition + 历史 messages 重建 context(类似 runAgent 的 Stage 1-6 但用既有 agentId)</li>
+        <li>追加 user prompt 消息</li>
+        <li>进入新回合,query() 继续</li>
+      </ol>
+      <h3>12.3 agentId 的保持</h3>
+      <pre><code><span class="com">// runAgent 里</span>
+<span class="kw">const</span> agentId = override?.agentId ? override.agentId : <span class="fn">createAgentId</span>()
+<span class="com">// resume 时 override.agentId 传入 → 复用原 agentId</span>
+<span class="com">// 这样 sidechain 文件会继续追加到同一文件</span></code></pre>
+    </section>
+
+    <section id="cross-device">
+      <h2><span class="num">13</span>跨设备 resume</h2>
+      <p class="lead">同步 transcript 到另一台机器能 resume 吗?有一些约束。</p>
+      <h3>13.1 跨设备的困难</h3>
+      <table>
+        <thead><tr><th>问题</th><th>原因</th><th>当前处理</th></tr></thead>
+        <tbody>
+          <tr><td>路径不一致</td><td>transcript 里的 cwd 是绝对路径</td><td>⚠️ 需要用户手动调整 sanitize 后的目录名</td></tr>
+          <tr><td>tool-results 文件依赖</td><td>落盘大结果需要同步过去</td><td>需要整个 project 目录一起同步</td></tr>
+          <tr><td>MCP server 本地路径</td><td>stdio server 的 command 是本地路径</td><td>配置不迁移,MCP 连接可能失败</td></tr>
+          <tr><td>OAuth token 依赖 keychain</td><td>每台机器独立</td><td>需要重新登录</td></tr>
+        </tbody>
+      </table>
+      <h3>13.2 实用做法</h3>
+      <pre><code><span class="com"># 把整个项目的 transcript 打包</span>
+<span class="kw">cd</span> ~/.claude/projects/
+<span class="kw">tar</span> czf project-backup.tar.gz -Users-me-project/
+
+<span class="com"># 在另一台机器解开到同样结构</span>
+<span class="kw">tar</span> xzf project-backup.tar.gz -C ~/.claude/projects/
+
+<span class="com"># resume 时注意 sanitize 路径是否匹配新机器的 /Users/&lt;name&gt;/project</span></code></pre>
+      <h3>13.3 官方同步路径</h3>
+      <p>Claude.ai 订阅用户有官方的 session sync,不需要手动 copy;但本地 OSS 版本需要自己管。</p>
+    </section>
+
+    <section id="corruption">
+      <h2><span class="num">14</span>失败恢复</h2>
+      <h3>14.1 坏的 transcript 行</h3>
+      <pre><code><span class="com">// 读取时容错 — 坏行直接跳</span>
+<span class="kw">for</span> (<span class="kw">const</span> line <span class="kw">of</span> lines) {
+  <span class="kw">try</span> { entries.<span class="fn">push</span>(<span class="fn">jsonParse</span>(line)) }
+  <span class="kw">catch</span> { <span class="com">/* skip */</span> }
+}
+<span class="com">// 损坏行通常是 crash 在写 \n 之前</span>
+<span class="com">// 结果:部分历史可能丢失,但不影响剩下的 replay</span></code></pre>
+      <h3>14.2 metadata 丢失</h3>
+      <pre><code><span class="com">// 如果 agent-metadata/&lt;id&gt;.json 不见了</span>
+<span class="kw">async function</span> <span class="fn">readAgentMetadata</span>(agentId) {
+  <span class="kw">try</span> { <span class="kw">return</span> <span class="fn">jsonParse</span>(<span class="kw">await</span> <span class="fn">readFile</span>(path, <span class="str">'utf-8'</span>)) }
+  <span class="kw">catch</span> { <span class="kw">return</span> <span class="kw">null</span> }
+}
+<span class="com">// 返回 null,上层 fallback 到默认值(general-purpose agentType)</span></code></pre>
+      <h3>14.3 contentReplacement 丢失</h3>
+      <pre><code><span class="com">// 最坏情况:prompt cache miss 一次</span>
+<span class="com">// 但不会 crash,新的替换决策会从头建立</span></code></pre>
+      <h3>14.4 schema 演进</h3>
+      <pre><code><span class="com">// 老版本 transcript 字段可能缺</span>
+<span class="kw">if</span> (<span class="fn">isLegacyProgressEntry</span>(entry)) {
+  <span class="com">// 转换成新格式或丢弃</span>
+}
+<span class="com">// 整体设计:Entry 类型是宽松的,不强制 schema 严格版本匹配</span></code></pre>
+    </section>
+
+    <section id="e2e">
+      <h2><span class="num">15</span>端到端示例</h2>
+      <p class="lead">用一个完整场景串起来。</p>
+      <ol class="steps">
+        <li>
+          <strong>Day 1 10:00</strong> — 用户启动 claude,问"帮我重构 auth 模块"
+          <p>创建 sessionId = <code>abc123</code>,transcript 文件 <code>abc123.jsonl</code> 开始写。</p>
+        </li>
+        <li>
+          <strong>Day 1 10:05</strong> — 模型跑了 5 轮,写了 3 个文件
+          <p>transcript 已有 ~30 条 entries。一个 200KB 的 Grep 结果被 applyToolResultBudget 落盘到 <code>tool-results/toolu_X.txt</code>,contentReplacement 记入 JSON。</p>
+        </li>
+        <li>
+          <strong>Day 1 10:10</strong> — 派了一个 security-reviewer 子 agent 后台跑
+          <p><code>subagents/agent_xyz.jsonl</code> 开始写,<code>agent-metadata/agent_xyz.json</code> 记录 metadata。</p>
+        </li>
+        <li>
+          <strong>Day 1 10:30</strong> — 用户按 Ctrl+C 关闭 claude
+          <p>主 session 状态都在磁盘。subagent 子进程被终止(因为同进程)。如果是 async + 独立进程,它会继续跑完。</p>
+        </li>
+        <li>
+          <strong>Day 2 09:00</strong> — 用户重新 <code>claude --resume</code>
+          <p>FuzzyPicker 显示 session 列表,用户选 <code>abc123</code>(首条消息 "帮我重构 auth..." 为预览)。</p>
+        </li>
+        <li>
+          <strong>Resume 重建</strong>
+          <ul>
+            <li>读 <code>abc123.jsonl</code> 30 条 entries → 转成 messages</li>
+            <li>扫描 Read/Edit 重建 readFileState</li>
+            <li>读 <code>content-replacements/abc123.json</code> 重建 replacements</li>
+            <li>协议检查:没有孤儿 tool_use(上次干净退出)</li>
+            <li>agent-metadata 扫描:发现 agent_xyz 曾经启动过,列入"历史子 agent"</li>
+          </ul>
+        </li>
+        <li>
+          <strong>进入 REPL</strong> — 用户看到完整对话历史,输入"继续"
+          <p>下一次 API 调用字节级跟 Day 1 一致(因为 contentReplacement 恢复) → prompt cache 命中 → 首个 TTFT &lt; 500ms(而不是 5s)。</p>
+        </li>
+        <li>
+          <strong>恢复子 agent(可选)</strong>
+          <p>用户:"security-reviewer 的结果呢?" → 主 agent 判断子 agent 结束了 → 调 resumeAgentBackground 让它生成最终报告。</p>
+        </li>
+      </ol>
+    </section>
+
+    <section id="principles">
+      <h2><span class="num">16</span>可迁移设计原则</h2>
+      <ol class="steps">
+        <li><strong>Append-only 是持久化之王</strong> — JSONL 比任何复杂格式更可靠,O(1) 写入 + 损坏可恢复</li>
+        <li><strong>sync write 换崩溃安全</strong> — 性能损失 (~ms) 换到"crash 后一切可恢复",在 agent 场景绝对值得</li>
+        <li><strong>冗余 metadata</strong> — 不是只存一份 source of truth,而是把"常用查询字段"冗余存一份,避免 N×全扫描</li>
+        <li><strong>持久化替换决策</strong> — 不只存数据,还要存"对数据的决策",resume 后字节一致才能 cache 命中</li>
+        <li><strong>子流程独立记录</strong> — sidechain 让子 agent 可独立 resume,同时不膨胀主 transcript</li>
+        <li><strong>协议修复而非拒绝</strong> — 遇到孤儿 tool_use 不 panic,而是补占位让协议合法,让模型继续</li>
+        <li><strong>懒验证 / 容错读取</strong> — 坏行跳过,缺文件 fallback,字段缺失默认值。用户的 3 年前 session 都该能打开</li>
+        <li><strong>UUID 链</strong> — parentUuid 让 fork / branch / merge 变成可能,虽然现在没完全用,但为未来留路</li>
+      </ol>
+      <div class="box note">
+        <div class="title">最深的启示</div>
+        持久化<strong>不是事后补救,是架构核心</strong>。contentReplacementState 这种"写了 3 年才有人注意的细节",
+        是决定产品"能用 vs 好用"的关键。设计 agent 系统时,<strong>从 day 1 就想好"crash 和 resume 怎么办"</strong>,
+        把它塞进每个子系统设计里,而不是等上线后加补丁。
+      </div>
+    </section>
+
+    <footer style="margin-top:80px;padding-top:32px;border-top:1px solid var(--gray-300);color:var(--gray-500);font-size:13px;">
+      <p>本文基于 Claude Code 反编译版源码(commit 1173a62)。
+      关键文件:<span class="path">src/utils/sessionStorage.ts</span>、
+      <span class="path">src/commands/resume/</span>、
+      <span class="path">src/utils/toolResultStorage.ts</span>、
+      <span class="path">src/services/compact/compact.ts</span>。</p>
+    </footer>
+  </main>
+</div>
+</body>
+</html>

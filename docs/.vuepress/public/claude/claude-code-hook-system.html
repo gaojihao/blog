@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code Hook 系统详解</title>
+<style>
+  :root { --orange: #D77757; --orange-soft: #F4E5DD; --orange-deep: #B0552F; --blue: #5769F7; --blue-soft: #E5E8FE; --green: #5BA67A; --green-soft: #E2F0E8; --red: #C9534D; --red-soft: #F5DEDC; --yellow: #D9A441; --yellow-soft: #F7ECD3; --purple: #8B5CF6; --purple-soft: #EDE7F8; --gray-900: #1F1B17; --gray-700: #4A413A; --gray-500: #87796F; --gray-300: #D9D0C7; --gray-100: #F6F1EC; --gray-50: #FBF8F4; --bg: #FBF8F4; }
+  * { box-sizing: border-box; } html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif; color: var(--gray-900); background: var(--bg); line-height: 1.7; }
+  .layout { display: grid; grid-template-columns: 280px 1fr; max-width: 1400px; margin: 0 auto; }
+  nav.toc { position: sticky; top: 0; height: 100vh; overflow-y: auto; padding: 32px 20px; border-right: 1px solid var(--gray-300); background: var(--gray-50); font-size: 14px; }
+  nav.toc h3 { margin: 0 0 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray-500); }
+  nav.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: section; }
+  nav.toc ol li { counter-increment: section; margin-bottom: 6px; }
+  nav.toc ol li a { display: block; padding: 6px 10px; color: var(--gray-700); text-decoration: none; border-radius: 6px; border-left: 2px solid transparent; transition: all 0.15s; }
+  nav.toc ol li a::before { content: counter(section, decimal-leading-zero) "  "; color: var(--gray-500); font-variant-numeric: tabular-nums; font-size: 12px; }
+  nav.toc ol li a:hover { background: var(--orange-soft); color: var(--orange-deep); border-left-color: var(--orange); }
+  main { padding: 56px 56px 120px; max-width: 980px; }
+  header.hero { margin-bottom: 56px; padding-bottom: 32px; border-bottom: 1px solid var(--gray-300); }
+  header.hero .eyebrow { color: var(--orange); font-size: 13px; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px; font-weight: 600; }
+  header.hero h1 { font-size: 40px; margin: 0 0 12px; letter-spacing: -0.01em; }
+  header.hero p { font-size: 17px; color: var(--gray-700); max-width: 720px; }
+  section { margin-bottom: 64px; scroll-margin-top: 24px; }
+  section > h2 { font-size: 28px; margin: 0 0 8px; padding-top: 16px; border-top: 3px solid var(--orange); display: inline-block; padding-right: 64px; }
+  section > h2 .num { color: var(--orange); font-variant-numeric: tabular-nums; margin-right: 12px; }
+  section > .lead { color: var(--gray-700); font-size: 16px; margin-bottom: 28px; max-width: 760px; }
+  h3 { font-size: 20px; margin: 32px 0 12px; } h4 { font-size: 16px; margin: 20px 0 8px; color: var(--gray-700); }
+  code { font-family: "SF Mono", "Menlo", monospace; font-size: 13px; background: var(--gray-100); padding: 1px 6px; border-radius: 4px; color: var(--orange-deep); }
+  pre { background: #1F1B17; color: #E8E1D9; padding: 18px 22px; border-radius: 10px; overflow-x: auto; font-size: 13px; line-height: 1.6; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; font-size: 13px; }
+  pre .kw { color: #E5A77B; } pre .str { color: #C8E0B4; } pre .com { color: #6F665D; font-style: italic; }
+  pre .fn { color: #93B5E0; } pre .num { color: #E5A77B; } pre .ty { color: #D7B5E5; }
+  .box { border-left: 4px solid var(--gray-300); padding: 16px 20px; border-radius: 6px; margin: 18px 0; background: white; box-shadow: 0 1px 2px rgba(31,27,23,0.04); }
+  .box.info { border-color: var(--blue); background: var(--blue-soft); }
+  .box.warn { border-color: var(--yellow); background: var(--yellow-soft); }
+  .box.error { border-color: var(--red); background: var(--red-soft); }
+  .box.ok { border-color: var(--green); background: var(--green-soft); }
+  .box.note { border-color: var(--orange); background: var(--orange-soft); }
+  .box.purple { border-color: var(--purple); background: var(--purple-soft); }
+  .box .title { font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .box.info .title { color: var(--blue); } .box.warn .title { color: var(--yellow); }
+  .box.error .title { color: var(--red); } .box.ok .title { color: var(--green); }
+  .box.note .title { color: var(--orange-deep); } .box.purple .title { color: var(--purple); }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; background: white; box-shadow: 0 1px 2px rgba(31,27,23,0.04); border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--gray-300); vertical-align: top; }
+  th { background: var(--gray-100); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-700); }
+  tr:last-child td { border-bottom: none; } td code { font-size: 12px; }
+  figure { margin: 24px 0; padding: 24px; background: white; border: 1px solid var(--gray-300); border-radius: 12px; text-align: center; }
+  figure svg { max-width: 100%; height: auto; }
+  figcaption { margin-top: 14px; font-size: 13px; color: var(--gray-500); font-style: italic; }
+  .steps { list-style: none; padding: 0; counter-reset: step; }
+  .steps li { counter-increment: step; position: relative; padding: 14px 18px 14px 56px; background: white; border: 1px solid var(--gray-300); border-radius: 8px; margin-bottom: 10px; }
+  .steps li::before { content: counter(step); position: absolute; left: 14px; top: 12px; width: 30px; height: 30px; border-radius: 50%; background: var(--orange); color: white; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .steps li strong { display: block; margin-bottom: 4px; }
+  .path { font-family: "SF Mono", monospace; font-size: 12px; color: var(--blue); background: var(--blue-soft); padding: 2px 8px; border-radius: 4px; }
+  .lbl { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; margin-right: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .lbl.ok { background: var(--green-soft); color: var(--green); }
+  .lbl.fail { background: var(--red-soft); color: var(--red); }
+  .lbl.warn { background: var(--yellow-soft); color: #8a6520; }
+  .lbl.info { background: var(--blue-soft); color: var(--blue); }
+  @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } nav.toc { display: none; } main { padding: 32px 24px 80px; } }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h3>目录</h3>
+    <ol>
+      <li><a href="#intro">引言:Hook 是 agent 扩展性基石</a></li>
+      <li><a href="#events">14 种 Hook 事件清单</a></li>
+      <li><a href="#lifecycle-map">Hook 在 agent 生命周期的位置</a></li>
+      <li><a href="#config">配置语法</a></li>
+      <li><a href="#input">输入协议(stdin JSON)</a></li>
+      <li><a href="#output">输出协议(exit code + stdout JSON)</a></li>
+      <li><a href="#block">阻断语义</a></li>
+      <li><a href="#inject">非阻断注入 additionalContexts</a></li>
+      <li><a href="#timeout">超时与 AbortSignal</a></li>
+      <li><a href="#trust">admin-trusted 信任分级</a></li>
+      <li><a href="#frontmatter">Frontmatter hook 生命周期</a></li>
+      <li><a href="#stop-convert">Stop → SubagentStop 转换</a></li>
+      <li><a href="#precompact">PreCompact 阻断的特殊性</a></li>
+      <li><a href="#notification">Notification hook</a></li>
+      <li><a href="#hello">实战:写一个 typecheck hook</a></li>
+      <li><a href="#principles">可迁移设计原则</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="hero">
+      <div class="eyebrow">Claude Code 源码深度讲解 · 必修篇 4/5</div>
+      <h1>Hook 系统 — Extensibility 基础设施</h1>
+      <p>Hook 让用户<strong>无需改源码</strong>就能在 agent 生命周期的 14 个关键点注入自定义逻辑。
+      这是把"产品的上限"交给用户创造力的核心机制。本文把 14 种事件、输入输出协议、阻断语义全部讲透。</p>
+    </header>
+
+    <section id="intro">
+      <h2><span class="num">01</span>引言:Hook 是 agent 扩展性基石</h2>
+      <p class="lead">没有 hook,用户扩展 agent 只能 fork 源码或写 wrapper;有 hook,写几行 shell 脚本就能植入业务逻辑。</p>
+      <h3>1.1 典型用例</h3>
+      <table>
+        <thead><tr><th>场景</th><th>Hook 事件</th><th>脚本做什么</th></tr></thead>
+        <tbody>
+          <tr><td>提交前必须 typecheck</td><td>PreToolUse (Edit/Write)</td><td>跑 <code>tsc --noEmit</code>,失败则 exit 2</td></tr>
+          <tr><td>记录所有 bash 命令</td><td>PreToolUse (Bash)</td><td>追加到审计日志</td></tr>
+          <tr><td>格式化刚编辑的文件</td><td>PostToolUse (Edit)</td><td>调 prettier</td></tr>
+          <tr><td>agent 完成发 Slack 通知</td><td>Stop</td><td>curl Slack webhook</td></tr>
+          <tr><td>session 启动注入环境信息</td><td>SessionStart</td><td>stdout JSON additionalContexts</td></tr>
+          <tr><td>任务创建时登记 Jira</td><td>TaskCreated</td><td>POST Jira API</td></tr>
+        </tbody>
+      </table>
+      <h3>1.2 跟 middleware 的区别</h3>
+      <div class="box info">
+        <div class="title">为什么不用代码内置 middleware</div>
+        middleware 要用户会 TypeScript,要 import SDK,要发布。
+        Hook 用 shell 脚本 + stdin/stdout JSON,<strong>任何语言都能写</strong>。
+        门槛从"会编程"降到"会写 shell"。受众扩大 10 倍。
+      </div>
+    </section>
+
+    <section id="events">
+      <h2><span class="num">02</span>14 种 Hook 事件清单</h2>
+      <p class="lead">Claude Code 在以下 14 个关键点触发 hook。</p>
+      <table>
+        <thead><tr><th>#</th><th>事件</th><th>触发点</th><th>能阻断?</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><code>SessionStart</code></td><td>会话启动</td><td>否</td></tr>
+          <tr><td>2</td><td><code>SessionEnd</code></td><td>会话结束</td><td>否</td></tr>
+          <tr><td>3</td><td><code>UserPromptSubmit</code></td><td>用户发送消息前</td><td>是</td></tr>
+          <tr><td>4</td><td><code>PreToolUse</code></td><td>工具执行前</td><td>是</td></tr>
+          <tr><td>5</td><td><code>PostToolUseFailure</code></td><td>工具失败后</td><td>否</td></tr>
+          <tr><td>6</td><td><code>Stop</code></td><td>主 agent 准备结束 turn</td><td>是</td></tr>
+          <tr><td>7</td><td><code>StopFailure</code></td><td>Stop hook 自己失败时</td><td>否</td></tr>
+          <tr><td>8</td><td><code>SubagentStart</code></td><td>子 agent 启动前</td><td>否</td></tr>
+          <tr><td>9</td><td><code>SubagentStop</code></td><td>子 agent 结束前</td><td>是</td></tr>
+          <tr><td>10</td><td><code>TaskCreated</code></td><td>TaskCreate 写完文件后</td><td>是(回滚)</td></tr>
+          <tr><td>11</td><td><code>TaskCompleted</code></td><td>TaskUpdate 标 completed 前</td><td>是</td></tr>
+          <tr><td>12</td><td><code>PreCompact</code></td><td>autocompact 开始前</td><td>是</td></tr>
+          <tr><td>13</td><td><code>Notification</code></td><td>客户端推送通知</td><td>否</td></tr>
+          <tr><td>14</td><td><code>PostSampling</code></td><td>模型采样完成后</td><td>否</td></tr>
+        </tbody>
+      </table>
+      <h3>2.1 阻断 vs 非阻断的区别</h3>
+      <p><strong>阻断</strong>事件意味着 hook 可以返回 exit 2 让对应操作<strong>不发生</strong>。
+      <strong>非阻断</strong>只是"发生时通知你,但改变不了什么"。</p>
+    </section>
+
+    <section id="lifecycle-map">
+      <h2><span class="num">03</span>Hook 在 agent 生命周期的位置</h2>
+      <figure>
+        <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg">
+          <defs><marker id="arhl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/></marker></defs>
+          <rect x="350" y="20" width="200" height="40" rx="8" fill="#5BA67A"/>
+          <text x="450" y="45" text-anchor="middle" font-size="14" font-weight="700" fill="white">Session 启动</text>
+          <rect x="620" y="25" width="200" height="30" rx="4" fill="#E5E8FE" stroke="#5769F7"/>
+          <text x="720" y="45" text-anchor="middle" font-size="11" fill="#5769F7">SessionStart hook</text>
+          <line x1="450" y1="60" x2="450" y2="85" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arhl)"/>
+
+          <rect x="350" y="85" width="200" height="40" rx="8" fill="#F7ECD3" stroke="#D9A441"/>
+          <text x="450" y="110" text-anchor="middle" font-size="13" font-weight="600" fill="#8a6520">用户输入</text>
+          <rect x="620" y="90" width="200" height="30" rx="4" fill="#E5E8FE" stroke="#5769F7"/>
+          <text x="720" y="110" text-anchor="middle" font-size="11" fill="#5769F7">UserPromptSubmit hook</text>
+          <line x1="450" y1="125" x2="450" y2="150" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arhl)"/>
+
+          <rect x="350" y="150" width="200" height="40" rx="8" fill="#F4E5DD" stroke="#D77757"/>
+          <text x="450" y="175" text-anchor="middle" font-size="13" font-weight="600" fill="#B0552F">模型采样</text>
+          <rect x="620" y="155" width="200" height="30" rx="4" fill="#E5E8FE" stroke="#5769F7"/>
+          <text x="720" y="175" text-anchor="middle" font-size="11" fill="#5769F7">PostSampling hook</text>
+          <line x1="450" y1="190" x2="450" y2="215" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arhl)"/>
+
+          <rect x="350" y="215" width="200" height="40" rx="8" fill="#E2F0E8" stroke="#5BA67A"/>
+          <text x="450" y="240" text-anchor="middle" font-size="13" font-weight="600" fill="#5BA67A">工具调用</text>
+          <rect x="620" y="205" width="200" height="30" rx="4" fill="#E5E8FE" stroke="#5769F7"/>
+          <text x="720" y="225" text-anchor="middle" font-size="11" fill="#5769F7">PreToolUse hook(前)</text>
+          <rect x="620" y="240" width="200" height="30" rx="4" fill="#E5E8FE" stroke="#5769F7"/>
+          <text x="720" y="260" text-anchor="middle" font-size="11" fill="#5769F7">PostToolUseFailure(失败)</text>
+          <line x1="450" y1="255" x2="450" y2="280" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arhl)"/>
+
+          <rect x="350" y="280" width="200" height="40" rx="8" fill="#EDE7F8" stroke="#8B5CF6"/>
+          <text x="450" y="305" text-anchor="middle" font-size="13" font-weight="600" fill="#8B5CF6">子 agent(可选)</text>
+          <rect x="620" y="275" width="200" height="30" rx="4" fill="#E5E8FE" stroke="#5769F7"/>
+          <text x="720" y="295" text-anchor="middle" font-size="11" fill="#5769F7">SubagentStart / Stop</text>
+          <line x1="450" y1="320" x2="450" y2="345" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arhl)"/>
+
+          <rect x="350" y="345" width="200" height="40" rx="8" fill="#F5DEDC" stroke="#C9534D"/>
+          <text x="450" y="370" text-anchor="middle" font-size="13" font-weight="600" fill="#C9534D">回合结束 / 压缩</text>
+          <rect x="620" y="335" width="200" height="30" rx="4" fill="#E5E8FE" stroke="#5769F7"/>
+          <text x="720" y="355" text-anchor="middle" font-size="11" fill="#5769F7">Stop / StopFailure</text>
+          <rect x="620" y="370" width="200" height="30" rx="4" fill="#E5E8FE" stroke="#5769F7"/>
+          <text x="720" y="390" text-anchor="middle" font-size="11" fill="#5769F7">PreCompact hook</text>
+        </svg>
+        <figcaption>Hook 散布在 session → turn → tool → agent → compact 各层生命周期节点</figcaption>
+      </figure>
+    </section>
+
+    <section id="config">
+      <h2><span class="num">04</span>配置语法</h2>
+      <h3>4.1 标准格式</h3>
+      <pre><code><span class="com">// settings.json</span>
+{
+  <span class="str">"hooks"</span>: {
+    <span class="str">"PreToolUse"</span>: [
+      {
+        <span class="str">"matcher"</span>: <span class="str">"Edit|Write"</span>,       <span class="com">// 工具名正则,可省略(匹配所有)</span>
+        <span class="str">"command"</span>: <span class="str">"./scripts/pre-edit.sh"</span>,   <span class="com">// 可执行脚本</span>
+        <span class="str">"timeout"</span>: <span class="num">30000</span>,              <span class="com">// 可选超时(默认 60s)</span>
+        <span class="str">"env"</span>: { <span class="str">"HOOK_DEBUG"</span>: <span class="str">"1"</span> }    <span class="com">// 可选额外 env</span>
+      }
+    ],
+    <span class="str">"Stop"</span>: [
+      { <span class="str">"command"</span>: <span class="str">"curl https://slack.webhook.url -d 'done'"</span> }
+    ]
+  }
+}</code></pre>
+      <h3>4.2 matcher 语义</h3>
+      <ul>
+        <li><strong>PreToolUse / PostToolUseFailure</strong>:matcher 是工具名,支持正则或 glob</li>
+        <li><strong>Notification</strong>:matcher 是 notification type</li>
+        <li>其他事件:matcher 通常不用,留空即对所有触发</li>
+      </ul>
+      <h3>4.3 多个 hook 串行执行</h3>
+      <pre><code>{
+  <span class="str">"PreToolUse"</span>: [
+    { <span class="str">"matcher"</span>: <span class="str">"Bash"</span>, <span class="str">"command"</span>: <span class="str">"./audit.sh"</span> },
+    { <span class="str">"matcher"</span>: <span class="str">"Bash"</span>, <span class="str">"command"</span>: <span class="str">"./security-check.sh"</span> }
+  ]
+}
+<span class="com">// Bash 调用会串行跑 audit.sh → security-check.sh</span>
+<span class="com">// 任一返回 exit 2 → 整个工具调用被阻断</span></code></pre>
+    </section>
+
+    <section id="input">
+      <h2><span class="num">05</span>输入协议(stdin JSON)</h2>
+      <p class="lead">Hook 从 stdin 读取一个 JSON 对象,字段取决于事件类型。</p>
+      <h3>5.1 通用字段(所有事件都有)</h3>
+      <pre><code>{
+  <span class="str">"hook_event_name"</span>: <span class="str">"PreToolUse"</span>,
+  <span class="str">"session_id"</span>: <span class="str">"abc123..."</span>,
+  <span class="str">"cwd"</span>: <span class="str">"/Users/me/project"</span>,
+  <span class="str">"transcript_path"</span>: <span class="str">"~/.claude/projects/.../abc123.jsonl"</span>,
+  <span class="str">"permission_mode"</span>: <span class="str">"default"</span>
+}</code></pre>
+      <h3>5.2 PreToolUse 额外字段</h3>
+      <pre><code>{
+  <span class="str">"hook_event_name"</span>: <span class="str">"PreToolUse"</span>,
+  <span class="str">"tool_name"</span>: <span class="str">"Edit"</span>,
+  <span class="str">"tool_input"</span>: {
+    <span class="str">"file_path"</span>: <span class="str">"/Users/me/project/src/foo.ts"</span>,
+    <span class="str">"old_string"</span>: <span class="str">"foo"</span>,
+    <span class="str">"new_string"</span>: <span class="str">"bar"</span>
+  },
+  <span class="str">"tool_use_id"</span>: <span class="str">"toolu_X"</span>
+}</code></pre>
+      <h3>5.3 SubagentStart 额外字段</h3>
+      <pre><code>{
+  <span class="str">"hook_event_name"</span>: <span class="str">"SubagentStart"</span>,
+  <span class="str">"agent_id"</span>: <span class="str">"agent_xyz"</span>,
+  <span class="str">"agent_type"</span>: <span class="str">"security-reviewer"</span>
+}</code></pre>
+      <h3>5.4 TaskCreated 额外字段</h3>
+      <pre><code>{
+  <span class="str">"hook_event_name"</span>: <span class="str">"TaskCreated"</span>,
+  <span class="str">"task_id"</span>: <span class="str">"42"</span>,
+  <span class="str">"task_subject"</span>: <span class="str">"Add login page"</span>,
+  <span class="str">"task_description"</span>: <span class="str">"Implement JWT-based auth..."</span>,
+  <span class="str">"teammate_name"</span>: <span class="str">"team-lead"</span>,
+  <span class="str">"team_name"</span>: <span class="str">"myteam"</span>
+}</code></pre>
+    </section>
+
+    <section id="output">
+      <h2><span class="num">06</span>输出协议(exit code + stdout JSON)</h2>
+      <p class="lead">Hook 用 exit code + stdout 传达结果。</p>
+      <h3>6.1 Exit code 语义</h3>
+      <table>
+        <thead><tr><th>Exit</th><th>含义</th><th>下一步</th></tr></thead>
+        <tbody>
+          <tr><td><code>0</code></td><td>成功,允许继续</td><td>可能消费 stdout JSON</td></tr>
+          <tr><td><code>2</code></td><td><strong>阻断</strong> — stderr 作为错误原因</td><td>对应操作被中断</td></tr>
+          <tr><td>其他</td><td>hook 自己出错</td><td>忽略该 hook,继续主流程</td></tr>
+        </tbody>
+      </table>
+      <h3>6.2 Stdout JSON 结构</h3>
+      <pre><code>{
+  <span class="com">// 阻断消息(与 exit 2 语义重复,但更结构化)</span>
+  <span class="str">"blockingError"</span>: <span class="str">"Type check failed"</span>,
+
+  <span class="com">// 非阻断:追加到模型上下文</span>
+  <span class="str">"additionalContexts"</span>: [
+    <span class="str">"Current git branch is feature/auth"</span>,
+    <span class="str">"CI last run: PASS"</span>
+  ],
+
+  <span class="com">// Permission 类 hook 的决策</span>
+  <span class="str">"permissionDecision"</span>: <span class="str">"allow"</span>,
+  <span class="str">"permissionDecisionReason"</span>: <span class="str">"Matched safe-pattern allowlist"</span>,
+
+  <span class="com">// 改输入(PreToolUse)</span>
+  <span class="str">"updatedInput"</span>: { <span class="str">"file_path"</span>: <span class="str">"/normalized/path"</span> },
+
+  <span class="com">// PreToolUse hookSpecificOutput</span>
+  <span class="str">"hookSpecificOutput"</span>: {
+    <span class="str">"hookEventName"</span>: <span class="str">"PreToolUse"</span>,
+    <span class="str">"permissionDecision"</span>: <span class="str">"deny"</span>,
+    <span class="str">"permissionDecisionReason"</span>: <span class="str">"..."</span>
+  }
+}</code></pre>
+      <h3>6.3 输出示例:typecheck hook</h3>
+      <pre><code><span class="com">#!/bin/bash</span>
+<span class="com"># 读 hook 输入</span>
+<span class="kw">input</span>=$(cat)
+<span class="kw">tool_name</span>=$(echo <span class="str">"$input"</span> | jq -r .tool_name)
+
+<span class="kw">if</span> [[ <span class="str">"$tool_name"</span> == <span class="str">"Edit"</span> || <span class="str">"$tool_name"</span> == <span class="str">"Write"</span> ]]; <span class="kw">then</span>
+  <span class="kw">if</span> ! tsc --noEmit; <span class="kw">then</span>
+    <span class="kw">echo</span> <span class="str">"TypeScript check failed before $tool_name"</span> &gt;&amp;<span class="num">2</span>
+    <span class="kw">exit</span> <span class="num">2</span>                  <span class="com"># 阻断</span>
+  <span class="kw">fi</span>
+<span class="kw">fi</span>
+<span class="kw">exit</span> <span class="num">0</span></code></pre>
+    </section>
+
+    <section id="block">
+      <h2><span class="num">07</span>阻断语义</h2>
+      <p class="lead">阻断是 hook 最强大的能力,但只对特定事件有效。</p>
+      <h3>7.1 阻断对应结果</h3>
+      <table>
+        <thead><tr><th>事件</th><th>阻断效果</th></tr></thead>
+        <tbody>
+          <tr><td>UserPromptSubmit</td><td>用户消息不发送给模型</td></tr>
+          <tr><td>PreToolUse</td><td>工具不执行,模型收到 tool_result(is_error)</td></tr>
+          <tr><td>Stop</td><td>agent 不结束,继续一个 turn(用于"还没跑测试不准停")</td></tr>
+          <tr><td>SubagentStop</td><td>子 agent 不结束,继续</td></tr>
+          <tr><td>TaskCreated</td><td>任务回滚(deleteTask),抛错给模型</td></tr>
+          <tr><td>TaskCompleted</td><td>不标完成,返回 success: false</td></tr>
+          <tr><td>PreCompact</td><td>compact 不执行</td></tr>
+        </tbody>
+      </table>
+      <h3>7.2 模型如何知道被阻断</h3>
+      <pre><code><span class="com">// PreToolUse 阻断后,模型收到:</span>
+{
+  type: <span class="str">'tool_result'</span>,
+  tool_use_id: <span class="str">'toolu_X'</span>,
+  is_error: <span class="kw">true</span>,
+  content: <span class="str">"Execution stopped by PreToolUse hook: TypeScript check failed before Edit"</span>
+}
+<span class="com">// 模型读到错误 → 可能自己修 bug 再重试,或告诉用户原因</span></code></pre>
+      <h3>7.3 "Stop 阻断"的特殊用法</h3>
+      <pre><code><span class="com">// Stop hook 返回 exit 2 → agent 不结束</span>
+<span class="com">// 经典用途:</span>
+<span class="com">// "如果还没跑 test,塞一条 user message 让 agent 继续跑 test"</span>
+<span class="com">// 实现:</span>
+<span class="kw">if</span> ! git diff --exit-code; <span class="kw">then</span>
+  <span class="kw">echo</span> <span class="str">'{"blockingError": "You have uncommitted changes. Run tests first."}'</span>
+  <span class="kw">exit</span> <span class="num">2</span>
+<span class="kw">fi</span></code></pre>
+    </section>
+
+    <section id="inject">
+      <h2><span class="num">08</span>非阻断注入 additionalContexts</h2>
+      <p class="lead">不阻断的 hook 也能<strong>改变 agent 行为</strong> — 通过注入上下文。</p>
+      <h3>8.1 SessionStart 注入</h3>
+      <pre><code><span class="com">#!/bin/bash</span>
+<span class="com"># 会话启动时注入当前环境信息</span>
+<span class="kw">branch</span>=$(git branch --show-current)
+<span class="kw">recent_commits</span>=$(git log --oneline -5)
+
+<span class="kw">cat</span> &lt;&lt;EOF
+{
+  <span class="str">"additionalContexts"</span>: [
+    <span class="str">"Current branch: $branch"</span>,
+    <span class="str">"Recent commits:\n$recent_commits"</span>
+  ]
+}
+EOF
+<span class="kw">exit</span> <span class="num">0</span></code></pre>
+      <h3>8.2 注入如何到达模型</h3>
+      <ol class="steps">
+        <li>hook 输出 JSON 含 additionalContexts</li>
+        <li>executeHooks 聚合所有 hook 的 additionalContexts</li>
+        <li>用 <code>createAttachmentMessage({ type: 'hook_additional_context', ...})</code> 包装</li>
+        <li>作为 user message 插入 initialMessages 之前(isMeta: true,不在 UI 显示)</li>
+      </ol>
+      <h3>8.3 SubagentStart 的特殊注入</h3>
+      <p>SubagentStart 的 additionalContexts 特别重要 — 它是给子 agent 的"预备知识":</p>
+      <pre><code><span class="com">// runAgent.ts 里</span>
+<span class="kw">for await</span> (<span class="kw">const</span> hookResult <span class="kw">of</span> <span class="fn">executeSubagentStartHooks</span>(agentId, agentType, signal)) {
+  <span class="kw">if</span> (hookResult.additionalContexts?.length) {
+    additionalContexts.<span class="fn">push</span>(...hookResult.additionalContexts)
+  }
+}
+<span class="com">// 这些 contexts 会作为 initialMessages 的第一条注入</span>
+<span class="com">// 相当于在 agent 开始前"给它简报"</span></code></pre>
+    </section>
+
+    <section id="timeout">
+      <h2><span class="num">09</span>超时与 AbortSignal</h2>
+      <p class="lead">Hook 是用户代码,不能让它卡死整个 agent。</p>
+      <h3>9.1 默认超时</h3>
+      <pre><code><span class="kw">const</span> TOOL_HOOK_EXECUTION_TIMEOUT_MS = <span class="num">60_000</span>    <span class="com">// 60 秒</span>
+<span class="com">// hook 运行超过这个时间 → SIGTERM → SIGKILL</span>
+<span class="com">// 超时的 hook 视为失败,不阻断主流程(exit code ≠ 0 且 ≠ 2 → ignore)</span></code></pre>
+      <h3>9.2 AbortSignal 传播</h3>
+      <pre><code><span class="com">// 所有 hook 都接收 AbortSignal</span>
+<span class="fn">executeHooks</span>({
+  hookInput,
+  toolUseID,
+  signal: toolUseContext.abortController.signal,
+  timeoutMs,
+})
+
+<span class="com">// 内部实现:</span>
+<span class="com">// 1. spawn 子进程跑 hook</span>
+<span class="com">// 2. 监听 signal.aborted → child.kill()</span>
+<span class="com">// 3. 同时定时器 timeoutMs → child.kill()</span>
+<span class="com">// 4. 先到的生效</span></code></pre>
+      <h3>9.3 用户覆盖超时</h3>
+      <pre><code>{ <span class="str">"command"</span>: <span class="str">"./long-audit.sh"</span>, <span class="str">"timeout"</span>: <span class="num">180000</span> }
+<span class="com">// 某些 hook 确实需要更长时间(如全项目 lint / test)</span></code></pre>
+    </section>
+
+    <section id="trust">
+      <h2><span class="num">10</span>admin-trusted 信任分级</h2>
+      <p class="lead">企业策略可以限制"谁能注册 hook",防止用户自己加绕过审计的钩子。</p>
+      <h3>10.1 来源信任级别</h3>
+      <table>
+        <thead><tr><th>Hook 来源</th><th>admin-trusted?</th><th>受 strictPluginOnlyCustomization 限制</th></tr></thead>
+        <tbody>
+          <tr><td>managed-settings.json</td><td><span class="lbl ok">是</span></td><td>不受限(本身就是企业级)</td></tr>
+          <tr><td>policySettings</td><td><span class="lbl ok">是</span></td><td>不受限</td></tr>
+          <tr><td>plugin 提供</td><td><span class="lbl ok">是</span></td><td>不受限(plugin 经过审计签名)</td></tr>
+          <tr><td>built-in agent frontmatter</td><td><span class="lbl ok">是</span></td><td>不受限</td></tr>
+          <tr><td>user settings</td><td><span class="lbl warn">否</span></td><td><strong>被限制</strong></td></tr>
+          <tr><td>project settings</td><td><span class="lbl warn">否</span></td><td><strong>被限制</strong></td></tr>
+          <tr><td>user agent frontmatter</td><td><span class="lbl warn">否</span></td><td><strong>被限制</strong></td></tr>
+        </tbody>
+      </table>
+      <h3>10.2 受限时的行为</h3>
+      <pre><code><span class="com">// runAgent.ts:570</span>
+<span class="kw">const</span> hooksAllowedForThisAgent =
+  !<span class="fn">isRestrictedToPluginOnly</span>(<span class="str">'hooks'</span>) ||
+  <span class="fn">isSourceAdminTrusted</span>(agentDefinition.source)
+
+<span class="kw">if</span> (agentDefinition.hooks &amp;&amp; hooksAllowedForThisAgent) {
+  <span class="fn">registerFrontmatterHooks</span>(...)   <span class="com">// 允许</span>
+}
+<span class="com">// 否则 frontmatter hooks 被静默忽略</span></code></pre>
+    </section>
+
+    <section id="frontmatter">
+      <h2><span class="num">11</span>Frontmatter hook 生命周期</h2>
+      <p class="lead">agent 的 markdown frontmatter 可以定义 hook,仅在该 agent 活着期间生效。</p>
+      <h3>11.1 示例</h3>
+      <pre><code><span class="com"># ~/.claude/agents/security-auditor.md</span>
+---
+description: <span class="str">"Security audit specialist"</span>
+hooks:
+  PreToolUse:
+    - matcher: <span class="str">"Bash"</span>
+      command: <span class="str">"./audit/log-bash.sh"</span>
+  Stop:
+    - command: <span class="str">"./audit/final-report.sh"</span>
+---
+
+You are a security auditor...</code></pre>
+      <h3>11.2 注册时机</h3>
+      <pre><code><span class="com">// runAgent.ts:573 — agent 启动时注册</span>
+<span class="fn">registerFrontmatterHooks</span>(
+  rootSetAppState,
+  agentId,                       <span class="com">// ← 关键:按 agentId 作用域</span>
+  agentDefinition.hooks,
+  <span class="str">`agent '${agentDefinition.agentType}'`</span>,
+  <span class="kw">true</span>,                          <span class="com">// isAgent</span>
+)</code></pre>
+      <h3>11.3 agent 结束时自动清理</h3>
+      <pre><code><span class="com">// runAgent 的 finally 块</span>
+<span class="fn">clearSessionHooks</span>(agentId)
+<span class="com">// 该 agent 注册的所有 hook 从 registry 移除</span>
+<span class="com">// 不影响其他 agent 或 session 级 hook</span></code></pre>
+    </section>
+
+    <section id="stop-convert">
+      <h2><span class="num">12</span>Stop → SubagentStop 转换</h2>
+      <p class="lead">这是 frontmatter hook 里一个关键细节 — agent 写 <code>hooks.Stop</code> 意图明确,系统自动"翻译"为 SubagentStop。</p>
+      <h3>12.1 问题</h3>
+      <pre><code><span class="com"># agent frontmatter</span>
+hooks:
+  Stop:
+    - command: <span class="str">"notify agent done"</span>
+
+<span class="com"># 用户期望:该 agent 结束时跑</span>
+<span class="com"># 但 Stop 事件本意是"主对话 Stop"</span>
+<span class="com"># 如果不转换,主线程结束才跑 → 错位</span></code></pre>
+      <h3>12.2 解决:注册时自动改名</h3>
+      <pre><code><span class="com">// registerFrontmatterHooks.ts 内部</span>
+<span class="kw">for</span> (<span class="kw">const</span> [eventName, configs] <span class="kw">of</span> Object.<span class="fn">entries</span>(hooks)) {
+  <span class="kw">const</span> effectiveEvent = isAgent &amp;&amp; eventName === <span class="str">'Stop'</span>
+    ? <span class="str">'SubagentStop'</span>
+    : eventName
+  <span class="com">// 注册时用 effectiveEvent</span>
+  <span class="fn">registerHook</span>(agentId, effectiveEvent, configs)
+}</code></pre>
+      <div class="box info">
+        <div class="title">设计哲学:用户写他们想的,系统翻译意图</div>
+        不强迫用户记住 "SubagentStop" 这个术语,让他们写自然的 "Stop"。
+        <strong>接口模糊度应该被框架吸收,不是推给用户</strong>。
+      </div>
+    </section>
+
+    <section id="precompact">
+      <h2><span class="num">13</span>PreCompact 阻断的特殊性</h2>
+      <p class="lead">PreCompact 阻断 = 禁止整段 compact。后果比一般阻断严重得多。</p>
+      <h3>13.1 为什么需要</h3>
+      <p>某些工作流不希望历史被摘要(比如审计场景需要保留完整对话),PreCompact hook 能阻止。</p>
+      <h3>13.2 风险</h3>
+      <div class="box error">
+        <div class="title">后果</div>
+        如果持续阻断 PreCompact,token 超阈值后会进入<strong>硬阻塞</strong> — 用户收到
+        "Prompt is too long" 错误。需要手动 <code>/compact</code> 或退出会话。
+      </div>
+      <h3>13.3 使用场景</h3>
+      <pre><code><span class="com">#!/bin/bash</span>
+<span class="com"># 审计模式:记录压缩点,但不阻止</span>
+<span class="kw">echo</span> <span class="str">"Compact triggered at $(date)"</span> &gt;&gt; /audit/compact.log
+<span class="kw">exit</span> <span class="num">0</span>    <span class="com"># 注意是 0,不是 2</span>
+
+<span class="com"># 严格模式:彻底阻止 — 不推荐</span>
+<span class="com"># exit 2</span></code></pre>
+    </section>
+
+    <section id="notification">
+      <h2><span class="num">14</span>Notification hook</h2>
+      <p class="lead">Notification 用于把 Claude Code 事件推送到外部系统。</p>
+      <h3>14.1 通知类型</h3>
+      <pre><code>{
+  <span class="str">"hook_event_name"</span>: <span class="str">"Notification"</span>,
+  <span class="str">"notification_type"</span>: <span class="str">"task_complete"</span>,    <span class="com">// 或 'waiting_for_input', 'error', ...</span>
+  <span class="str">"title"</span>: <span class="str">"Task completed"</span>,
+  <span class="str">"message"</span>: <span class="str">"Agent finished the auth refactor"</span>
+}</code></pre>
+      <h3>14.2 典型用法</h3>
+      <pre><code><span class="com">#!/bin/bash</span>
+<span class="kw">input</span>=$(cat)
+<span class="kw">type</span>=$(echo <span class="str">"$input"</span> | jq -r .notification_type)
+<span class="kw">title</span>=$(echo <span class="str">"$input"</span> | jq -r .title)
+
+<span class="kw">case</span> <span class="str">"$type"</span> <span class="kw">in</span>
+  task_complete)
+    osascript -e <span class="str">"display notification \"$title\" with title \"Claude Code\""</span>
+    ;;
+  waiting_for_input)
+    <span class="com"># macOS 声音提醒</span>
+    afplay /System/Library/Sounds/Tink.aiff
+    ;;
+<span class="kw">esac</span></code></pre>
+    </section>
+
+    <section id="hello">
+      <h2><span class="num">15</span>实战:写一个 typecheck hook</h2>
+      <p class="lead">一个完整例子,在 Edit/Write 前自动跑 tsc 检查。</p>
+      <h3>15.1 hook 脚本</h3>
+      <pre><code><span class="com">#!/bin/bash</span>
+<span class="com"># ~/project/.claude/hooks/pre-edit-typecheck.sh</span>
+<span class="kw">set</span> -euo pipefail
+
+<span class="com"># 读 hook 输入</span>
+<span class="kw">input</span>=$(cat)
+<span class="kw">tool_name</span>=$(echo <span class="str">"$input"</span> | jq -r .tool_name)
+<span class="kw">cwd</span>=$(echo <span class="str">"$input"</span> | jq -r .cwd)
+
+<span class="com"># 只对 Edit/Write 触发(额外保险,虽然 matcher 也会过滤)</span>
+<span class="kw">if</span> [[ <span class="str">"$tool_name"</span> != <span class="str">"Edit"</span> &amp;&amp; <span class="str">"$tool_name"</span> != <span class="str">"Write"</span> ]]; <span class="kw">then</span>
+  <span class="kw">exit</span> <span class="num">0</span>
+<span class="kw">fi</span>
+
+<span class="com"># 切到项目目录</span>
+<span class="kw">cd</span> <span class="str">"$cwd"</span>
+
+<span class="com"># 跑 TypeScript 检查</span>
+<span class="kw">if</span> ! npx tsc --noEmit 2&gt; /tmp/tsc-errors.log; <span class="kw">then</span>
+  <span class="kw">errors</span>=$(head -20 /tmp/tsc-errors.log)
+  <span class="kw">cat</span> &lt;&lt;EOF &gt;&amp;<span class="num">2</span>
+TypeScript errors exist before edit. Fix them first:
+
+<span class="str">$errors</span>
+EOF
+  <span class="kw">exit</span> <span class="num">2</span>    <span class="com"># 阻断</span>
+<span class="kw">fi</span>
+
+<span class="com"># 或者返回结构化:</span>
+<span class="com"># cat &lt;&lt;EOF</span>
+<span class="com"># {"blockingError": "TypeScript errors: $errors"}</span>
+<span class="com"># EOF</span>
+<span class="com"># exit 2</span>
+
+<span class="kw">exit</span> <span class="num">0</span></code></pre>
+      <h3>15.2 注册</h3>
+      <pre><code><span class="com">// ~/project/.claude/settings.json</span>
+{
+  <span class="str">"hooks"</span>: {
+    <span class="str">"PreToolUse"</span>: [
+      {
+        <span class="str">"matcher"</span>: <span class="str">"Edit|Write"</span>,
+        <span class="str">"command"</span>: <span class="str">"./.claude/hooks/pre-edit-typecheck.sh"</span>,
+        <span class="str">"timeout"</span>: <span class="num">30000</span>
+      }
+    ]
+  }
+}</code></pre>
+      <h3>15.3 测试</h3>
+      <pre><code><span class="com"># 让脚本可执行</span>
+<span class="kw">chmod</span> +x .claude/hooks/pre-edit-typecheck.sh
+
+<span class="com"># 启动 Claude Code</span>
+claude
+
+<span class="com"># 让它尝试 Edit 一个文件 — 如果项目有 type error,模型会收到阻断错误</span>
+<span class="com"># 调试时看 /hooks status 验证 hook 已加载</span></code></pre>
+    </section>
+
+    <section id="principles">
+      <h2><span class="num">16</span>可迁移设计原则</h2>
+      <ol class="steps">
+        <li><strong>用 stdin/stdout JSON 做协议,不是编程 API</strong> — 任何语言都能写,降低使用门槛</li>
+        <li><strong>Exit code 表达结果</strong> — 0/2/其他 三种状态足够覆盖所有场景</li>
+        <li><strong>非阻断注入 = 受限扩展</strong> — additionalContexts 让 hook 能影响行为但不能中断</li>
+        <li><strong>事件分阻断/非阻断</strong> — 只有少数真正重要的点允许阻断,其他是观察者</li>
+        <li><strong>超时保护</strong> — 用户代码必须有时间界限,否则会拖垮主流程</li>
+        <li><strong>按来源分级信任</strong> — 企业策略 &gt; plugin &gt; 用户,高层可以禁用低层的 hook 能力</li>
+        <li><strong>作用域明确</strong> — session / agent / 全局各一套,不串扰</li>
+        <li><strong>意图翻译</strong> — 用户写 "Stop" 系统翻译为 "SubagentStop",接口模糊度由框架吸收</li>
+      </ol>
+      <div class="box note">
+        <div class="title">最深的启示</div>
+        Claude Code 的 hook 系统是"<strong>让用户写代码的能力</strong>"和"<strong>保证系统稳定性</strong>"的精妙平衡。
+        14 种事件、10+ 层信任、超时保护、作用域隔离 —— 任何一个环节缺失,hook 就从"扩展点"退化成"攻击面"。
+        设计扩展机制时,<strong>安全边界比功能丰富度更重要</strong>。
+      </div>
+    </section>
+
+    <footer style="margin-top:80px;padding-top:32px;border-top:1px solid var(--gray-300);color:var(--gray-500);font-size:13px;">
+      <p>本文基于 Claude Code 反编译版源码(commit 1173a62)。
+      关键文件:<span class="path">src/utils/hooks.ts</span>、
+      <span class="path">src/utils/hooks/{registerFrontmatterHooks.ts, sessionHooks.ts, postSamplingHooks.ts}</span>、
+      <span class="path">src/types/sdk-stubs.d.ts</span>。</p>
+    </footer>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code 工具系统详解</title>
+<style>
+  :root {
+    --orange: #D77757; --orange-soft: #F4E5DD; --orange-deep: #B0552F;
+    --blue: #5769F7; --blue-soft: #E5E8FE;
+    --green: #5BA67A; --green-soft: #E2F0E8;
+    --red: #C9534D; --red-soft: #F5DEDC;
+    --yellow: #D9A441; --yellow-soft: #F7ECD3;
+    --purple: #8B5CF6; --purple-soft: #EDE7F8;
+    --teal: #2BA89E; --teal-soft: #D6F0ED;
+    --gray-900: #1F1B17; --gray-700: #4A413A; --gray-500: #87796F;
+    --gray-300: #D9D0C7; --gray-100: #F6F1EC; --gray-50: #FBF8F4;
+    --bg: #FBF8F4;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif; color: var(--gray-900); background: var(--bg); line-height: 1.7; }
+  .layout { display: grid; grid-template-columns: 280px 1fr; max-width: 1400px; margin: 0 auto; }
+  nav.toc { position: sticky; top: 0; height: 100vh; overflow-y: auto; padding: 32px 20px; border-right: 1px solid var(--gray-300); background: var(--gray-50); font-size: 14px; }
+  nav.toc h3 { margin: 0 0 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray-500); }
+  nav.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: section; }
+  nav.toc ol li { counter-increment: section; margin-bottom: 6px; }
+  nav.toc ol li a { display: block; padding: 6px 10px; color: var(--gray-700); text-decoration: none; border-radius: 6px; border-left: 2px solid transparent; transition: all 0.15s; }
+  nav.toc ol li a::before { content: counter(section, decimal-leading-zero) "  "; color: var(--gray-500); font-variant-numeric: tabular-nums; font-size: 12px; }
+  nav.toc ol li a:hover { background: var(--orange-soft); color: var(--orange-deep); border-left-color: var(--orange); }
+  main { padding: 56px 56px 120px; max-width: 980px; }
+  header.hero { margin-bottom: 56px; padding-bottom: 32px; border-bottom: 1px solid var(--gray-300); }
+  header.hero .eyebrow { color: var(--orange); font-size: 13px; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px; font-weight: 600; }
+  header.hero h1 { font-size: 40px; margin: 0 0 12px; letter-spacing: -0.01em; }
+  header.hero p { font-size: 17px; color: var(--gray-700); max-width: 720px; }
+  section { margin-bottom: 64px; scroll-margin-top: 24px; }
+  section > h2 { font-size: 28px; margin: 0 0 8px; padding-top: 16px; border-top: 3px solid var(--orange); display: inline-block; padding-right: 64px; }
+  section > h2 .num { color: var(--orange); font-variant-numeric: tabular-nums; margin-right: 12px; }
+  section > .lead { color: var(--gray-700); font-size: 16px; margin-bottom: 28px; max-width: 760px; }
+  h3 { font-size: 20px; margin: 32px 0 12px; }
+  h4 { font-size: 16px; margin: 20px 0 8px; color: var(--gray-700); }
+  code { font-family: "SF Mono", "Menlo", monospace; font-size: 13px; background: var(--gray-100); padding: 1px 6px; border-radius: 4px; color: var(--orange-deep); }
+  pre { background: #1F1B17; color: #E8E1D9; padding: 18px 22px; border-radius: 10px; overflow-x: auto; font-size: 13px; line-height: 1.6; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; font-size: 13px; }
+  pre .kw { color: #E5A77B; } pre .str { color: #C8E0B4; } pre .com { color: #6F665D; font-style: italic; }
+  pre .fn { color: #93B5E0; } pre .num { color: #E5A77B; } pre .ty { color: #D7B5E5; }
+  .box { border-left: 4px solid var(--gray-300); padding: 16px 20px; border-radius: 6px; margin: 18px 0; background: white; box-shadow: 0 1px 2px rgba(31,27,23,0.04); }
+  .box.info { border-color: var(--blue); background: var(--blue-soft); }
+  .box.warn { border-color: var(--yellow); background: var(--yellow-soft); }
+  .box.error { border-color: var(--red); background: var(--red-soft); }
+  .box.ok { border-color: var(--green); background: var(--green-soft); }
+  .box.note { border-color: var(--orange); background: var(--orange-soft); }
+  .box.purple { border-color: var(--purple); background: var(--purple-soft); }
+  .box .title { font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .box.info .title { color: var(--blue); } .box.warn .title { color: var(--yellow); }
+  .box.error .title { color: var(--red); } .box.ok .title { color: var(--green); }
+  .box.note .title { color: var(--orange-deep); } .box.purple .title { color: var(--purple); }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; background: white; box-shadow: 0 1px 2px rgba(31,27,23,0.04); border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--gray-300); vertical-align: top; }
+  th { background: var(--gray-100); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-700); }
+  tr:last-child td { border-bottom: none; }
+  td code { font-size: 12px; }
+  figure { margin: 24px 0; padding: 24px; background: white; border: 1px solid var(--gray-300); border-radius: 12px; text-align: center; }
+  figure svg { max-width: 100%; height: auto; }
+  figcaption { margin-top: 14px; font-size: 13px; color: var(--gray-500); font-style: italic; }
+  .steps { list-style: none; padding: 0; counter-reset: step; }
+  .steps li { counter-increment: step; position: relative; padding: 14px 18px 14px 56px; background: white; border: 1px solid var(--gray-300); border-radius: 8px; margin-bottom: 10px; }
+  .steps li::before { content: counter(step); position: absolute; left: 14px; top: 12px; width: 30px; height: 30px; border-radius: 50%; background: var(--orange); color: white; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .steps li strong { display: block; margin-bottom: 4px; }
+  .path { font-family: "SF Mono", monospace; font-size: 12px; color: var(--blue); background: var(--blue-soft); padding: 2px 8px; border-radius: 4px; }
+  .lbl { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; margin-right: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .lbl.ok { background: var(--green-soft); color: var(--green); }
+  .lbl.fail { background: var(--red-soft); color: var(--red); }
+  .lbl.warn { background: var(--yellow-soft); color: #8a6520; }
+  .lbl.info { background: var(--blue-soft); color: var(--blue); }
+  @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } nav.toc { display: none; } main { padding: 32px 24px 80px; } }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h3>目录</h3>
+    <ol>
+      <li><a href="#intro">引言:工具是 agent 的手和眼</a></li>
+      <li><a href="#iface">Tool 接口完整解构</a></li>
+      <li><a href="#schema">Zod 输入校验</a></li>
+      <li><a href="#flags">并发 / 只读 / 破坏性标志</a></li>
+      <li><a href="#budget">maxResultSizeChars 预算</a></li>
+      <li><a href="#defer">shouldDefer 工具懒加载</a></li>
+      <li><a href="#assemble">assembleToolPool 组装</a></li>
+      <li><a href="#partition">并发 / 串行分批算法</a></li>
+      <li><a href="#streaming">StreamingToolExecutor 流式执行</a></li>
+      <li><a href="#lifecycle">单工具生命周期 9 步</a></li>
+      <li><a href="#result">tool_result 协议三种形态</a></li>
+      <li><a href="#failures">三种失败形态</a></li>
+      <li><a href="#self-repair">失败→自我修复模式</a></li>
+      <li><a href="#hooks">PreTool/PostTool hook 切入</a></li>
+      <li><a href="#mcp-wrap">MCP 工具的 wrapping</a></li>
+      <li><a href="#telemetry">三路 telemetry 上报</a></li>
+      <li><a href="#principles">可迁移设计原则</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="hero">
+      <div class="eyebrow">Claude Code 源码深度讲解 · 必修篇 2/5</div>
+      <h1>工具系统 — Tool 接口与执行管线</h1>
+      <p>工具是 agent 的手和眼,决定了 agent 能做什么。Claude Code 用精心设计的 <code>Tool</code> 接口抽象了 60+ 内置工具 + 无限 MCP 工具,统一走一条带<strong>并发分批</strong>、<strong>流式执行</strong>、<strong>失败自愈</strong>的管线。</p>
+    </header>
+
+    <section id="intro">
+      <h2><span class="num">01</span>引言:工具是 agent 的手和眼</h2>
+      <p class="lead">没有工具的 LLM 只能对话;有工具的 LLM 能做事。工具系统设计得好坏,直接决定 agent 能力的上限。</p>
+      <h3>1.1 工具设计的 5 个核心问题</h3>
+      <table>
+        <thead><tr><th>问题</th><th>Claude Code 答案</th></tr></thead>
+        <tbody>
+          <tr><td>如何定义一个工具?</td><td><code>buildTool({ name, prompt, schema, call, ...flags })</code></td></tr>
+          <tr><td>如何验证输入?</td><td>Zod schema + lazy evaluation</td></tr>
+          <tr><td>如何并发执行?</td><td><code>isConcurrencySafe</code> 判定 → partitionToolCalls</td></tr>
+          <tr><td>如何处理大结果?</td><td><code>maxResultSizeChars</code> 预算 → 落盘 + 预览</td></tr>
+          <tr><td>如何处理失败?</td><td>翻译为 tool_result(is_error) → 模型自我修复</td></tr>
+        </tbody>
+      </table>
+      <h3>1.2 工具系统 = agent 的 syscall 接口</h3>
+      <div class="box info">
+        <div class="title">操作系统类比</div>
+        OS 对用户进程暴露 <code>read / write / fork / exec</code> 等系统调用;
+        agent 运行时对 LLM 暴露 <code>Read / Edit / Bash / Agent</code> 等工具。
+        设计规则也类似:<strong>接口窄、语义明、失败可恢复、权限可控</strong>。
+      </div>
+    </section>
+
+    <section id="iface">
+      <h2><span class="num">02</span>Tool 接口完整解构</h2>
+      <p class="lead"><span class="path">src/Tool.ts</span> 定义了 <code>ToolDef&lt;Input, Output&gt;</code>,是整个 agent 系统最重要的接口之一。</p>
+      <h3>2.1 核心字段</h3>
+      <pre><code><span class="kw">type</span> <span class="ty">ToolDef</span>&lt;<span class="ty">Input</span>, <span class="ty">Output</span>&gt; = {
+  <span class="com">// ====== 身份 ======</span>
+  name: <span class="ty">string</span>                            <span class="com">// 唯一名,模型看到的 tool name</span>
+  aliases?: <span class="ty">string[]</span>                       <span class="com">// 向后兼容的旧名</span>
+  searchHint: <span class="ty">string</span>                      <span class="com">// ToolSearch 检索用的短描述</span>
+  mcpInfo?: { serverName, toolName }           <span class="com">// MCP 工具元信息</span>
+
+  <span class="com">// ====== 给模型看的 prompt ======</span>
+  <span class="fn">description</span>(): <span class="ty">Promise</span>&lt;<span class="ty">string</span>&gt;            <span class="com">// 1 句短描述</span>
+  <span class="fn">prompt</span>(context): <span class="ty">Promise</span>&lt;<span class="ty">string</span>&gt;          <span class="com">// 完整使用说明</span>
+
+  <span class="com">// ====== 输入输出 schema ======</span>
+  inputSchema: <span class="ty">Input</span>                       <span class="com">// Zod schema</span>
+  inputJSONSchema?: <span class="ty">ToolInputJSONSchema</span>    <span class="com">// MCP 工具直接 JSON Schema</span>
+  outputSchema?: <span class="ty">ZodType</span>                   <span class="com">// 可选,帮 SDK 类型推断</span>
+
+  <span class="com">// ====== 执行逻辑 ======</span>
+  <span class="fn">call</span>(input, context, canUseTool, assistantMessage, onProgress):
+    <span class="ty">AsyncGenerator</span>&lt;<span class="ty">Progress</span>, { data: <span class="ty">Output</span> }&gt;
+  <span class="fn">checkPermissions</span>?(input, context): <span class="ty">PermissionResult</span>
+  <span class="fn">validateInput</span>?(input, context): <span class="ty">ValidationResult</span>
+
+  <span class="com">// ====== 标志位 ======</span>
+  <span class="fn">isEnabled</span>(): <span class="ty">boolean</span>                      <span class="com">// 当前环境是否可用</span>
+  <span class="fn">isConcurrencySafe</span>(input): <span class="ty">boolean</span>         <span class="com">// 与同类并发安全</span>
+  <span class="fn">isReadOnly</span>(input): <span class="ty">boolean</span>                <span class="com">// 只读</span>
+  <span class="fn">isDestructive</span>?(input): <span class="ty">boolean</span>           <span class="com">// 破坏性(删除/覆盖)</span>
+  <span class="fn">isOpenWorld</span>?(input): <span class="ty">boolean</span>             <span class="com">// 操作外部世界(网络)</span>
+  shouldDefer?: <span class="ty">boolean</span>                    <span class="com">// 工具懒加载</span>
+  alwaysLoad?: <span class="ty">boolean</span>                     <span class="com">// 永远在 turn 1 可见</span>
+  strict?: <span class="ty">boolean</span>                         <span class="com">// 严格模式(tengu_tool_pear)</span>
+
+  <span class="com">// ====== 行为策略 ======</span>
+  <span class="fn">interruptBehavior</span>?(): <span class="str">'cancel'</span> | <span class="str">'block'</span>   <span class="com">// 中断时怎么办</span>
+  maxResultSizeChars: <span class="ty">number</span>              <span class="com">// 结果过大自动落盘</span>
+  <span class="fn">isSearchOrReadCommand</span>?(input): { isSearch, isRead, isList }
+
+  <span class="com">// ====== UI / 显示 ======</span>
+  <span class="fn">userFacingName</span>(): <span class="ty">string</span>
+  <span class="fn">renderToolUseMessage</span>?(input): <span class="ty">ReactNode</span>
+  <span class="fn">renderToolResultMessage</span>?(output, ...): <span class="ty">ReactNode</span>
+
+  <span class="com">// ====== 转换 ======</span>
+  <span class="fn">mapToolResultToToolResultBlockParam</span>?(output, toolUseID): <span class="ty">ToolResultBlockParam</span>
+  <span class="fn">toAutoClassifierInput</span>?(input): <span class="ty">string</span>    <span class="com">// classifier 的 summary</span>
+  <span class="fn">backfillObservableInput</span>?(input): <span class="kw">void</span>   <span class="com">// 展开派生字段</span>
+}</code></pre>
+      <h3>2.2 buildTool 辅助函数</h3>
+      <pre><code><span class="com">// 实际写工具时用 buildTool,自动补齐默认值</span>
+<span class="kw">export const</span> MyTool = <span class="fn">buildTool</span>({
+  name: <span class="str">'MyTool'</span>,
+  searchHint: <span class="str">'do something useful'</span>,
+  maxResultSizeChars: <span class="num">100_000</span>,
+  <span class="fn">isEnabled</span>() { <span class="kw">return</span> <span class="kw">true</span> },
+  <span class="fn">isConcurrencySafe</span>() { <span class="kw">return</span> <span class="kw">false</span> },
+  <span class="fn">isReadOnly</span>() { <span class="kw">return</span> <span class="kw">false</span> },
+  inputSchema: <span class="fn">lazySchema</span>(() =&gt; z.<span class="fn">object</span>({ ... })),
+  <span class="kw">async</span>* <span class="fn">call</span>(input, context) { yield progress; <span class="kw">return</span> { data } },
+  <span class="fn">userFacingName</span>() { <span class="kw">return</span> <span class="str">'MyTool'</span> },
+}) <span class="kw">satisfies</span> <span class="ty">ToolDef</span>&lt;...&gt;</code></pre>
+    </section>
+
+    <section id="schema">
+      <h2><span class="num">03</span>Zod 输入校验</h2>
+      <p class="lead">为什么用 Zod 而不是 JSON Schema 直接写?Zod 同时给运行时校验和 TypeScript 类型推断,是"双用"武器。</p>
+      <h3>3.1 lazy schema 设计</h3>
+      <pre><code><span class="com">// 为什么 lazy?</span>
+<span class="com">// 1. 避免模块加载时循环依赖</span>
+<span class="com">// 2. 某些 schema 依赖 feature flag(运行时才知道)</span>
+<span class="kw">const</span> inputSchema = <span class="fn">lazySchema</span>(() =&gt;
+  z.<span class="fn">strictObject</span>({
+    path: z.<span class="fn">string</span>().<span class="fn">describe</span>(<span class="str">'Absolute file path'</span>),
+    offset: z.<span class="fn">number</span>().<span class="fn">int</span>().<span class="fn">optional</span>(),
+    limit: z.<span class="fn">number</span>().<span class="fn">int</span>().<span class="fn">positive</span>().<span class="fn">optional</span>(),
+  })
+)</code></pre>
+      <h3>3.2 strictObject 禁止额外字段</h3>
+      <p>用 <code>strictObject</code> 而不是 <code>object</code> —— 输入里多一个字段就报错。防止模型"自作主张"加未记录的字段。</p>
+      <h3>3.3 describe 的作用</h3>
+      <p>每个字段的 <code>.describe('...')</code> 会<strong>序列化进 JSON Schema</strong>,作为工具描述的一部分发给模型。这是模型理解每个参数含义的主要来源。</p>
+      <h3>3.4 formatZodValidationError</h3>
+      <pre><code><span class="com">// toolExecution.ts — 当校验失败时</span>
+<span class="kw">const</span> parsedInput = tool.inputSchema.<span class="fn">safeParse</span>(toolUse.input)
+<span class="kw">if</span> (!parsedInput.success) {
+  <span class="kw">let</span> errorContent = <span class="fn">formatZodValidationError</span>(tool.name, parsedInput.error)
+  <span class="com">// "expected array, got string" 这种 Zod 原生错误不够清楚</span>
+  <span class="com">// 补充 schemaHint 帮模型理解</span>
+  errorContent += schemaHint
+  <span class="com">// 作为 tool_result(is_error: true) 返回</span>
+}</code></pre>
+    </section>
+
+    <section id="flags">
+      <h2><span class="num">04</span>并发 / 只读 / 破坏性标志</h2>
+      <p class="lead">三个布尔标志把"这个工具能不能跟别的一起跑"、"能不能跳过权限检查"、"需不需要用户确认"统一到了类型系统里。</p>
+      <h3>4.1 三个标志的含义</h3>
+      <table>
+        <thead><tr><th>标志</th><th>输入依赖?</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td><code>isConcurrencySafe(input)</code></td><td>✓</td><td>能否与其他并发安全工具<strong>并发</strong>执行</td></tr>
+          <tr><td><code>isReadOnly(input)</code></td><td>✓</td><td>是否不会改变世界状态 → 自动放行读权限</td></tr>
+          <tr><td><code>isDestructive?(input)</code></td><td>✓</td><td>是否不可逆(删除/覆盖/send)→ 强制确认</td></tr>
+          <tr><td><code>isOpenWorld?(input)</code></td><td>✓</td><td>是否操作外部世界(网络请求)→ 安全评估</td></tr>
+        </tbody>
+      </table>
+      <h3>4.2 为什么是 input 相关</h3>
+      <pre><code><span class="com">// Bash 工具:同是 Bash,但 input 不同含义截然不同</span>
+<span class="fn">isConcurrencySafe</span>({ command: <span class="str">'ls -la'</span> }) == <span class="kw">true</span>   <span class="com">// ✓ 只读</span>
+<span class="fn">isConcurrencySafe</span>({ command: <span class="str">'rm -rf'</span> }) == <span class="kw">false</span>  <span class="com">// ✗ 可能与别的冲突</span>
+<span class="fn">isConcurrencySafe</span>({ command: <span class="str">'cd foo && ls'</span> }) == <span class="kw">false</span>  <span class="com">// ✗ 改了 cwd</span>
+
+<span class="com">// 判定基于 shell-quote 解析命令 + 黑白名单</span></code></pre>
+      <h3>4.3 isConcurrencySafe 的异常容错</h3>
+      <pre><code><span class="com">// toolOrchestration.ts:111</span>
+<span class="kw">const</span> isConcurrencySafe = parsedInput?.success
+  ? (() =&gt; {
+      <span class="kw">try</span> { <span class="kw">return</span> <span class="ty">Boolean</span>(tool?.<span class="fn">isConcurrencySafe</span>(parsedInput.data)) }
+      <span class="kw">catch</span> {
+        <span class="com">// 比如 shell-quote 对奇怪命令解析抛错时,保守判定为 false</span>
+        <span class="kw">return</span> <span class="kw">false</span>
+      }
+    })()
+  : <span class="kw">false</span></code></pre>
+      <p>设计哲学:<strong>不确定就保守</strong>。宁可错过并发机会,不冒并发错误风险。</p>
+    </section>
+
+    <section id="budget">
+      <h2><span class="num">05</span>maxResultSizeChars 预算</h2>
+      <p class="lead">每个工具声明自己<strong>单个结果</strong>的字符数上限,超过就自动落盘 + 给模型一个预览。</p>
+      <h3>5.1 典型值</h3>
+      <table>
+        <thead><tr><th>工具</th><th>maxResultSizeChars</th><th>原因</th></tr></thead>
+        <tbody>
+          <tr><td>Read</td><td><code>Infinity</code></td><td>Read 本身是"看内容",结果就是文件内容,落盘只会形成 Read→file→Read 循环</td></tr>
+          <tr><td>Bash</td><td><code>30_000</code></td><td>长命令输出应该持久化</td></tr>
+          <tr><td>Grep</td><td><code>30_000</code></td><td>匹配结果可能极长</td></tr>
+          <tr><td>TodoWrite</td><td><code>100_000</code></td><td>短数组,不太可能触发</td></tr>
+          <tr><td>WebFetch</td><td><code>100_000</code></td><td>网页 HTML 通常</td></tr>
+        </tbody>
+      </table>
+      <h3>5.2 触发时落盘</h3>
+      <pre><code><span class="com">// 在 tool 执行完,结果大于阈值 → persistToolResult</span>
+<span class="com">// 文件路径:<projectDir>/<sessionId>/tool-results/<toolUseId>.txt</span>
+
+<span class="com">// 返回给模型的是:</span>
+<span class="str">`&lt;persisted-output&gt;
+Output too large (85 KB). Full output saved to:
+/Users/me/.claude/projects/.../tool-results/toolu_X.txt
+
+Preview (first 2 KB):
+&lt;前 2KB 内容&gt;
+...
+&lt;/persisted-output&gt;`</span></code></pre>
+      <p>模型看到 preview + 文件路径,如需完整内容可用 Read 工具读该文件。</p>
+      <h3>5.3 Infinity 的意义</h3>
+      <p>三个工具用 Infinity:<strong>Read / MemoryTool / 某些 MCP</strong>。它们的输出是"内容本身",持久化一份<strong>等于复制</strong>没意义。<code>applyToolResultBudget</code> 会跳过它们。</p>
+    </section>
+
+    <section id="defer">
+      <h2><span class="num">06</span>shouldDefer 工具懒加载</h2>
+      <p class="lead">工具数量越多,tool schema 越长,占的 prompt 越多。shouldDefer 让不常用的工具<strong>延迟加载</strong>。</p>
+      <h3>6.1 两阶段加载</h3>
+      <ol class="steps">
+        <li>
+          <strong>初始 prompt</strong>
+          <p>带 <code>shouldDefer: true</code> 的工具只发<strong>名字 + searchHint</strong>,不发完整 schema。</p>
+        </li>
+        <li>
+          <strong>模型发现需要用时</strong>
+          <p>模型先调 <code>ToolSearch({ query: 'task list' })</code> → 拿回匹配的工具完整 schema。</p>
+        </li>
+        <li>
+          <strong>工具解锁</strong>
+          <p>之后模型能正常调用该工具,直到 session 结束。</p>
+        </li>
+      </ol>
+      <h3>6.2 哪些工具 defer</h3>
+      <ul>
+        <li>所有 Task 工具(TaskCreate/Update/List/Get)</li>
+        <li>TodoWrite</li>
+        <li>CronCreate/Delete/List</li>
+        <li>大部分 MCP 工具(按需)</li>
+      </ul>
+      <h3>6.3 alwaysLoad 反面标志</h3>
+      <pre><code><span class="com">// 关键工具永不 defer,即使 ToolSearch 启用</span>
+alwaysLoad: <span class="kw">true</span>
+<span class="com">// 比如 Read、Edit、Bash、Agent、AskUserQuestion</span>
+<span class="com">// 这些模型必须在 turn 1 就能直接调用,不能等 ToolSearch</span></code></pre>
+      <h3>6.4 收益估算</h3>
+      <div class="box info">
+        <div class="title">5-10% token 节省</div>
+        Task 系列 5 个工具 ~6k token,Cron 3 个 ~2k token,MCP 10 个 ~5k token。
+        <strong>90% 的 query 用不到它们</strong>,defer 能为每个 query 节省 10k+ token。
+        对"小任务高并发"场景收益最大。
+      </div>
+    </section>
+
+    <section id="assemble">
+      <h2><span class="num">07</span>assembleToolPool 组装</h2>
+      <p class="lead">Tool pool 不是静态数组,而是每次 <code>permissionMode / MCP 变化</code>时动态重组的。</p>
+      <h3>7.1 组装流程</h3>
+      <pre><code><span class="com">// tools.ts — assembleToolPool 简化版</span>
+<span class="kw">export function</span> <span class="fn">assembleToolPool</span>(permissionContext, mcpTools): <span class="ty">Tool[]</span> {
+  <span class="kw">return</span> [
+    <span class="com">// 1. 永远在的核心</span>
+    BashTool, FileReadTool, FileEditTool, FileWriteTool,
+    GlobTool, GrepTool, WebFetchTool, WebSearchTool,
+
+    <span class="com">// 2. 条件工具</span>
+    ...(<span class="fn">isTodoV2Enabled</span>() ? [TaskCreate, TaskUpdate, TaskList, TaskGet] : [TodoWriteTool]),
+    ...(<span class="fn">isAgentSwarmsEnabled</span>() ? [TeamCreateTool, TeamDeleteTool, SendMessageTool] : []),
+
+    <span class="com">// 3. permissionMode 依赖</span>
+    ...(permissionContext.mode === <span class="str">'plan'</span> ? [ExitPlanModeV2Tool] : [EnterPlanModeTool]),
+
+    <span class="com">// 4. MCP 工具</span>
+    ...mcpTools,
+  ].<span class="fn">filter</span>(t =&gt; t.<span class="fn">isEnabled</span>())
+}</code></pre>
+      <h3>7.2 重组时机</h3>
+      <ul>
+        <li>permissionMode 变化(/plan / /accept-edits)</li>
+        <li>新的 MCP server 连上</li>
+        <li>feature flag 翻转</li>
+        <li>agent 切换(每个 agent 可能有不同的 tool 列表)</li>
+      </ul>
+      <h3>7.3 refreshTools 回调</h3>
+      <pre><code><span class="com">// toolUseContext.options.refreshTools 在每回合间被调用</span>
+<span class="kw">if</span> (updatedToolUseContext.options.refreshTools) {
+  <span class="kw">const</span> refreshedTools = updatedToolUseContext.options.<span class="fn">refreshTools</span>()
+  <span class="kw">if</span> (refreshedTools !== updatedToolUseContext.options.tools) {
+    <span class="com">// 工具集变了 → 下一回合用新集合</span>
+    updatedToolUseContext.options.tools = refreshedTools
+  }
+}</code></pre>
+    </section>
+
+    <section id="partition">
+      <h2><span class="num">08</span>并发 / 串行分批算法</h2>
+      <p class="lead"><code>partitionToolCalls</code> 把一轮返回的所有 tool_use 块按"能否并发"分成若干 batch,这是性能和正确性的平衡点。</p>
+      <h3>8.1 核心算法(<span class="path">toolOrchestration.ts:105</span>)</h3>
+      <pre><code><span class="kw">function</span> <span class="fn">partitionToolCalls</span>(toolUseMessages, toolUseContext): <span class="ty">Batch[]</span> {
+  <span class="kw">return</span> toolUseMessages.<span class="fn">reduce</span>((acc, toolUse) =&gt; {
+    <span class="kw">const</span> tool = <span class="fn">findToolByName</span>(tools, toolUse.name)
+    <span class="kw">const</span> parsedInput = tool?.inputSchema.<span class="fn">safeParse</span>(toolUse.input)
+    <span class="kw">const</span> isConcurrencySafe = parsedInput?.success
+      ? <span class="ty">Boolean</span>(tool?.<span class="fn">isConcurrencySafe</span>(parsedInput.data))
+      : <span class="kw">false</span>
+
+    <span class="com">// 合并策略:</span>
+    <span class="com">// 连续的 concurrency-safe 合并成一个并发 batch</span>
+    <span class="com">// 其他单独成一个串行 batch</span>
+    <span class="kw">if</span> (isConcurrencySafe &amp;&amp; acc.at(-<span class="num">1</span>)?.isConcurrencySafe) {
+      acc.at(-<span class="num">1</span>)!.blocks.<span class="fn">push</span>(toolUse)
+    } <span class="kw">else</span> {
+      acc.<span class="fn">push</span>({ isConcurrencySafe, blocks: [toolUse] })
+    }
+    <span class="kw">return</span> acc
+  }, [])
+}</code></pre>
+      <h3>8.2 示例</h3>
+      <figure>
+        <svg viewBox="0 0 860 260" xmlns="http://www.w3.org/2000/svg">
+          <rect x="40" y="30" width="780" height="40" rx="6" fill="#E5E8FE" stroke="#5769F7"/>
+          <text x="430" y="55" text-anchor="middle" font-size="12" font-weight="700">模型一轮输出 7 个 tool_use(按顺序)</text>
+
+          <g font-size="11">
+            <rect x="40" y="90" width="100" height="30" rx="4" fill="#E2F0E8" stroke="#5BA67A"/><text x="90" y="110" text-anchor="middle">Read a.ts</text>
+            <rect x="150" y="90" width="100" height="30" rx="4" fill="#E2F0E8" stroke="#5BA67A"/><text x="200" y="110" text-anchor="middle">Read b.ts</text>
+            <rect x="260" y="90" width="100" height="30" rx="4" fill="#E2F0E8" stroke="#5BA67A"/><text x="310" y="110" text-anchor="middle">Grep "x"</text>
+            <rect x="370" y="90" width="100" height="30" rx="4" fill="#F5DEDC" stroke="#C9534D"/><text x="420" y="110" text-anchor="middle">Edit a.ts</text>
+            <rect x="480" y="90" width="100" height="30" rx="4" fill="#F5DEDC" stroke="#C9534D"/><text x="530" y="110" text-anchor="middle">Bash cd X</text>
+            <rect x="590" y="90" width="100" height="30" rx="4" fill="#E2F0E8" stroke="#5BA67A"/><text x="640" y="110" text-anchor="middle">Read c.ts</text>
+            <rect x="700" y="90" width="100" height="30" rx="4" fill="#E2F0E8" stroke="#5BA67A"/><text x="750" y="110" text-anchor="middle">Glob *.ts</text>
+          </g>
+
+          <rect x="40" y="150" width="330" height="40" rx="6" fill="#E2F0E8" stroke="#5BA67A" stroke-width="2"/>
+          <text x="205" y="175" text-anchor="middle" font-size="12" font-weight="600" fill="#5BA67A">Batch 1:并发(3 个 ReadOnly)</text>
+
+          <rect x="380" y="150" width="100" height="40" rx="6" fill="#F5DEDC" stroke="#C9534D" stroke-width="2"/>
+          <text x="430" y="175" text-anchor="middle" font-size="12" font-weight="600" fill="#C9534D">Batch 2</text>
+
+          <rect x="490" y="150" width="100" height="40" rx="6" fill="#F5DEDC" stroke="#C9534D" stroke-width="2"/>
+          <text x="540" y="175" text-anchor="middle" font-size="12" font-weight="600" fill="#C9534D">Batch 3</text>
+
+          <rect x="600" y="150" width="220" height="40" rx="6" fill="#E2F0E8" stroke="#5BA67A" stroke-width="2"/>
+          <text x="710" y="175" text-anchor="middle" font-size="12" font-weight="600" fill="#5BA67A">Batch 4:并发</text>
+
+          <text x="430" y="220" text-anchor="middle" font-size="11" fill="#87796F">串行跑这 4 个 batch;batch 内并发执行</text>
+        </svg>
+        <figcaption>连续的 concurrency-safe 合并成并发 batch,不 safe 的单独成串行 batch</figcaption>
+      </figure>
+      <h3>8.3 运行时执行</h3>
+      <pre><code><span class="com">// toolOrchestration.ts:20</span>
+<span class="kw">for</span> (<span class="kw">const</span> { isConcurrencySafe, blocks } <span class="kw">of</span> <span class="fn">partitionToolCalls</span>(...)) {
+  <span class="kw">if</span> (isConcurrencySafe) {
+    <span class="kw">yield</span>* <span class="fn">runToolsConcurrently</span>(blocks, ...)      <span class="com">// 并发 Promise.all</span>
+  } <span class="kw">else</span> {
+    <span class="kw">yield</span>* <span class="fn">runToolsSerially</span>(blocks, ...)          <span class="com">// for-await 逐个</span>
+  }
+}</code></pre>
+      <h3>8.4 并发上限</h3>
+      <pre><code><span class="kw">function</span> <span class="fn">getMaxToolUseConcurrency</span>() {
+  <span class="kw">return</span> <span class="fn">parseInt</span>(process.env.CLAUDE_CODE_MAX_TOOL_USE_CONCURRENCY || <span class="str">''</span>, <span class="num">10</span>) || <span class="num">10</span>
+}
+<span class="com">// 默认 10 并发。超过时用 bounded all() 限流</span></code></pre>
+    </section>
+
+    <section id="streaming">
+      <h2><span class="num">09</span>StreamingToolExecutor 流式执行</h2>
+      <p class="lead">经典路径是"模型一轮输出完 → 开始执行工具"。StreamingToolExecutor 把它改成"模型输出 tool_use 的那一刻就开始执行"。</p>
+      <h3>9.1 对比</h3>
+      <table>
+        <thead><tr><th></th><th>经典 runTools</th><th>StreamingToolExecutor</th></tr></thead>
+        <tbody>
+          <tr><td>开始时机</td><td>模型输出完后</td><td>流式阶段就开始</td></tr>
+          <tr><td>时间线</td><td>串行:流式 → 执行</td><td>并行:流式 + 执行</td></tr>
+          <tr><td>延迟改善</td><td>—</td><td>典型 30-50%</td></tr>
+          <tr><td>复杂度</td><td>简单</td><td>需要处理中断、fallback</td></tr>
+          <tr><td>启用条件</td><td>默认</td><td><code>gates.streamingToolExecution</code></td></tr>
+        </tbody>
+      </table>
+      <h3>9.2 执行器核心 API</h3>
+      <pre><code><span class="kw">class</span> <span class="ty">StreamingToolExecutor</span> {
+  <span class="fn">addTool</span>(toolBlock, assistantMessage): <span class="kw">void</span>    <span class="com">// 流式阶段喂入新 tool_use</span>
+  *<span class="fn">getCompletedResults</span>(): <span class="ty">Iterable</span>&lt;<span class="ty">Update</span>&gt;       <span class="com">// 当前已完成的</span>
+  <span class="kw">async</span>* <span class="fn">getRemainingResults</span>(): <span class="ty">AsyncIterable</span>&lt;<span class="ty">Update</span>&gt;    <span class="com">// 流结束后等剩下的</span>
+  <span class="fn">discard</span>(): <span class="kw">void</span>                                <span class="com">// fallback 时丢弃</span>
+}</code></pre>
+      <h3>9.3 流式阶段的使用</h3>
+      <pre><code><span class="com">// query.ts:848 — 流里每收到 tool_use 就塞进执行器</span>
+<span class="kw">for</span> (<span class="kw">const</span> toolBlock <span class="kw">of</span> msgToolUseBlocks) {
+  streamingToolExecutor.<span class="fn">addTool</span>(toolBlock, assistantMessage)
+}
+
+<span class="com">// 流未结束就可能有工具跑完了 — 马上 yield tool_result</span>
+<span class="kw">for</span> (<span class="kw">const</span> result <span class="kw">of</span> streamingToolExecutor.<span class="fn">getCompletedResults</span>()) {
+  <span class="kw">if</span> (result.message) <span class="kw">yield</span> result.message
+}</code></pre>
+      <h3>9.4 中断语义</h3>
+      <pre><code><span class="com">// 流式 abort 发生时</span>
+<span class="kw">if</span> (toolUseContext.abortController.signal.aborted) {
+  <span class="kw">if</span> (streamingToolExecutor) {
+    <span class="com">// getRemainingResults 内部检查 abort,给每个未完成 tool 合成中断型 tool_result</span>
+    <span class="kw">for await</span> (<span class="kw">const</span> update <span class="kw">of</span> streamingToolExecutor.<span class="fn">getRemainingResults</span>()) {
+      <span class="kw">if</span> (update.message) <span class="kw">yield</span> update.message
+    }
+  }
+}</code></pre>
+    </section>
+
+    <section id="lifecycle">
+      <h2><span class="num">10</span>单工具生命周期 9 步</h2>
+      <p class="lead"><code>runToolUse</code> 是单个工具从调用到返回的完整流程,每一步都可能分叉。</p>
+      <figure>
+        <svg viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg">
+          <defs><marker id="artl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/></marker></defs>
+          <rect x="340" y="20" width="240" height="40" rx="8" fill="#5769F7"/><text x="460" y="45" text-anchor="middle" font-size="14" font-weight="700" fill="white">tool_use 到达</text>
+          <line x1="460" y1="60" x2="460" y2="80" stroke="#4A413A" stroke-width="1.5" marker-end="url(#artl)"/>
+
+          <rect x="300" y="80" width="320" height="40" rx="6" fill="white" stroke="#5769F7" stroke-width="1.5"/><text x="460" y="105" text-anchor="middle" font-size="12" font-weight="600">① findToolByName — 工具不存在则报错</text>
+          <line x1="460" y1="120" x2="460" y2="140" stroke="#4A413A" stroke-width="1.5" marker-end="url(#artl)"/>
+
+          <rect x="300" y="140" width="320" height="40" rx="6" fill="white" stroke="#5769F7" stroke-width="1.5"/><text x="460" y="165" text-anchor="middle" font-size="12" font-weight="600">② abort 预检 — 已中断则返回 CANCEL_MESSAGE</text>
+          <line x1="460" y1="180" x2="460" y2="200" stroke="#4A413A" stroke-width="1.5" marker-end="url(#artl)"/>
+
+          <rect x="300" y="200" width="320" height="40" rx="6" fill="white" stroke="#5769F7" stroke-width="1.5"/><text x="460" y="225" text-anchor="middle" font-size="12" font-weight="600">③ inputSchema.safeParse — Zod 校验</text>
+          <line x1="460" y1="240" x2="460" y2="260" stroke="#4A413A" stroke-width="1.5" marker-end="url(#artl)"/>
+
+          <rect x="300" y="260" width="320" height="40" rx="6" fill="white" stroke="#5769F7" stroke-width="1.5"/><text x="460" y="285" text-anchor="middle" font-size="12" font-weight="600">④ validateInput — 工具自定义校验</text>
+          <line x1="460" y1="300" x2="460" y2="320" stroke="#4A413A" stroke-width="1.5" marker-end="url(#artl)"/>
+
+          <rect x="300" y="320" width="320" height="40" rx="6" fill="#F4E5DD" stroke="#D77757" stroke-width="1.5"/><text x="460" y="345" text-anchor="middle" font-size="12" font-weight="600">⑤ canUseTool — permission 决策</text>
+          <line x1="460" y1="360" x2="460" y2="380" stroke="#4A413A" stroke-width="1.5" marker-end="url(#artl)"/>
+
+          <rect x="300" y="380" width="320" height="40" rx="6" fill="#EDE7F8" stroke="#8B5CF6" stroke-width="1.5"/><text x="460" y="405" text-anchor="middle" font-size="12" font-weight="600">⑥ PreToolUse hook — 可阻断 / 改输入</text>
+          <line x1="460" y1="420" x2="460" y2="440" stroke="#4A413A" stroke-width="1.5" marker-end="url(#artl)"/>
+
+          <rect x="300" y="440" width="320" height="40" rx="6" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1.5"/><text x="460" y="465" text-anchor="middle" font-size="12" font-weight="600">⑦ tool.call() — 实际执行</text>
+          <line x1="460" y1="480" x2="460" y2="500" stroke="#4A413A" stroke-width="1.5" marker-end="url(#artl)"/>
+
+          <rect x="300" y="500" width="320" height="20" rx="4" fill="#F7ECD3" stroke="#D9A441" stroke-width="1"/><text x="460" y="515" text-anchor="middle" font-size="11">⑧ PostToolUse* hook → ⑨ format tool_result</text>
+        </svg>
+        <figcaption>9 步生命周期:每步都可能因错误/中断提前返回,但都返回一个配对的 tool_result</figcaption>
+      </figure>
+      <h3>10.1 关键步骤解析</h3>
+      <table>
+        <thead><tr><th>步骤</th><th>失败返回</th></tr></thead>
+        <tbody>
+          <tr><td>①</td><td><code>&lt;tool_use_error&gt;Error: No such tool available: {name}&lt;/tool_use_error&gt;</code></td></tr>
+          <tr><td>②</td><td><code>createToolResultStopMessage</code> + CANCEL_MESSAGE</td></tr>
+          <tr><td>③</td><td><code>&lt;tool_use_error&gt;InputValidationError: ...&lt;/tool_use_error&gt;</code></td></tr>
+          <tr><td>④</td><td><code>&lt;tool_use_error&gt;{validationMessage}&lt;/tool_use_error&gt;</code></td></tr>
+          <tr><td>⑤</td><td>permission 结果:allow/deny/prompt</td></tr>
+          <tr><td>⑥</td><td>exit 2 → 阻断;stdout JSON → 改输入</td></tr>
+          <tr><td>⑦</td><td>try/catch 捕获所有异常 → formatError</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="result">
+      <h2><span class="num">11</span>tool_result 协议三种形态</h2>
+      <p class="lead">工具的最终产出是一个 <code>tool_result</code> 块,三种可能形态。</p>
+      <h3>11.1 文本结果</h3>
+      <pre><code>{
+  type: <span class="str">'tool_result'</span>,
+  tool_use_id: <span class="str">'toolu_X'</span>,
+  content: <span class="str">'文件读取成功,内容:\n...'</span>,
+  is_error: <span class="kw">false</span>
+}</code></pre>
+      <h3>11.2 错误结果</h3>
+      <pre><code>{
+  type: <span class="str">'tool_result'</span>,
+  tool_use_id: <span class="str">'toolu_X'</span>,
+  content: <span class="str">'&lt;tool_use_error&gt;ENOENT: no such file&lt;/tool_use_error&gt;'</span>,
+  is_error: <span class="kw">true</span>       <span class="com">// ← 让模型知道失败</span>
+}</code></pre>
+      <h3>11.3 图像/多媒体结果</h3>
+      <pre><code>{
+  type: <span class="str">'tool_result'</span>,
+  tool_use_id: <span class="str">'toolu_X'</span>,
+  content: [
+    { type: <span class="str">'text'</span>, text: <span class="str">'Screenshot captured'</span> },
+    { type: <span class="str">'image'</span>, source: { type: <span class="str">'base64'</span>, media_type: <span class="str">'image/png'</span>, data: <span class="str">'...'</span> } }
+  ]
+}</code></pre>
+      <h3>11.4 mcpMeta 特殊字段</h3>
+      <pre><code><span class="com">// MCP 工具可以附带协议层元数据(非模型可见)</span>
+{
+  type: <span class="str">'tool_result'</span>,
+  tool_use_id: <span class="str">'toolu_X'</span>,
+  content: ...,
+  mcpMeta: {
+    _meta: { timestamp: <span class="str">'2026-05-01'</span>, server: <span class="str">'github'</span> },
+    structuredContent: { issueNumber: <span class="num">42</span> }
+  }
+}
+<span class="com">// 这些被 SDK 消费者读取,但不发给模型</span></code></pre>
+    </section>
+
+    <section id="failures">
+      <h2><span class="num">12</span>三种失败形态</h2>
+      <p class="lead">工具失败被精心分成三类,每类的翻译不同。</p>
+      <table>
+        <thead><tr><th>失败类型</th><th>例子</th><th>翻译</th></tr></thead>
+        <tbody>
+          <tr><td><strong>校验失败</strong></td><td>input 参数错</td><td><code>&lt;tool_use_error&gt;InputValidationError: expected "path" to be string&lt;/tool_use_error&gt;</code></td></tr>
+          <tr><td><strong>权限拒绝</strong></td><td>PreToolUse hook 阻断</td><td><code>Execution stopped by PreToolUse hook: {reason}</code></td></tr>
+          <tr><td><strong>运行时异常</strong></td><td>ENOENT / 网络错误</td><td><code>&lt;tool_use_error&gt;Error calling tool (Read): ENOENT: no such file&lt;/tool_use_error&gt;</code></td></tr>
+        </tbody>
+      </table>
+      <h3>12.1 失败的异常安全保证</h3>
+      <pre><code><span class="com">// toolExecution.ts:1664 — 顶层 try/catch 兜底</span>
+<span class="kw">try</span> {
+  ...
+  <span class="kw">return</span> resultingMessages
+} <span class="kw">catch</span> (error) {
+  <span class="com">// 任何未捕获异常都翻译成 tool_result(is_error)</span>
+  <span class="com">// 保证协议配对 — 不会让 tool_use 变成孤儿</span>
+  <span class="kw">return</span> [{
+    message: <span class="fn">createUserMessage</span>({
+      content: [{ type: <span class="str">'tool_result'</span>, content: <span class="fn">formatError</span>(error), is_error: <span class="kw">true</span>, tool_use_id }],
+      ...
+    })
+  }]
+}</code></pre>
+    </section>
+
+    <section id="self-repair">
+      <h2><span class="num">13</span>失败→自我修复模式</h2>
+      <p class="lead">Claude Code 最优雅的设计之一:把工具失败作为<strong>给模型的反馈</strong>,而不是<strong>给用户的报错</strong>。</p>
+      <h3>13.1 范式对比</h3>
+      <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div style="background:white;border:1px solid var(--gray-300);border-radius:8px;padding:16px;">
+          <h4 style="color:var(--red);margin-top:0;">传统 RPC 模式</h4>
+          <pre style="font-size:11px;"><code>tool error throws
+  ↓
+caller handles with try/catch
+  ↓
+caller shows error to user</code></pre>
+        </div>
+        <div style="background:white;border:1px solid var(--gray-300);border-radius:8px;padding:16px;">
+          <h4 style="color:var(--green);margin-top:0;">Agent 模式</h4>
+          <pre style="font-size:11px;"><code>tool error → tool_result(is_error)
+  ↓
+下一回合模型读到错误
+  ↓
+模型自己改参数再试</code></pre>
+        </div>
+      </div>
+      <h3>13.2 具体例子</h3>
+      <pre><code><span class="com">// 第 1 轮</span>
+assistant: Read({ path: <span class="str">"foo.ts"</span> })
+tool_result(is_error): <span class="str">"ENOENT: no such file foo.ts"</span>
+
+<span class="com">// 第 2 轮 — 模型自己修复</span>
+assistant: "让我先 ls 看看目录"
+  → Bash({ command: <span class="str">"ls"</span> })
+tool_result: <span class="str">"Foo.ts Bar.ts README.md"</span>
+
+<span class="com">// 第 3 轮</span>
+assistant: "原来是 Foo.ts(大写)"
+  → Read({ path: <span class="str">"Foo.ts"</span> })
+tool_result: <span class="str">"文件内容..."</span></code></pre>
+      <div class="box note">
+        <div class="title">为什么这是 killer feature</div>
+        传统 API:错了就停。Agent 模式:错了就<strong>学习</strong>。
+        把错误信息完整暴露给模型,让 LLM 发挥它最强的能力 —— <strong>从上下文推理</strong>。
+        这个设计让 agent 处理"未知错误"的能力显著超过硬编码的 try/retry 逻辑。
+      </div>
+      <h3>13.3 错误文案的艺术</h3>
+      <pre><code><span class="com">// 好的错误文案</span>
+<span class="str">"ENOENT: no such file '/tmp/foo.ts'. Did you mean /tmp/Foo.ts?"</span>
+<span class="str">"InputValidationError: field 'limit' must be positive, got -1"</span>
+<span class="str">"PermissionDenied: File write to /etc/passwd blocked by policy rule 'managed-settings.json:3'"</span>
+
+<span class="com">// 坏的错误文案</span>
+<span class="str">"Error"</span>                    <span class="com">// 毫无信息</span>
+<span class="str">"TypeError: Cannot read properties of undefined"</span>   <span class="com">// 内部细节</span>
+<span class="str">"something went wrong"</span>    <span class="com">// 模糊</span></code></pre>
+    </section>
+
+    <section id="hooks">
+      <h2><span class="num">14</span>PreTool/PostTool hook 切入</h2>
+      <p class="lead">工具执行前后,用户可以注入任意 shell 脚本。这是 Claude Code 扩展性的基石(详见 hook 篇)。</p>
+      <h3>14.1 切入点</h3>
+      <ul>
+        <li><strong>PreToolUse</strong>:工具执行前。<strong>能阻断</strong>、能改 input</li>
+        <li><strong>PostToolUseFailure</strong>:工具失败后。只能<strong>提示</strong>、不能改变</li>
+        <li><strong>PostToolUse</strong>:工具成功后(部分场景)</li>
+      </ul>
+      <h3>14.2 切入方式</h3>
+      <pre><code><span class="com">// settings.json</span>
+{
+  <span class="str">"hooks"</span>: {
+    <span class="str">"PreToolUse"</span>: [
+      {
+        <span class="str">"matcher"</span>: <span class="str">"Edit|Write"</span>,       <span class="com">// 只对这些工具触发</span>
+        <span class="str">"command"</span>: <span class="str">"./scripts/check-typecheck.sh"</span>
+      }
+    ]
+  }
+}</code></pre>
+      <h3>14.3 阻断协议</h3>
+      <pre><code><span class="com">// exit 0 → 允许</span>
+<span class="com">// exit 2 → 阻断,stderr 作为 reason 返回给模型</span>
+<span class="com">// stdout JSON { "updatedInput": {...} } → 修改输入</span>
+<span class="com">// stdout JSON { "additionalContexts": [...] } → 附加上下文</span>
+<span class="kw">exit</span> <span class="num">2</span> &gt;&amp;<span class="num">2</span> <span class="str">"TypeScript check failed before Edit"</span></code></pre>
+    </section>
+
+    <section id="mcp-wrap">
+      <h2><span class="num">15</span>MCP 工具的 wrapping</h2>
+      <p class="lead">MCP 工具天然就是 ToolDef — 但要在客户端侧做一层转换。</p>
+      <h3>15.1 包装过程</h3>
+      <pre><code><span class="com">// 伪码:client.ts:getMcpToolsCommandsAndResources</span>
+<span class="kw">function</span> <span class="fn">wrapMcpTool</span>(mcpTool, serverName, client) {
+  <span class="kw">return</span> <span class="fn">buildTool</span>({
+    name: <span class="str">`mcp__${serverName}__${mcpTool.name}`</span>,      <span class="com">// 加前缀</span>
+    searchHint: mcpTool.description.<span class="fn">slice</span>(<span class="num">0</span>, <span class="num">80</span>),
+    inputJSONSchema: mcpTool.inputSchema,          <span class="com">// 直接用 JSON Schema</span>
+    isMcp: <span class="kw">true</span>,
+    mcpInfo: { serverName, toolName: mcpTool.name },
+    maxResultSizeChars: <span class="num">100_000</span>,
+    <span class="fn">isConcurrencySafe</span>() { <span class="kw">return</span> mcpTool._meta?.<span class="str">'anthropic/concurrencySafe'</span> ?? <span class="kw">false</span> },
+    <span class="fn">isReadOnly</span>() { <span class="kw">return</span> mcpTool._meta?.<span class="str">'anthropic/readOnly'</span> ?? <span class="kw">false</span> },
+
+    <span class="kw">async</span>* <span class="fn">call</span>(args, context) {
+      <span class="kw">const</span> result = <span class="kw">await</span> <span class="fn">callMCPToolWithUrlElicitationRetry</span>({
+        client, tool: mcpTool.name, args,
+        signal: context.abortController.signal,
+      })
+      <span class="kw">return</span> { data: result }
+    },
+    ...
+  })
+}</code></pre>
+      <h3>15.2 统一的 execute 路径</h3>
+      <p>包装后,MCP 工具走<strong>完全相同</strong>的 tool execution pipeline:partition → batch → execute → format。
+      <code>isMcp: true</code> 只是让某些 telemetry 能识别。</p>
+    </section>
+
+    <section id="telemetry">
+      <h2><span class="num">16</span>三路 telemetry 上报</h2>
+      <p class="lead">每个工具调用都<strong>同时</strong>上报到三个系统,用于不同用途。</p>
+      <table>
+        <thead><tr><th>系统</th><th>用途</th><th>格式</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Statsig</strong>(<code>logEvent</code>)</td><td>产品分析、A/B test</td><td><code>tengu_tool_use_error</code> 等</td></tr>
+          <tr><td><strong>Langfuse</strong>(<code>recordToolObservation</code>)</td><td>LLM trace 可视化</td><td>Observation tree</td></tr>
+          <tr><td><strong>OTLP</strong>(<code>logOTelEvent</code>)</td><td>企业 observability</td><td>OpenTelemetry 标准</td></tr>
+        </tbody>
+      </table>
+      <h3>16.1 classifyToolError — 反混淆</h3>
+      <pre><code><span class="com">// toolExecution.ts:179 — 解决压缩构建里错误分类丢失的问题</span>
+<span class="kw">export function</span> <span class="fn">classifyToolError</span>(error: <span class="ty">unknown</span>): <span class="ty">string</span> {
+  <span class="com">// 1. 开发者显式声明的 telemetry-safe 字符串</span>
+  <span class="kw">if</span> (error <span class="kw">instanceof</span> <span class="ty">TelemetrySafeError</span>) <span class="kw">return</span> error.telemetryMessage.<span class="fn">slice</span>(<span class="num">0</span>, <span class="num">200</span>)
+
+  <span class="com">// 2. Node.js fs 错误:用 errno(ENOENT, EACCES)</span>
+  <span class="kw">if</span> (error <span class="kw">instanceof</span> <span class="ty">Error</span>) {
+    <span class="kw">const</span> errnoCode = <span class="fn">getErrnoCode</span>(error)
+    <span class="kw">if</span> (errnoCode) <span class="kw">return</span> errnoCode
+  }
+
+  <span class="com">// 3. 未压缩:用 error.name(ShellError, AbortError...)</span>
+  <span class="kw">if</span> (error.name &amp;&amp; error.name !== <span class="str">'Error'</span> &amp;&amp; error.name.length &gt; <span class="num">3</span>) {
+    <span class="kw">return</span> error.name.<span class="fn">slice</span>(<span class="num">0</span>, <span class="num">60</span>)
+  }
+
+  <span class="kw">return</span> <span class="str">'unknown'</span>
+}</code></pre>
+      <div class="box info">
+        <div class="title">为什么要专门做这个</div>
+        压缩构建会把 <code>class ShellError extends Error</code> mangled 成 <code>class a extends Error</code>。
+        直接用 <code>error.constructor.name</code> 在线上会看到 <code>'a'</code>、<code>'b'</code> 这种无意义分类。
+        反混淆链路保证<strong>生产环境埋点仍可读</strong>。
+      </div>
+    </section>
+
+    <section id="principles">
+      <h2><span class="num">17</span>可迁移设计原则</h2>
+      <p class="lead">8 条可用到任何 agent 工具系统的原则。</p>
+      <ol class="steps">
+        <li>
+          <strong>Tool 接口要涵盖"元数据 + 执行"两面</strong>
+          <p>不仅要定义 call 函数,还要声明 concurrent、readonly、destructive 等元数据。元数据让<strong>编排层</strong>能自动优化。</p>
+        </li>
+        <li>
+          <strong>schema 驱动,不要手写 JSON Schema</strong>
+          <p>Zod 给双重好处:运行时校验 + TypeScript 类型。写一份,用两处。</p>
+        </li>
+        <li>
+          <strong>并发是性能的金矿</strong>
+          <p>partitionToolCalls 让 3 个独立 Read 从 3×串行降到 1 次并发时间。对<strong>调研任务</strong>提速 2-3×。</p>
+        </li>
+        <li>
+          <strong>流式 > 批式</strong>
+          <p>StreamingToolExecutor 让工具执行 overlap 模型输出,总延迟下降 30-50%。虽然实现复杂度翻倍,但用户体验翻三倍。</p>
+        </li>
+        <li>
+          <strong>失败即上下文</strong>
+          <p>错误不是 throw 给用户,是 tool_result 给模型。模型从错误中学习的能力远超硬编码重试。</p>
+        </li>
+        <li>
+          <strong>预算机制保护上下文窗口</strong>
+          <p>单工具 maxResultSizeChars + 跨工具 applyToolResultBudget,双层防护不让任何单次工具调用破坏上下文。</p>
+        </li>
+        <li>
+          <strong>Hook 是扩展点,不是实现手段</strong>
+          <p>把工具 hook 做成产品级扩展点,让用户不需要改源码就能加自定义逻辑 —— 这让工具系统的"上限"取决于用户创造力而非你的产品规划。</p>
+        </li>
+        <li>
+          <strong>懒加载拯救 prompt 预算</strong>
+          <p>shouldDefer + ToolSearch 让 90% 用不到的工具不占 prompt,每 query 节省 10k+ token。在工具数量增长时线性收益。</p>
+        </li>
+      </ol>
+    </section>
+
+    <footer style="margin-top:80px;padding-top:32px;border-top:1px solid var(--gray-300);color:var(--gray-500);font-size:13px;">
+      <p>本文基于 Claude Code 反编译版源码(commit 1173a62)。
+      关键文件:<span class="path">src/Tool.ts</span>、
+      <span class="path">src/services/tools/{toolOrchestration.ts, StreamingToolExecutor.ts, toolExecution.ts, toolHooks.ts}</span>、
+      <span class="path">src/tools.ts</span>、<span class="path">packages/builtin-tools/</span>。</p>
+    </footer>
+  </main>
+</div>
+</body>
+</html>

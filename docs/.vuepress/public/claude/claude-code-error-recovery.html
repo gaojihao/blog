@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code Agent Loop 错误恢复机制详解</title>
+<style>
+  :root {
+    --orange: #D77757;
+    --orange-soft: #F4E5DD;
+    --orange-deep: #B0552F;
+    --blue: #5769F7;
+    --blue-soft: #E5E8FE;
+    --green: #5BA67A;
+    --green-soft: #E2F0E8;
+    --red: #C9534D;
+    --red-soft: #F5DEDC;
+    --yellow: #D9A441;
+    --yellow-soft: #F7ECD3;
+    --gray-900: #1F1B17;
+    --gray-700: #4A413A;
+    --gray-500: #87796F;
+    --gray-300: #D9D0C7;
+    --gray-100: #F6F1EC;
+    --gray-50: #FBF8F4;
+    --bg: #FBF8F4;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--gray-900);
+    background: var(--bg);
+    line-height: 1.7;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* TOC */
+  nav.toc {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 32px 20px;
+    border-right: 1px solid var(--gray-300);
+    background: var(--gray-50);
+    font-size: 14px;
+  }
+  nav.toc h3 {
+    margin: 0 0 16px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gray-500);
+  }
+  nav.toc ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: section;
+  }
+  nav.toc ol li {
+    counter-increment: section;
+    margin-bottom: 6px;
+  }
+  nav.toc ol li a {
+    display: block;
+    padding: 6px 10px;
+    color: var(--gray-700);
+    text-decoration: none;
+    border-radius: 6px;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  nav.toc ol li a::before {
+    content: counter(section, decimal-leading-zero) "  ";
+    color: var(--gray-500);
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+  }
+  nav.toc ol li a:hover {
+    background: var(--orange-soft);
+    color: var(--orange-deep);
+    border-left-color: var(--orange);
+  }
+
+  /* Content */
+  main {
+    padding: 56px 56px 120px;
+    max-width: 980px;
+  }
+  header.hero {
+    margin-bottom: 56px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--gray-300);
+  }
+  header.hero .eyebrow {
+    color: var(--orange);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  header.hero h1 {
+    font-size: 40px;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+  }
+  header.hero p {
+    font-size: 17px;
+    color: var(--gray-700);
+    max-width: 720px;
+  }
+
+  section {
+    margin-bottom: 64px;
+    scroll-margin-top: 24px;
+  }
+  section > h2 {
+    font-size: 28px;
+    margin: 0 0 8px;
+    padding-top: 16px;
+    border-top: 3px solid var(--orange);
+    display: inline-block;
+    padding-right: 64px;
+  }
+  section > h2 .num {
+    color: var(--orange);
+    font-variant-numeric: tabular-nums;
+    margin-right: 12px;
+  }
+  section > .lead {
+    color: var(--gray-700);
+    font-size: 16px;
+    margin-bottom: 28px;
+    max-width: 760px;
+  }
+  h3 { font-size: 20px; margin: 32px 0 12px; }
+  h4 { font-size: 16px; margin: 20px 0 8px; color: var(--gray-700); }
+
+  /* Code */
+  code {
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 13px;
+    background: var(--gray-100);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--orange-deep);
+  }
+  pre {
+    background: #1F1B17;
+    color: #E8E1D9;
+    padding: 18px 22px;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 16px 0;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-size: 13px;
+  }
+  pre .kw { color: #E5A77B; }
+  pre .str { color: #C8E0B4; }
+  pre .com { color: #6F665D; font-style: italic; }
+  pre .fn { color: #93B5E0; }
+  pre .num { color: #E5A77B; }
+  pre .ty { color: #D7B5E5; }
+
+  /* Boxes */
+  .box {
+    border-left: 4px solid var(--gray-300);
+    padding: 16px 20px;
+    border-radius: 6px;
+    margin: 18px 0;
+    background: white;
+    box-shadow: 0 1px 2px rgba(31,27,23,0.04);
+  }
+  .box.info { border-color: var(--blue); background: var(--blue-soft); }
+  .box.warn { border-color: var(--yellow); background: var(--yellow-soft); }
+  .box.error { border-color: var(--red); background: var(--red-soft); }
+  .box.ok { border-color: var(--green); background: var(--green-soft); }
+  .box.note { border-color: var(--orange); background: var(--orange-soft); }
+  .box .title {
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .box.info .title { color: var(--blue); }
+  .box.warn .title { color: var(--yellow); }
+  .box.error .title { color: var(--red); }
+  .box.ok .title { color: var(--green); }
+  .box.note .title { color: var(--orange-deep); }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+    background: white;
+    box-shadow: 0 1px 2px rgba(31,27,23,0.04);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  th, td {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--gray-300);
+    vertical-align: top;
+  }
+  th {
+    background: var(--gray-100);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-700);
+  }
+  tr:last-child td { border-bottom: none; }
+  td code { font-size: 12px; }
+
+  /* Diagrams */
+  figure {
+    margin: 24px 0;
+    padding: 24px;
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 12px;
+    text-align: center;
+  }
+  figure svg { max-width: 100%; height: auto; }
+  figcaption {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--gray-500);
+    font-style: italic;
+  }
+
+  /* Pills / chips */
+  .pill {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 4px;
+  }
+  .pill.layer1 { background: var(--blue-soft); color: var(--blue); }
+  .pill.layer2 { background: var(--orange-soft); color: var(--orange-deep); }
+  .pill.layer3 { background: var(--green-soft); color: var(--green); }
+  .pill.layer4 { background: var(--yellow-soft); color: #8a6520; }
+
+  /* Step list */
+  .steps {
+    list-style: none;
+    padding: 0;
+    counter-reset: step;
+  }
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 14px 18px 14px 56px;
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 14px;
+    top: 12px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--orange);
+    color: white;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+  .steps li strong { display: block; margin-bottom: 4px; }
+
+  /* Two-column */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .two-col > div {
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .two-col h4 { margin-top: 0; }
+
+  /* Path link */
+  .path {
+    font-family: "SF Mono", monospace;
+    font-size: 12px;
+    color: var(--blue);
+    background: var(--blue-soft);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  /* Inline label */
+  .lbl {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-right: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .lbl.ok { background: var(--green-soft); color: var(--green); }
+  .lbl.fail { background: var(--red-soft); color: var(--red); }
+  .lbl.warn { background: var(--yellow-soft); color: #8a6520; }
+
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 1fr; }
+    nav.toc { display: none; }
+    main { padding: 32px 24px 80px; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h3>目录</h3>
+    <ol>
+      <li><a href="#overview">引言:为什么 agent loop 需要错误恢复</a></li>
+      <li><a href="#layered">分层架构总览</a></li>
+      <li><a href="#layer1">第 1 层:withRetry — SDK 重试</a></li>
+      <li><a href="#layer2">第 2 层:错误翻译为伪 Assistant 消息</a></li>
+      <li><a href="#layer3">第 3 层:queryLoop 状态机</a></li>
+      <li><a href="#withheld">withheld 暂缓暴露机制</a></li>
+      <li><a href="#ptl">PromptTooLong 恢复链</a></li>
+      <li><a href="#otk">max_output_tokens 恢复</a></li>
+      <li><a href="#protocol">协议配对修复</a></li>
+      <li><a href="#tombstone">tombstone 与流式 fallback</a></li>
+      <li><a href="#fallback">FallbackTriggeredError 模型切换</a></li>
+      <li><a href="#tool">第 4 层:工具执行错误</a></li>
+      <li><a href="#abort">中断处理</a></li>
+      <li><a href="#terminal">终态枚举</a></li>
+      <li><a href="#e2e">端到端示例</a></li>
+      <li><a href="#principles">核心设计原则</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <div class="eyebrow">Claude Code 源码深度讲解</div>
+      <h1>Agent Loop 错误恢复机制</h1>
+      <p>从 SDK 网络重试,到模型流式响应中的可恢复错误,再到工具执行内部失败 ——
+      Claude Code 用一套分层 + 状态机的设计把"失败"驯化成可修复、可观测、不污染上下文的事件。
+      本文逐层拆解这套机制,辅以源码级流程图,让从未读过源码的人也能在一小时内建立完整心智模型。</p>
+    </header>
+
+    <!-- ============================================================ -->
+    <section id="overview">
+      <h2><span class="num">01</span>引言:为什么 agent loop 需要错误恢复</h2>
+      <p class="lead">一个 agent 回合从用户输入开始,经历若干次"模型采样 → 工具执行 → 结果回灌"。
+      每一步都可能失败,而失败的代价不只是当前回合崩溃,更可能导致后续请求都用 400 拒绝。</p>
+
+      <h3>典型失败场景</h3>
+      <table>
+        <thead>
+          <tr><th>失败类型</th><th>典型表现</th><th>不处理的后果</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>网络抖动</td>
+            <td>ECONNRESET / 超时</td>
+            <td>用户看到突兀的报错,即使再点一次就能成功</td>
+          </tr>
+          <tr>
+            <td>限流 429 / 过载 529</td>
+            <td>API 头部 <code>retry-after</code></td>
+            <td>不退避会被持续拒绝;不限制重试次数会放大容量级联</td>
+          </tr>
+          <tr>
+            <td>Prompt 超长 413</td>
+            <td>对话累积超模型上下文</td>
+            <td>之后每次请求都 413,会话进入死锁</td>
+          </tr>
+          <tr>
+            <td>输出截断 max_output_tokens</td>
+            <td>模型在 8k token 处被截断</td>
+            <td>tool_use 块发了一半,下一次请求会因签名/配对错误 400</td>
+          </tr>
+          <tr>
+            <td>tool_use / tool_result 配对断裂</td>
+            <td>发了 tool_use 但还没发 tool_result 时崩溃</td>
+            <td>API 校验拒绝整个会话:<code>tool_use ids were found without tool_result</code></td>
+          </tr>
+          <tr>
+            <td>thinking 块跨模型重放</td>
+            <td>Fallback 切到不兼容模型</td>
+            <td><code>thinking blocks cannot be modified</code> 400</td>
+          </tr>
+          <tr>
+            <td>工具内部异常</td>
+            <td>Bash 命令抛错、文件不存在、MCP server 断连</td>
+            <td>整个 query 循环被 throw 出去,模型永远没有机会修复错误</td>
+          </tr>
+          <tr>
+            <td>用户中断</td>
+            <td>Ctrl+C 在 tool_use 进行中</td>
+            <td>遗留孤儿 tool_use,下一回合 400</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="box note">
+        <div class="title">核心设计目标</div>
+        <strong>让模型"看到"自己的错误并自我修复,而不是让错误冒泡到用户。</strong>
+        几乎所有可恢复错误最终都被翻译成一条 <code>tool_result(is_error: true)</code> 或
+        <code>AssistantMessage(isApiErrorMessage: true)</code>,继续留在对话里,模型下一回合就能根据它修正策略。
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="layered">
+      <h2><span class="num">02</span>分层架构总览</h2>
+      <p class="lead">错误处理被刻意拆成 4 层,每层只关心自己尺度的失败,层与层之间通过"已知错误类型"对接。</p>
+
+      <figure>
+        <svg viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#87796F"/>
+            </marker>
+            <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#E5E8FE"/>
+              <stop offset="1" stop-color="#D5DAFD"/>
+            </linearGradient>
+            <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#F4E5DD"/>
+              <stop offset="1" stop-color="#EFD5C5"/>
+            </linearGradient>
+            <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#E2F0E8"/>
+              <stop offset="1" stop-color="#CFE5D9"/>
+            </linearGradient>
+            <linearGradient id="g4" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#F7ECD3"/>
+              <stop offset="1" stop-color="#F0DEB3"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Title -->
+          <text x="450" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#1F1B17">Agent Loop 错误恢复 4 层架构</text>
+
+          <!-- Layer 1: withRetry -->
+          <rect x="60" y="60" width="780" height="80" rx="10" fill="url(#g1)" stroke="#5769F7" stroke-width="1.5"/>
+          <text x="80" y="88" font-size="13" font-weight="700" fill="#5769F7">第 1 层 · withRetry()</text>
+          <text x="80" y="108" font-size="12" fill="#1F1B17">SDK 调用层:对网络/HTTP 错误做指数退避重试</text>
+          <text x="80" y="126" font-size="11" fill="#4A413A">429/529 限流 · ECONNRESET 重连 · OAuth 401 自动刷新 · max_tokens 溢出调小重试 · 跨模型 fallback 信号</text>
+          <text x="780" y="108" text-anchor="end" font-size="11" fill="#5769F7" font-family="monospace">src/services/api/withRetry.ts</text>
+
+          <!-- Arrow -->
+          <line x1="450" y1="140" x2="450" y2="170" stroke="#87796F" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <text x="460" y="160" font-size="11" fill="#87796F">无法重试 → throw CannotRetryError</text>
+
+          <!-- Layer 2: getAssistantMessageFromError -->
+          <rect x="60" y="180" width="780" height="80" rx="10" fill="url(#g2)" stroke="#D77757" stroke-width="1.5"/>
+          <text x="80" y="208" font-size="13" font-weight="700" fill="#B0552F">第 2 层 · getAssistantMessageFromError()</text>
+          <text x="80" y="228" font-size="12" fill="#1F1B17">错误翻译层:把任意异常 → 一条带 isApiErrorMessage 的 AssistantMessage</text>
+          <text x="80" y="246" font-size="11" fill="#4A413A">PTL/媒体超限/鉴权/限流/模型不存在/refusal/工具配对错误 · 每类都给可读文案 + errorDetails</text>
+          <text x="780" y="228" text-anchor="end" font-size="11" fill="#B0552F" font-family="monospace">src/services/api/errors.ts</text>
+
+          <!-- Arrow -->
+          <line x1="450" y1="260" x2="450" y2="290" stroke="#87796F" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <text x="460" y="280" font-size="11" fill="#87796F">作为 AssistantMessage 流回循环</text>
+
+          <!-- Layer 3: queryLoop -->
+          <rect x="60" y="300" width="780" height="80" rx="10" fill="url(#g3)" stroke="#5BA67A" stroke-width="1.5"/>
+          <text x="80" y="328" font-size="13" font-weight="700" fill="#5BA67A">第 3 层 · queryLoop while(true) 状态机</text>
+          <text x="80" y="348" font-size="12" fill="#1F1B17">核心恢复层:统一处理可恢复错误,通过 state.transition 决定下一步</text>
+          <text x="80" y="366" font-size="11" fill="#4A413A">withheld 暂缓 · collapse drain · reactive compact · max_output 升档+续写 · 协议配对修复 · tombstone</text>
+          <text x="780" y="348" text-anchor="end" font-size="11" fill="#5BA67A" font-family="monospace">src/query.ts</text>
+
+          <!-- Arrow -->
+          <line x1="450" y1="380" x2="450" y2="410" stroke="#87796F" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <text x="460" y="400" font-size="11" fill="#87796F">工具调用错误转 tool_result(is_error)</text>
+
+          <!-- Layer 4: tool execution -->
+          <rect x="60" y="420" width="780" height="40" rx="10" fill="url(#g4)" stroke="#D9A441" stroke-width="1.5"/>
+          <text x="80" y="446" font-size="13" font-weight="700" fill="#8a6520">第 4 层 · 工具执行错误处理</text>
+          <text x="780" y="446" text-anchor="end" font-size="11" fill="#8a6520" font-family="monospace">src/services/tools/toolExecution.ts</text>
+        </svg>
+        <figcaption>错误从底层向上经过翻译,在第 3 层做大部分恢复决策,无法恢复的才暴露给用户</figcaption>
+      </figure>
+
+      <h3>每层解决的核心问题</h3>
+      <ul>
+        <li><span class="pill layer1">第 1 层</span>"能不能再发一次?"—— 网络/限流是瞬态的,先盲重试</li>
+        <li><span class="pill layer2">第 2 层</span>"这是什么错?"—— 把陌生异常翻译成 5~6 个标准化错误类型</li>
+        <li><span class="pill layer3">第 3 层</span>"能不能改改上下文重发?"—— 压缩、剥图、注入续写提示</li>
+        <li><span class="pill layer4">第 4 层</span>"工具自己挂了怎么办?"—— 不让工具异常打断 agent 循环</li>
+      </ul>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="layer1">
+      <h2><span class="num">03</span>第 1 层:withRetry — SDK 重试</h2>
+      <p class="lead"><span class="path">src/services/api/withRetry.ts</span>:这是离 Anthropic SDK 最近的一层。
+      它本质是一个 async generator,在外层 generator 里穿插 yield <code>SystemAPIErrorMessage</code> 通知 UI"正在重试",同时 sleep 退避。</p>
+
+      <h3>3.1 整体重试流程</h3>
+
+      <figure>
+        <svg viewBox="0 0 880 540" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/>
+            </marker>
+          </defs>
+
+          <!-- Start -->
+          <ellipse cx="440" cy="34" rx="80" ry="22" fill="#5769F7"/>
+          <text x="440" y="40" text-anchor="middle" font-size="13" font-weight="600" fill="white">withRetry 开始</text>
+
+          <!-- Try block -->
+          <rect x="320" y="78" width="240" height="50" rx="8" fill="white" stroke="#5769F7" stroke-width="1.5"/>
+          <text x="440" y="100" text-anchor="middle" font-size="13" font-weight="600" fill="#1F1B17">operation(client, attempt)</text>
+          <text x="440" y="118" text-anchor="middle" font-size="11" fill="#87796F">调用 Anthropic SDK</text>
+
+          <line x1="440" y1="56" x2="440" y2="78" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+          <!-- Success path -->
+          <line x1="320" y1="103" x2="180" y2="103" stroke="#5BA67A" stroke-width="1.5" marker-end="url(#arrow2)"/>
+          <text x="250" y="95" font-size="11" fill="#5BA67A" font-weight="600">成功</text>
+          <ellipse cx="100" cy="103" rx="70" ry="20" fill="#5BA67A"/>
+          <text x="100" y="108" text-anchor="middle" font-size="12" font-weight="600" fill="white">return result</text>
+
+          <!-- Catch -->
+          <line x1="440" y1="128" x2="440" y2="158" stroke="#C9534D" stroke-width="1.5" marker-end="url(#arrow2)"/>
+          <text x="455" y="148" font-size="11" fill="#C9534D" font-weight="600">throw error</text>
+
+          <!-- Decision diamond: classify error -->
+          <polygon points="440,160 580,210 440,260 300,210" fill="#F4E5DD" stroke="#D77757" stroke-width="1.5"/>
+          <text x="440" y="200" text-anchor="middle" font-size="12" font-weight="600" fill="#1F1B17">分类错误</text>
+          <text x="440" y="216" text-anchor="middle" font-size="11" fill="#4A413A">是否可重试?</text>
+          <text x="440" y="232" text-anchor="middle" font-size="11" fill="#4A413A">是否触发 fallback?</text>
+
+          <!-- Branch: not retryable -->
+          <line x1="580" y1="210" x2="700" y2="210" stroke="#C9534D" stroke-width="1.5" marker-end="url(#arrow2)"/>
+          <text x="640" y="200" text-anchor="middle" font-size="11" fill="#C9534D" font-weight="600">否</text>
+          <rect x="700" y="190" width="160" height="40" rx="8" fill="#F5DEDC" stroke="#C9534D" stroke-width="1.5"/>
+          <text x="780" y="206" text-anchor="middle" font-size="12" font-weight="600" fill="#C9534D">throw</text>
+          <text x="780" y="222" text-anchor="middle" font-size="11" fill="#1F1B17">CannotRetryError</text>
+
+          <!-- Branch: 529 over limit + fallback model -->
+          <line x1="440" y1="260" x2="440" y2="290" stroke="#D77757" stroke-width="1.5" marker-end="url(#arrow2)"/>
+          <text x="455" y="280" font-size="11" fill="#D77757" font-weight="600">529×3 + fallback</text>
+          <rect x="320" y="290" width="240" height="40" rx="8" fill="#F4E5DD" stroke="#D77757" stroke-width="1.5"/>
+          <text x="440" y="306" text-anchor="middle" font-size="12" font-weight="600" fill="#B0552F">throw</text>
+          <text x="440" y="322" text-anchor="middle" font-size="11" fill="#1F1B17">FallbackTriggeredError</text>
+
+          <!-- Branch: retryable -->
+          <line x1="300" y1="210" x2="180" y2="210" stroke="#5769F7" stroke-width="1.5" marker-end="url(#arrow2)"/>
+          <text x="240" y="200" text-anchor="middle" font-size="11" fill="#5769F7" font-weight="600">是</text>
+          <rect x="20" y="190" width="160" height="40" rx="8" fill="#E5E8FE" stroke="#5769F7" stroke-width="1.5"/>
+          <text x="100" y="206" text-anchor="middle" font-size="12" font-weight="600" fill="#5769F7">getRetryDelay()</text>
+          <text x="100" y="222" text-anchor="middle" font-size="11" fill="#1F1B17">指数退避 + jitter</text>
+
+          <!-- 429 special: retry-after / reset -->
+          <rect x="20" y="248" width="160" height="50" rx="8" fill="white" stroke="#5769F7" stroke-width="1"/>
+          <text x="100" y="265" text-anchor="middle" font-size="11" fill="#1F1B17">429:读取 retry-after</text>
+          <text x="100" y="280" text-anchor="middle" font-size="11" fill="#1F1B17">5h Max 配额:用 reset 时间</text>
+          <text x="100" y="293" text-anchor="middle" font-size="10" fill="#87796F">而非按次退避</text>
+          <line x1="100" y1="230" x2="100" y2="248" stroke="#87796F" stroke-width="1" stroke-dasharray="3 3"/>
+
+          <!-- Yield -->
+          <rect x="20" y="320" width="160" height="40" rx="8" fill="#F7ECD3" stroke="#D9A441" stroke-width="1.5"/>
+          <text x="100" y="336" text-anchor="middle" font-size="12" font-weight="600" fill="#8a6520">yield</text>
+          <text x="100" y="352" text-anchor="middle" font-size="11" fill="#1F1B17">SystemAPIErrorMessage</text>
+
+          <!-- Sleep -->
+          <line x1="100" y1="360" x2="100" y2="390" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow2)"/>
+          <rect x="20" y="390" width="160" height="40" rx="8" fill="white" stroke="#4A413A" stroke-width="1.5"/>
+          <text x="100" y="406" text-anchor="middle" font-size="12" font-weight="600">sleep(delay)</text>
+          <text x="100" y="422" text-anchor="middle" font-size="10" fill="#87796F">持久模式分片心跳</text>
+
+          <!-- Loop back -->
+          <path d="M 100 430 Q 100 480 440 480 L 440 460" fill="none" stroke="#5769F7" stroke-width="1.5" marker-end="url(#arrow2)"/>
+          <text x="270" y="475" font-size="12" fill="#5769F7" font-weight="600">attempt++</text>
+
+          <!-- Limit exceeded -->
+          <line x1="440" y1="460" x2="440" y2="430" stroke="#5769F7" stroke-width="1" stroke-dasharray="3 3"/>
+          <rect x="320" y="430" width="240" height="30" rx="6" fill="white" stroke="#87796F" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="440" y="450" text-anchor="middle" font-size="11" fill="#87796F">attempt &gt; maxRetries → CannotRetryError</text>
+        </svg>
+        <figcaption>withRetry 的核心逻辑:可重试 → 退避 → 重发;不可重试 → 抛 CannotRetryError;限流连续超阈 + 有 fallback model → 抛 FallbackTriggeredError</figcaption>
+      </figure>
+
+      <h3>3.2 关键决策点</h3>
+
+      <h4>1) 哪些错误"可重试"</h4>
+      <pre><code><span class="com">// withRetry.ts</span>
+<span class="kw">const</span> <span class="fn">shouldRetry</span> = (<span class="ty">err</span>: <span class="ty">APIError</span>) <span class="kw">=&gt;</span>
+  err.status === <span class="num">529</span> ||                  <span class="com">// overloaded</span>
+  err.status === <span class="num">429</span> ||                  <span class="com">// rate limit</span>
+  err.status &gt;= <span class="num">500</span> ||                   <span class="com">// server error</span>
+  isStaleConnectionError(err)                <span class="com">// ECONNRESET / EPIPE</span></code></pre>
+      <p>401/403 不进重试列表,但<strong>会触发一次客户端重建</strong>(强制刷新 OAuth token),给"token 刚刚过期"留一次机会;
+      第二次还是 401 就 <code>CannotRetryError</code>。</p>
+
+      <h4>2) 背景查询的"快失败"</h4>
+      <div class="box info">
+        <div class="title">设计动机</div>
+        摘要、标题、分类器这些用户根本不会感知到的查询,在容量级联(529 风暴)时如果还重试,
+        每次重试就是 3-10× 的网关放大。所以 Claude Code 维护了一个白名单 <code>FOREGROUND_529_RETRY_SOURCES</code>
+        —— 只有用户在等的查询才重试 529,其他直接 <code>CannotRetryError</code>。
+      </div>
+
+      <pre><code><span class="kw">const</span> FOREGROUND_529_RETRY_SOURCES = <span class="kw">new</span> <span class="ty">Set</span>([
+  <span class="str">'repl_main_thread'</span>, <span class="str">'sdk'</span>,
+  <span class="str">'agent:custom'</span>, <span class="str">'agent:default'</span>, <span class="str">'agent:builtin'</span>,
+  <span class="str">'compact'</span>, <span class="str">'hook_agent'</span>, <span class="str">'hook_prompt'</span>,
+  <span class="str">'verification_agent'</span>, <span class="str">'side_question'</span>,
+  <span class="str">'auto_mode'</span>, <span class="com">// 安全分类器:必须完成才能保证 auto-mode 正确性</span>
+])</code></pre>
+
+      <h4>3) Fast mode 降级</h4>
+      <p>fast mode 用的是 Opus 4.6 加速版本,共享同一个 prompt cache。一旦命中 429/529:</p>
+      <ul>
+        <li><strong>retry-after &lt; 阈值</strong>:短退避 + 保持 fast mode(保住缓存)</li>
+        <li><strong>retry-after &gt; 阈值</strong>:进入 cooldown,本会话切到普通速度版本</li>
+        <li><strong>overage 被禁用</strong>:永久关闭 fast mode</li>
+      </ul>
+
+      <h4>4) max_tokens 上下文溢出</h4>
+      <p>这是个老 API 的兼容路径。如果遇到 <code>input length and `max_tokens` exceed context limit: 188059 + 20000 &gt; 200000</code>,
+      不会 throw,而是把 <code>maxTokensOverride</code> 调小后 <code>continue</code>:</p>
+      <pre><code><span class="kw">const</span> overflowData = parseMaxTokensContextOverflowError(error)
+<span class="kw">if</span> (overflowData) {
+  <span class="kw">const</span> available = contextLimit - inputTokens - <span class="num">1000</span>  <span class="com">// 1000 安全 buffer</span>
+  retryContext.maxTokensOverride = <span class="fn">Math.max</span>(<span class="num">3000</span>, available, minThinking + <span class="num">1</span>)
+  <span class="kw">continue</span>  <span class="com">// 用调小后的 max_tokens 重发</span>
+}</code></pre>
+
+      <h4>5) 持久重试模式(无人值守)</h4>
+      <p>设置 <code>CLAUDE_CODE_UNATTENDED_RETRY=1</code>(ant-only)后,429/529 会无限重试,但有两个关键改造:</p>
+      <ul>
+        <li>背避上限 5 分钟,总 cap 6 小时(读 <code>anthropic-ratelimit-unified-reset</code> 头部直接 sleep 到重置时间)</li>
+        <li>长 sleep 切片为 30s 心跳,每片都 yield 一条 <code>SystemAPIErrorMessage</code>,
+            防止宿主环境(CI、Lambda)把会话标记为 idle</li>
+      </ul>
+
+      <h3>3.3 跨模型 fallback 信号</h3>
+      <p>当连续 <code>MAX_529_RETRIES = 3</code> 次 529 仍未恢复:</p>
+
+      <div class="two-col">
+        <div>
+          <h4><span class="lbl ok">有 fallbackModel</span></h4>
+          <p>抛 <code>FallbackTriggeredError(originalModel, fallbackModel)</code>。
+          不在 withRetry 内切模型 —— 因为切模型会导致 thinking 签名失配,必须在更上层处理。</p>
+        </div>
+        <div>
+          <h4><span class="lbl fail">无 fallbackModel</span></h4>
+          <p>外部用户抛 <code>CannotRetryError(REPEATED_529_ERROR_MESSAGE)</code>;
+          内部用户(ant)继续重试到上限。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="layer2">
+      <h2><span class="num">04</span>第 2 层:错误翻译为伪 Assistant 消息</h2>
+      <p class="lead"><span class="path">src/services/api/errors.ts</span> 的 <code>getAssistantMessageFromError()</code>
+      把任意 JS 异常翻译成一条结构化的 <code>AssistantMessage</code>,这是把"错误"接入到 agent 对话流的关键转换。</p>
+
+      <h3>4.1 伪 Assistant 消息的结构</h3>
+      <pre><code><span class="com">// utils/messages.ts:443</span>
+<span class="kw">export function</span> <span class="fn">createAssistantAPIErrorMessage</span>({ content, apiError, error, errorDetails }) {
+  <span class="kw">return</span> <span class="fn">baseCreateAssistantMessage</span>({
+    content: [{ type: <span class="str">'text'</span>, text: content }],
+    isApiErrorMessage: <span class="kw">true</span>,        <span class="com">// ← 关键标志</span>
+    apiError,
+    error,
+    errorDetails,                       <span class="com">// 原始错误(如 PTL 的 token 数)</span>
+  })
+}</code></pre>
+
+      <div class="box note">
+        <div class="title">为什么是 assistant 角色?</div>
+        因为 <code>tool_use → tool_result</code> 必须是 <strong>assistant → user</strong> 配对。
+        如果错误发生在模型采样阶段,流里产生的就是一条 assistant 消息,只是它内容是错误描述、并打了 <code>isApiErrorMessage</code> 标记。
+        下游的 stop hook、UI 渲染、查询循环都依赖这个标记来识别"这不是模型的真正回答"。
+      </div>
+
+      <h3>4.2 翻译表(节选)</h3>
+      <table>
+        <thead><tr><th>错误特征</th><th>翻译结果</th><th>用户看到</th></tr></thead>
+        <tbody>
+        <tr>
+          <td><code>APIConnectionTimeoutError</code></td>
+          <td><code>API_TIMEOUT_ERROR_MESSAGE</code></td>
+          <td>"Request timed out"</td>
+        </tr>
+        <tr>
+          <td>429 + 头部 <code>unified-representative-claim</code></td>
+          <td><code>error: 'rate_limit'</code> + <code>getRateLimitErrorMessage()</code></td>
+          <td>"5-hour limit reached. Resets at …"</td>
+        </tr>
+        <tr>
+          <td>错误文本含 <code>prompt is too long</code></td>
+          <td>content = <code>'Prompt is too long'</code> (固定字面量)<br>errorDetails = 原文 (含 token 数)</td>
+          <td>"Prompt is too long"<br>(后续被 reactive compact 解析 token 数)</td>
+        </tr>
+        <tr>
+          <td>413 + image exceeds maximum</td>
+          <td><code>getImageTooLargeErrorMessage()</code></td>
+          <td>"Image was too large. Double press esc to go back…"</td>
+        </tr>
+        <tr>
+          <td>413 + many-image dimensions exceed</td>
+          <td>"Run /compact to remove old images…"</td>
+          <td>引导用户主动 compact</td>
+        </tr>
+        <tr>
+          <td>400 + <code>tool_use ids were found without tool_result</code></td>
+          <td><code>error: 'invalid_request'</code> + 提示 <code>/rewind</code></td>
+          <td>"API Error: 400 due to tool use concurrency issues. Run /rewind to recover."</td>
+        </tr>
+        <tr>
+          <td>400 + <code>tool_use ids must be unique</code></td>
+          <td><code>tengu_duplicate_tool_use_id</code> 埋点 + /rewind 提示</td>
+          <td>"duplicate tool_use ID in conversation history"</td>
+        </tr>
+        <tr>
+          <td>403 + <code>OAuth token has been revoked</code></td>
+          <td><code>error: 'authentication_failed'</code></td>
+          <td>"OAuth token revoked · Please run /login"</td>
+        </tr>
+        <tr>
+          <td>404</td>
+          <td>引导 <code>/model</code> 切换;3P 用户给具体兜底建议</td>
+          <td>"Try /model to switch to claude-sonnet-4-5…"</td>
+        </tr>
+        <tr>
+          <td><code>stop_reason === 'refusal'</code></td>
+          <td>引导切 sonnet-4 / esc esc 重写</td>
+          <td>"unable to respond, violates Usage Policy"</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>4.3 一个细节:tool_use 配对错乱时的诊断埋点</h3>
+      <p>当 API 返回 <code>tool_use ids were found without tool_result</code>,Claude Code 不只是给用户提示,
+      还会把<strong>规范化前后的消息序列</strong>都序列化进 Statsig 埋点 <code>tengu_tool_use_tool_result_mismatch_error</code>:</p>
+      <pre><code><span class="com">// errors.ts:222</span>
+<span class="kw">function</span> <span class="fn">logToolUseToolResultMismatch</span>(toolUseId, messages, messagesForAPI) {
+  <span class="com">// 1. 在 messagesForAPI 中找到出问题的 tool_use 索引</span>
+  <span class="com">// 2. 在原始 messages 中找到同一 tool_use 索引</span>
+  <span class="com">// 3. 把 tool_use 之后的所有块按 "role:type:id" 序列化</span>
+  <span class="com">//    例如: "assistant:tool_use:toolu_X, user:text, user:tool_result:toolu_Y"</span>
+  <span class="com">// 4. 同时上报两条序列,用于追因 normalize 阶段是否丢了 tool_result</span>
+}</code></pre>
+      <p>这种"出错时上报上下文形态"的设计在源码里很常见,是排查偶发问题的关键基础设施。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="layer3">
+      <h2><span class="num">05</span>第 3 层:queryLoop 状态机</h2>
+      <p class="lead"><span class="path">src/query.ts</span> 的 <code>queryLoop()</code> 是整个 agent loop 的核心。
+      它是一个单 <code>while(true)</code> 状态机,所有恢复路径都通过 <code>state = { ... }; continue</code> 提交。</p>
+
+      <h3>5.1 为什么用单 while + state 而不是递归</h3>
+      <div class="box note">
+        <div class="title">注释里的设计说明(query.ts:292)</div>
+        <ol>
+          <li><strong>降低分支爆炸</strong>:compact、fallback、stop-hook、token-budget、中断 5 条恢复路径若用递归实现,
+              每条路径都要复制一遍参数传递,容易遗漏字段。状态机里 5 条路径都只是<strong>赋值 state 然后 continue</strong>,
+              所有字段一次性更新。</li>
+          <li><strong>三段式回合</strong>:每轮都按"模型采样 → 工具执行 → 附件注入"顺序,
+              先保证 tool_use/tool_result 配对完整,再注入普通附件,避免 API 协议冲突。</li>
+          <li><strong>错误先压住、后恢复、最后暴露</strong>:防止 SDK 提前结束会话导致恢复链路在后台空跑。</li>
+        </ol>
+      </div>
+
+      <h3>5.2 跨迭代的 State</h3>
+      <pre><code><span class="kw">type</span> <span class="ty">State</span> = {
+  messages: <span class="ty">Message[]</span>
+  toolUseContext: <span class="ty">ToolUseContext</span>
+  autoCompactTracking: <span class="ty">AutoCompactTrackingState</span> | <span class="kw">undefined</span>
+  maxOutputTokensRecoveryCount: <span class="ty">number</span>            <span class="com">// 输出截断已重试次数</span>
+  hasAttemptedReactiveCompact: <span class="ty">boolean</span>             <span class="com">// reactive compact 是否已用过(防死循环)</span>
+  maxOutputTokensOverride: <span class="ty">number</span> | <span class="kw">undefined</span>      <span class="com">// 升档到 64k 的标志</span>
+  pendingToolUseSummary: <span class="ty">Promise</span>&lt;...&gt; | <span class="kw">undefined</span>
+  stopHookActive: <span class="ty">boolean</span> | <span class="kw">undefined</span>
+  turnCount: <span class="ty">number</span>
+  transition: <span class="ty">Continue</span> | <span class="kw">undefined</span>            <span class="com">// 上一轮为何 continue,测试可断言</span>
+}</code></pre>
+
+      <h3>5.3 主流程示意</h3>
+      <figure>
+        <svg viewBox="0 0 900 720" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/>
+            </marker>
+          </defs>
+
+          <!-- entry -->
+          <ellipse cx="450" cy="30" rx="100" ry="20" fill="#5BA67A"/>
+          <text x="450" y="35" text-anchor="middle" font-size="13" font-weight="600" fill="white">while (true) 进入</text>
+
+          <!-- pre-process -->
+          <rect x="270" y="70" width="360" height="60" rx="8" fill="white" stroke="#5BA67A" stroke-width="1.5"/>
+          <text x="450" y="92" text-anchor="middle" font-size="13" font-weight="600">回合预处理</text>
+          <text x="450" y="110" text-anchor="middle" font-size="11" fill="#4A413A">snip · microcompact · context-collapse · autocompact</text>
+          <text x="450" y="124" text-anchor="middle" font-size="11" fill="#4A413A">阻塞限阈预检 · skill 预取</text>
+
+          <line x1="450" y1="50" x2="450" y2="70" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow3)"/>
+          <line x1="450" y1="130" x2="450" y2="155" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow3)"/>
+
+          <!-- streaming -->
+          <rect x="220" y="155" width="460" height="80" rx="8" fill="#E5E8FE" stroke="#5769F7" stroke-width="1.5"/>
+          <text x="450" y="178" text-anchor="middle" font-size="13" font-weight="600">模型流式采样</text>
+          <text x="450" y="196" text-anchor="middle" font-size="11" fill="#4A413A">deps.callModel() → 边流边判 withheld</text>
+          <text x="450" y="212" text-anchor="middle" font-size="11" fill="#4A413A">收 tool_use → 推入 streamingToolExecutor 并行启动</text>
+          <text x="450" y="228" text-anchor="middle" font-size="11" fill="#4A413A">收 FallbackTriggeredError → 内层 while 重试切模型</text>
+
+          <line x1="450" y1="235" x2="450" y2="265" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow3)"/>
+
+          <!-- decision: needs follow up -->
+          <polygon points="450,265 580,310 450,355 320,310" fill="#F4E5DD" stroke="#D77757" stroke-width="1.5"/>
+          <text x="450" y="305" text-anchor="middle" font-size="12" font-weight="600">收到了 tool_use 块?</text>
+          <text x="450" y="323" text-anchor="middle" font-size="10" fill="#87796F">needsFollowUp</text>
+
+          <!-- branch: no follow up -->
+          <line x1="320" y1="310" x2="170" y2="310" stroke="#C9534D" stroke-width="1.5" marker-end="url(#arrow3)"/>
+          <text x="245" y="300" text-anchor="middle" font-size="11" fill="#C9534D" font-weight="600">否</text>
+
+          <rect x="20" y="280" width="150" height="60" rx="8" fill="white" stroke="#C9534D" stroke-width="1.5"/>
+          <text x="95" y="300" text-anchor="middle" font-size="12" font-weight="600">检查 withheld 错误</text>
+          <text x="95" y="316" text-anchor="middle" font-size="10" fill="#4A413A">PTL → collapse → compact</text>
+          <text x="95" y="330" text-anchor="middle" font-size="10" fill="#4A413A">OTK → 升档 → 续写</text>
+
+          <!-- recovery loop back -->
+          <path d="M 95 280 Q 95 230 220 195" fill="none" stroke="#5769F7" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrow3)"/>
+          <text x="40" y="245" font-size="10" fill="#5769F7" font-weight="600">恢复成功</text>
+          <text x="40" y="258" font-size="10" fill="#5769F7" font-weight="600">→ 重发</text>
+
+          <!-- branch: stop hooks -->
+          <line x1="95" y1="340" x2="95" y2="380" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow3)"/>
+          <rect x="20" y="380" width="150" height="50" rx="8" fill="white" stroke="#4A413A" stroke-width="1.5"/>
+          <text x="95" y="398" text-anchor="middle" font-size="12" font-weight="600">handleStopHooks</text>
+          <text x="95" y="414" text-anchor="middle" font-size="10" fill="#4A413A">阻塞返回 → continue</text>
+
+          <line x1="95" y1="430" x2="95" y2="460" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow3)"/>
+          <ellipse cx="95" cy="475" rx="75" ry="18" fill="#5BA67A"/>
+          <text x="95" y="480" text-anchor="middle" font-size="12" font-weight="600" fill="white">return completed</text>
+
+          <!-- branch: yes follow up -->
+          <line x1="580" y1="310" x2="730" y2="310" stroke="#5BA67A" stroke-width="1.5" marker-end="url(#arrow3)"/>
+          <text x="655" y="300" text-anchor="middle" font-size="11" fill="#5BA67A" font-weight="600">是</text>
+
+          <rect x="730" y="280" width="150" height="60" rx="8" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1.5"/>
+          <text x="805" y="302" text-anchor="middle" font-size="12" font-weight="600">runTools()</text>
+          <text x="805" y="318" text-anchor="middle" font-size="10" fill="#4A413A">并发/串行执行</text>
+          <text x="805" y="332" text-anchor="middle" font-size="10" fill="#4A413A">tool_result 入队</text>
+
+          <line x1="805" y1="340" x2="805" y2="380" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow3)"/>
+
+          <!-- attachments -->
+          <rect x="730" y="380" width="150" height="50" rx="8" fill="white" stroke="#4A413A" stroke-width="1.5"/>
+          <text x="805" y="398" text-anchor="middle" font-size="12" font-weight="600">注入附件</text>
+          <text x="805" y="414" text-anchor="middle" font-size="10" fill="#4A413A">memory · skill · queued</text>
+
+          <!-- max turns check -->
+          <line x1="805" y1="430" x2="805" y2="460" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow3)"/>
+          <polygon points="805,460 870,495 805,530 740,495" fill="#F7ECD3" stroke="#D9A441" stroke-width="1.5"/>
+          <text x="805" y="498" text-anchor="middle" font-size="11" font-weight="600">达到 maxTurns?</text>
+
+          <line x1="740" y1="495" x2="700" y2="495" stroke="#5BA67A" stroke-width="1.5" marker-end="url(#arrow3)"/>
+          <text x="720" y="488" text-anchor="middle" font-size="10" fill="#5BA67A">否</text>
+          <line x1="870" y1="495" x2="880" y2="495" stroke="#C9534D" stroke-width="1.5"/>
+          <text x="880" y="488" font-size="10" fill="#C9534D">是</text>
+          <text x="880" y="510" font-size="10" fill="#C9534D">return</text>
+
+          <!-- continue back to top -->
+          <path d="M 700 495 Q 450 600 450 50" fill="none" stroke="#5BA67A" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrow3)"/>
+          <text x="380" y="600" font-size="12" fill="#5BA67A" font-weight="600">state = next; continue;</text>
+          <text x="380" y="615" font-size="10" fill="#5BA67A">turnCount++</text>
+
+          <!-- abort handling -->
+          <rect x="220" y="640" width="460" height="60" rx="8" fill="#F5DEDC" stroke="#C9534D" stroke-width="1.5" stroke-dasharray="5 3"/>
+          <text x="450" y="662" text-anchor="middle" font-size="13" font-weight="600" fill="#C9534D">中断处理(任意阶段触发 abort)</text>
+          <text x="450" y="680" text-anchor="middle" font-size="11" fill="#4A413A">streamingToolExecutor.getRemainingResults() 合成 tool_result</text>
+          <text x="450" y="694" text-anchor="middle" font-size="11" fill="#4A413A">return aborted_streaming / aborted_tools</text>
+        </svg>
+        <figcaption>queryLoop 主流程:三段式回合 + 集中恢复决策</figcaption>
+      </figure>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="withheld">
+      <h2><span class="num">06</span>withheld 暂缓暴露机制</h2>
+      <p class="lead">这是 queryLoop 错误处理的"心脏"。可恢复错误从模型流里到达时,
+      <strong>不立即 yield 给 SDK 调用方</strong>,而是先暂存,等确认恢复成功或失败再决定要不要暴露。</p>
+
+      <h3>6.1 哪些消息会被 withheld</h3>
+      <pre><code><span class="com">// query.ts:805</span>
+<span class="kw">let</span> withheld = <span class="kw">false</span>
+<span class="kw">if</span> (feature(<span class="str">'CONTEXT_COLLAPSE'</span>)) {
+  <span class="kw">if</span> (contextCollapse?.<span class="fn">isWithheldPromptTooLong</span>(message, isPromptTooLongMessage, querySource)) {
+    withheld = <span class="kw">true</span>
+  }
+}
+<span class="kw">if</span> (reactiveCompact?.<span class="fn">isWithheldPromptTooLong</span>(message))         withheld = <span class="kw">true</span>
+<span class="kw">if</span> (mediaRecoveryEnabled &amp;&amp; reactiveCompact?.<span class="fn">isWithheldMediaSizeError</span>(message))  withheld = <span class="kw">true</span>
+<span class="kw">if</span> (<span class="fn">isWithheldMaxOutputTokens</span>(message))                            withheld = <span class="kw">true</span>
+
+<span class="kw">if</span> (!withheld) {
+  <span class="kw">yield</span> yieldMessage  <span class="com">// ← 只有不被 withheld 才出去</span>
+}
+<span class="com">// withheld = true 时仍会 push 进 assistantMessages,后续判定可见</span>
+assistantMessages.<span class="fn">push</span>(message)</code></pre>
+
+      <h3>6.2 为什么要 withheld?</h3>
+      <div class="box error">
+        <div class="title">问题:不 withheld 会怎样</div>
+        SDK 调用方(cowork、desktop、第三方集成)看到 <code>error</code> 字段就<strong>立刻关闭会话</strong>。
+        而 Claude Code 的恢复链路其实还在跑(可能要 10s+ 做 reactive compact 然后重发)。
+        结果就是:<strong>前端已停止监听,后端还在烧 token,最终的成功响应没有任何观众</strong>。
+      </div>
+
+      <div class="box ok">
+        <div class="title">解法:withheld 三阶段</div>
+        <ol>
+          <li><strong>暂缓</strong>:错误消息推入 assistantMessages,但不 yield 出去</li>
+          <li><strong>恢复</strong>:回合结束时(needsFollowUp = false 分支)判断错误类型,触发对应恢复链</li>
+          <li><strong>暴露</strong>:恢复成功 → state.continue 重发;恢复失败 → 才 yield withheld 消息并 return</li>
+        </ol>
+      </div>
+
+      <h3>6.3 mediaRecoveryEnabled 的"提早冻结"</h3>
+      <div class="box warn">
+        <div class="title">细节:门控值在回合开始就锁定</div>
+        <pre><code><span class="kw">const</span> mediaRecoveryEnabled = reactiveCompact?.<span class="fn">isReactiveCompactEnabled</span>() ?? <span class="kw">false</span></code></pre>
+        这个值在<strong>流式开始前</strong>就读取一次并固定下来。原因:流式可能持续 5-30 秒,
+        中间 <code>CACHED_MAY_BE_STALE</code> 的 GrowthBook 配置可能翻转。如果"前面把消息 withheld 了,后面恢复开关却关闭了",
+        错误消息就会被永久吞掉。提早冻结门控值保证 withheld 与恢复决策对齐。
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="ptl">
+      <h2><span class="num">07</span>PromptTooLong 恢复链</h2>
+      <p class="lead">PTL(413 / 400 prompt is too long)是最常见的可恢复错误。Claude Code 用"先轻后重"两层恢复策略,
+      每层只允许尝试一次,防止陷入死循环。</p>
+
+      <h3>7.1 两层恢复策略</h3>
+
+      <figure>
+        <svg viewBox="0 0 880 480" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/>
+            </marker>
+          </defs>
+
+          <!-- Step 1 -->
+          <rect x="40" y="60" width="800" height="80" rx="10" fill="#E5E8FE" stroke="#5769F7" stroke-width="1.5"/>
+          <text x="60" y="84" font-size="13" font-weight="700" fill="#5769F7">第 1 层 · context-collapse drain</text>
+          <text x="60" y="104" font-size="12" fill="#1F1B17">把 staged collapse 摘要排空,释放 token,保留细粒度上下文</text>
+          <text x="60" y="122" font-size="11" fill="#4A413A">条件:state.transition.reason !== 'collapse_drain_retry'(防同层重试)且 drained.committed &gt; 0</text>
+          <text x="820" y="104" text-anchor="end" font-size="11" fill="#5769F7" font-family="monospace">contextCollapse.recoverFromOverflow()</text>
+
+          <!-- Arrow success: continue -->
+          <path d="M 70 140 Q 70 200 440 240" fill="none" stroke="#5BA67A" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrow4)"/>
+          <text x="80" y="175" font-size="11" fill="#5BA67A" font-weight="600">drained &gt; 0</text>
+          <text x="80" y="190" font-size="11" fill="#5BA67A" font-weight="600">→ continue 重发</text>
+
+          <!-- Arrow fail: down -->
+          <line x1="440" y1="140" x2="440" y2="170" stroke="#C9534D" stroke-width="1.5" marker-end="url(#arrow4)"/>
+          <text x="450" y="160" font-size="11" fill="#C9534D" font-weight="600">仍 PTL</text>
+
+          <!-- Step 2 -->
+          <rect x="40" y="170" width="800" height="80" rx="10" fill="#F4E5DD" stroke="#D77757" stroke-width="1.5"/>
+          <text x="60" y="194" font-size="13" font-weight="700" fill="#B0552F">第 2 层 · reactive compact</text>
+          <text x="60" y="214" font-size="12" fill="#1F1B17">整段历史摘要重写,大幅压缩(成本高,但效果显著)</text>
+          <text x="60" y="232" font-size="11" fill="#4A413A">条件:hasAttemptedReactiveCompact === false(每个回合最多一次)</text>
+          <text x="820" y="214" text-anchor="end" font-size="11" fill="#B0552F" font-family="monospace">reactiveCompact.tryReactiveCompact()</text>
+
+          <!-- Arrow success -->
+          <path d="M 70 250 Q 70 310 440 350" fill="none" stroke="#5BA67A" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrow4)"/>
+          <text x="80" y="285" font-size="11" fill="#5BA67A" font-weight="600">compacted</text>
+          <text x="80" y="300" font-size="11" fill="#5BA67A" font-weight="600">→ continue 重发</text>
+
+          <!-- Arrow fail -->
+          <line x1="440" y1="250" x2="440" y2="280" stroke="#C9534D" stroke-width="1.5" marker-end="url(#arrow4)"/>
+          <text x="450" y="270" font-size="11" fill="#C9534D" font-weight="600">无法恢复</text>
+
+          <!-- Final: expose error -->
+          <rect x="240" y="280" width="400" height="60" rx="10" fill="#F5DEDC" stroke="#C9534D" stroke-width="1.5"/>
+          <text x="440" y="304" text-anchor="middle" font-size="13" font-weight="700" fill="#C9534D">暴露 withheld 错误</text>
+          <text x="440" y="322" text-anchor="middle" font-size="11" fill="#1F1B17">yield lastMessage; return { reason: 'prompt_too_long' }</text>
+
+          <!-- key insight -->
+          <rect x="40" y="370" width="800" height="90" rx="10" fill="#F7ECD3" stroke="#D9A441" stroke-width="1.5"/>
+          <text x="60" y="394" font-size="13" font-weight="700" fill="#8a6520">关键防线:hasAttemptedReactiveCompact 标记</text>
+          <text x="60" y="414" font-size="12" fill="#1F1B17">即使 stop hook 阻塞回到这里,该回合也不会再次执行 reactive compact</text>
+          <text x="60" y="430" font-size="11" fill="#4A413A">否则会形成 "413 → compact → 再 413 → 再 compact" 的死循环</text>
+          <text x="60" y="447" font-size="11" fill="#8a6520">注释原文(query.ts:1278):"曾因在此重置为 false 导致无限循环,消耗大量 API 调用"</text>
+        </svg>
+        <figcaption>PTL 恢复链:两层尝试,失败才暴露;hasAttemptedReactiveCompact 防止跨阶段死循环</figcaption>
+      </figure>
+
+      <h3>7.2 流程详解</h3>
+      <ol class="steps">
+        <li>
+          <strong>识别 withheld PTL</strong>
+          <pre><code><span class="kw">const</span> isWithheld413 =
+  lastMessage?.type === <span class="str">'assistant'</span> &amp;&amp;
+  lastMessage.isApiErrorMessage &amp;&amp;
+  <span class="fn">isPromptTooLongMessage</span>(lastMessage)</code></pre>
+        </li>
+        <li>
+          <strong>第 1 层:collapse drain</strong>
+          <p>排空已经 stage 但未提交的 context-collapse 项。这一层成本最低,因为 collapse 已经预备好了摘要。</p>
+          <pre><code><span class="kw">if</span> (state.transition?.reason !== <span class="str">'collapse_drain_retry'</span>) {
+  <span class="kw">const</span> drained = contextCollapse.<span class="fn">recoverFromOverflow</span>(messagesForQuery, querySource)
+  <span class="kw">if</span> (drained.committed &gt; <span class="num">0</span>) {
+    state = { ...drained, transition: { reason: <span class="str">'collapse_drain_retry'</span> } }
+    <span class="kw">continue</span>  <span class="com">// 重发</span>
+  }
+}</code></pre>
+          <p>透过 transition 防止"刚 drain 完又因为同样原因 drain"的退化。</p>
+        </li>
+        <li>
+          <strong>第 2 层:reactive compact</strong>
+          <p>调用 fork agent 生成整段历史的摘要,把对话压成几段 summary。</p>
+          <pre><code><span class="kw">const</span> compacted = <span class="kw">await</span> reactiveCompact.<span class="fn">tryReactiveCompact</span>({
+  hasAttempted: hasAttemptedReactiveCompact,
+  querySource, messages: messagesForQuery,
+  cacheSafeParams: { systemPrompt, userContext, systemContext, ... },
+})
+<span class="kw">if</span> (compacted) {
+  state = {
+    messages: <span class="fn">buildPostCompactMessages</span>(compacted),
+    hasAttemptedReactiveCompact: <span class="kw">true</span>,  <span class="com">// ← 关键:本回合不再重试</span>
+    transition: { reason: <span class="str">'reactive_compact_retry'</span> },
+  }
+  <span class="kw">continue</span>
+}</code></pre>
+        </li>
+        <li>
+          <strong>恢复失败:暴露并退出</strong>
+          <pre><code><span class="kw">yield</span> lastMessage  <span class="com">// 这时才把 withheld 错误真正暴露</span>
+<span class="kw">void</span> <span class="fn">executeStopFailureHooks</span>(lastMessage, toolUseContext)
+<span class="kw">return</span> { reason: <span class="str">'prompt_too_long'</span> }</code></pre>
+          <div class="box warn">
+            <div class="title">为什么不落到 stop hooks?</div>
+            注释里直接点明:"模型未产生有效响应,hook 评估没有意义,且会形成 错误→hook 阻塞→重试→再错误 的死循环
+            (hook 还会继续注入 token)"。所以 PTL 失败 = 直接 return,跳过整个 stop hook 阶段。
+          </div>
+        </li>
+      </ol>
+
+      <h3>7.3 媒体尺寸错误的并行路径</h3>
+      <p>image / PDF / many-image 超限走<strong>同一个 reactive compact 分支</strong>,但有两点不同:</p>
+      <ul>
+        <li><strong>跳过 collapse drain</strong>:collapse 不会剥图,排空也无意义</li>
+        <li><strong>compact 内部自动剥图</strong>:reactiveCompact 检测到媒体错误时,会调用 <code>stripImagesFromMessages</code> 配合摘要</li>
+        <li><strong>终态分类</strong>:返回 <code>{ reason: 'image_error' }</code> 而非 <code>'prompt_too_long'</code></li>
+      </ul>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="otk">
+      <h2><span class="num">08</span>max_output_tokens 恢复</h2>
+      <p class="lead">输出截断和 PTL 完全不同:不是输入超长,而是模型输出还没说完就到 8k 上限。
+      这个错误不能通过压缩历史解决,只能<strong>给模型更多输出空间</strong>或<strong>让模型续写</strong>。</p>
+
+      <figure>
+        <svg viewBox="0 0 880 460" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/>
+            </marker>
+          </defs>
+
+          <!-- Detect -->
+          <rect x="280" y="30" width="320" height="50" rx="10" fill="#F5DEDC" stroke="#C9534D" stroke-width="1.5"/>
+          <text x="440" y="52" text-anchor="middle" font-size="13" font-weight="600" fill="#C9534D">withheld:apiError === 'max_output_tokens'</text>
+          <text x="440" y="68" text-anchor="middle" font-size="10" fill="#4A413A">isWithheldMaxOutputTokens(lastMessage)</text>
+
+          <line x1="440" y1="80" x2="440" y2="105" stroke="#4A413A" stroke-width="1.5" marker-end="url(#arrow5)"/>
+
+          <!-- Decision: ever escalated -->
+          <polygon points="440,105 600,160 440,215 280,160" fill="#F4E5DD" stroke="#D77757" stroke-width="1.5"/>
+          <text x="440" y="148" text-anchor="middle" font-size="12" font-weight="600">是否已经升档过?</text>
+          <text x="440" y="166" text-anchor="middle" font-size="10" fill="#87796F">maxOutputTokensOverride === undefined?</text>
+          <text x="440" y="182" text-anchor="middle" font-size="10" fill="#87796F">tengu_otk_slot_v1 启用?</text>
+
+          <!-- Branch: escalate first -->
+          <line x1="280" y1="160" x2="170" y2="160" stroke="#5769F7" stroke-width="1.5" marker-end="url(#arrow5)"/>
+          <text x="225" y="150" text-anchor="middle" font-size="11" fill="#5769F7" font-weight="600">否</text>
+
+          <rect x="20" y="135" width="150" height="60" rx="8" fill="#E5E8FE" stroke="#5769F7" stroke-width="1.5"/>
+          <text x="95" y="155" text-anchor="middle" font-size="12" font-weight="600">升档</text>
+          <text x="95" y="172" text-anchor="middle" font-size="10" fill="#4A413A">override = 64k</text>
+          <text x="95" y="186" text-anchor="middle" font-size="10" fill="#4A413A">重发同一请求</text>
+
+          <!-- Branch: escalated already -->
+          <line x1="600" y1="160" x2="710" y2="160" stroke="#D77757" stroke-width="1.5" marker-end="url(#arrow5)"/>
+          <text x="655" y="150" text-anchor="middle" font-size="11" fill="#D77757" font-weight="600">是</text>
+
+          <!-- Decision 2: continuation count -->
+          <polygon points="800,160 880,200 800,240 720,200" fill="#F4E5DD" stroke="#D77757" stroke-width="1.5"/>
+          <text x="800" y="195" text-anchor="middle" font-size="11" font-weight="600">续写次数</text>
+          <text x="800" y="210" text-anchor="middle" font-size="11" font-weight="600">&lt; 3?</text>
+
+          <!-- Branch: continue write -->
+          <line x1="800" y1="240" x2="800" y2="270" stroke="#5BA67A" stroke-width="1.5" marker-end="url(#arrow5)"/>
+          <text x="810" y="260" font-size="11" fill="#5BA67A" font-weight="600">是</text>
+
+          <rect x="700" y="270" width="200" height="80" rx="8" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1.5"/>
+          <text x="800" y="292" text-anchor="middle" font-size="12" font-weight="600">注入续写提示</text>
+          <text x="800" y="308" text-anchor="middle" font-size="10" fill="#4A413A">isMeta: true</text>
+          <text x="800" y="322" text-anchor="middle" font-size="10" fill="#4A413A">"Resume directly —</text>
+          <text x="800" y="336" text-anchor="middle" font-size="10" fill="#4A413A">no apology, no recap"</text>
+
+          <!-- Branch: exhausted -->
+          <line x1="720" y1="200" x2="660" y2="200" stroke="#C9534D" stroke-width="1.5" marker-end="url(#arrow5)"/>
+          <text x="690" y="192" text-anchor="middle" font-size="11" fill="#C9534D" font-weight="600">否</text>
+
+          <rect x="500" y="180" width="160" height="40" rx="8" fill="#F5DEDC" stroke="#C9534D" stroke-width="1.5"/>
+          <text x="580" y="196" text-anchor="middle" font-size="12" font-weight="600" fill="#C9534D">暴露错误</text>
+          <text x="580" y="212" text-anchor="middle" font-size="10" fill="#1F1B17">yield lastMessage</text>
+
+          <!-- continue back -->
+          <path d="M 95 195 Q 95 410 440 410 Q 600 410 800 350" fill="none" stroke="#5BA67A" stroke-width="1.5" stroke-dasharray="5 3"/>
+          <text x="380" y="425" font-size="12" fill="#5BA67A" font-weight="600">state.continue → 回流式阶段</text>
+        </svg>
+        <figcaption>OTK 恢复:第一次升档 8k→64k(同一请求),后续每次注入续写提示,最多 3 次</figcaption>
+      </figure>
+
+      <h3>8.1 两阶段恢复</h3>
+      <h4>阶段 A:一次性升档(MAX_OUTPUT_TOKENS escalation)</h4>
+      <p>条件:本回合用的是默认 8k 上限(<code>maxOutputTokensOverride === undefined</code>),且 GrowthBook 启用。</p>
+      <pre><code><span class="kw">if</span> (capEnabled &amp;&amp; maxOutputTokensOverride === <span class="kw">undefined</span> &amp;&amp; !process.env.CLAUDE_CODE_MAX_OUTPUT_TOKENS) {
+  <span class="fn">logEvent</span>(<span class="str">'tengu_max_tokens_escalate'</span>, { escalatedTo: ESCALATED_MAX_TOKENS })
+  state = {
+    ...,
+    maxOutputTokensOverride: ESCALATED_MAX_TOKENS,  <span class="com">// 64000</span>
+    transition: { reason: <span class="str">'max_output_tokens_escalate'</span> },
+  }
+  <span class="kw">continue</span>  <span class="com">// 重发,这次给 64k 输出空间</span>
+}</code></pre>
+      <p><strong>动机</strong>:避免立即进入多轮恢复对话(每轮至少 1 次完整回合的成本),先一次性补足输出窗口。<br>
+      <strong>3P 默认关闭</strong>:Bedrock / Vertex 还没验证过 64k 输出。</p>
+
+      <h4>阶段 B:多轮续写(最多 3 次)</h4>
+      <p>升档后仍触顶,或已经是升档状态:</p>
+      <pre><code><span class="kw">if</span> (maxOutputTokensRecoveryCount &lt; MAX_OUTPUT_TOKENS_RECOVERY_LIMIT) {
+  <span class="kw">const</span> recoveryMessage = <span class="fn">createUserMessage</span>({
+    content:
+      <span class="str">'Output token limit hit. Resume directly — no apology, no recap of what you were doing. '</span> +
+      <span class="str">'Pick up mid-thought if that is where the cut happened. Break remaining work into smaller pieces.'</span>,
+    isMeta: <span class="kw">true</span>,  <span class="com">// 不在 transcript 显示</span>
+  })
+  state = {
+    messages: [...messagesForQuery, ...assistantMessages, recoveryMessage],
+    maxOutputTokensRecoveryCount: maxOutputTokensRecoveryCount + <span class="num">1</span>,
+    transition: { reason: <span class="str">'max_output_tokens_recovery'</span>, attempt: ... },
+  }
+  <span class="kw">continue</span>
+}</code></pre>
+
+      <div class="box info">
+        <div class="title">续写提示的写法很讲究</div>
+        <ul>
+          <li><strong>"no apology"</strong>:防止模型说"抱歉,我刚被截断了…",浪费 token</li>
+          <li><strong>"no recap"</strong>:防止重复已经说过的内容</li>
+          <li><strong>"Pick up mid-thought"</strong>:从被切断的位置继续,而不是重新组织</li>
+          <li><strong>"Break remaining work into smaller pieces"</strong>:让模型主动切分,降低再次截断概率</li>
+          <li><strong>isMeta: true</strong>:不在 UI 显示这条续写指令,用户感觉模型自然地写完了</li>
+        </ul>
+      </div>
+
+      <h3>8.2 三次都用完?</h3>
+      <pre><code><span class="com">// 恢复额度耗尽:此时才把 withheld 错误对外输出</span>
+<span class="kw">yield</span> lastMessage</code></pre>
+      <p>注意:这里没有 return —— 它会落入下方的 <code>if (lastMessage?.isApiErrorMessage) { ... return 'completed' }</code> 分支,
+      最终以 <code>completed</code> 状态结束(因为已经把错误暴露给用户了)。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="protocol">
+      <h2><span class="num">09</span>协议配对修复</h2>
+      <p class="lead">Anthropic API 有一个硬约束:<strong>每个 tool_use 块必须有对应的 tool_result 块紧随其后</strong>。
+      违反这个规则会导致后续每次请求都 400。Claude Code 在所有可能"中断 tool_use 配对"的地方都做了修复。</p>
+
+      <h3>9.1 yieldMissingToolResultBlocks</h3>
+      <p><span class="path">src/query.ts:126</span> 是核心修复函数:</p>
+      <pre><code><span class="kw">function</span>* <span class="fn">yieldMissingToolResultBlocks</span>(
+  assistantMessages: <span class="ty">AssistantMessage[]</span>,
+  errorMessage: <span class="ty">string</span>,
+) {
+  <span class="kw">for</span> (<span class="kw">const</span> assistantMessage <span class="kw">of</span> assistantMessages) {
+    <span class="kw">const</span> toolUseBlocks = (assistantMessage.message.content || [])
+      .<span class="fn">filter</span>(c =&gt; c.type === <span class="str">'tool_use'</span>)
+
+    <span class="com">// 为每个 tool_use 补一个错误型 tool_result,保证配对</span>
+    <span class="kw">for</span> (<span class="kw">const</span> toolUse <span class="kw">of</span> toolUseBlocks) {
+      <span class="kw">yield</span> <span class="fn">createUserMessage</span>({
+        content: [{
+          type: <span class="str">'tool_result'</span>,
+          content: errorMessage,
+          is_error: <span class="kw">true</span>,
+          tool_use_id: toolUse.id,
+        }],
+        toolUseResult: errorMessage,
+        sourceToolAssistantUUID: assistantMessage.uuid,
+      })
+    }
+  }
+}</code></pre>
+
+      <h3>9.2 在哪些地方调用</h3>
+      <table>
+        <thead><tr><th>调用点</th><th>触发原因</th><th>错误消息</th></tr></thead>
+        <tbody>
+        <tr>
+          <td><span class="path">query.ts:904</span><br>(FallbackTriggeredError)</td>
+          <td>切模型前清场,旧 tool_use 不能跟新模型 mix</td>
+          <td><code>"Model fallback triggered"</code></td>
+        </tr>
+        <tr>
+          <td><span class="path">query.ts:1023</span><br>(streaming 中断)</td>
+          <td>没有 streamingToolExecutor 时退化路径</td>
+          <td><code>"Interrupted by user"</code></td>
+        </tr>
+        <tr>
+          <td><span class="path">query.ts:983</span><br>(顶层 catch)</td>
+          <td>queryModelWithStreaming 本应 yield 错误却 throw 出来,可能已发 tool_use</td>
+          <td><code>error.message</code> 原文</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>9.3 流式 fallback 的特殊处理</h3>
+      <p>当 <code>onStreamingFallback</code> 触发时(流式请求中途切到非流式),<strong>不能</strong>调 yieldMissingToolResultBlocks,因为 thinking 块的签名跟原模型绑定:</p>
+      <pre><code><span class="kw">if</span> (streamingFallbackOccured) {
+  <span class="com">// 为孤儿消息发 tombstone,让 UI 与 transcript 都能删除它们</span>
+  <span class="kw">for</span> (<span class="kw">const</span> msg <span class="kw">of</span> assistantMessages) {
+    <span class="kw">yield</span> { type: <span class="str">'tombstone'</span>, message: msg }
+  }
+  <span class="fn">logEvent</span>(<span class="str">'tengu_orphaned_messages_tombstoned'</span>, ...)
+
+  <span class="com">// 清空所有累积状态,准备完整重跑</span>
+  assistantMessages.length = <span class="num">0</span>
+  toolResults.length = <span class="num">0</span>
+  toolUseBlocks.length = <span class="num">0</span>
+  needsFollowUp = <span class="kw">false</span>
+
+  <span class="com">// 丢弃执行器并重建</span>
+  streamingToolExecutor?.<span class="fn">discard</span>()
+  streamingToolExecutor = <span class="kw">new</span> <span class="ty">StreamingToolExecutor</span>(...)
+}</code></pre>
+      <div class="box note">
+        <div class="title">tombstone 的妙用</div>
+        <code>{type: 'tombstone', message}</code> 是一个特殊事件,UI 收到后会<strong>删除</strong>之前显示的对应消息,
+        transcript 也会跳过它。这样用户视角是"没看到失败的尝试,直接看到 fallback 后的成功响应",体验连续。
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="tombstone">
+      <h2><span class="num">10</span>tombstone 与流式 fallback</h2>
+      <p class="lead">tombstone 是一个用来"事后撤销"已经流出去的消息的机制,主要为流式 fallback 服务。</p>
+
+      <h3>10.1 为什么需要 tombstone</h3>
+      <p>典型场景:用户用 Opus 模型,fast mode 开启。流式请求开始,模型流出了:</p>
+      <pre><code>assistant:
+  thinking_block_1 (signature: opus-4-7-fast)
+  text_block: "Let me check..."
+  tool_use_block: { name: "Read", id: "toolu_X", input: {...} }</code></pre>
+      <p>这时 fast mode 触发 cooldown,SDK 内部决定改走非流式 fallback。问题:</p>
+      <ul>
+        <li>thinking_block 的签名跟 fast 模型绑定,重发到普通模型会 400</li>
+        <li>已经流出去的 tool_use 还没有 tool_result,不能直接拼接</li>
+        <li>UI 已经显示了"Let me check..."和工具调用的 spinner</li>
+      </ul>
+
+      <h3>10.2 tombstone 的处理</h3>
+      <pre><code><span class="kw">for</span> (<span class="kw">const</span> msg <span class="kw">of</span> assistantMessages) {
+  <span class="kw">yield</span> { type: <span class="str">'tombstone'</span>, message: msg }
+}</code></pre>
+      <p>UI 端收到 tombstone 事件后:</p>
+      <ol>
+        <li>找到对应 message 的渲染节点</li>
+        <li>从 transcript 中删除</li>
+        <li>从存档文件中跳过</li>
+      </ol>
+      <p>对用户来说,这次失败的流式尝试就像没发生过。</p>
+
+      <h3>10.3 ant-only 的 stripSignatureBlocks</h3>
+      <pre><code><span class="kw">if</span> (process.env.USER_TYPE === <span class="str">'ant'</span>) {
+  messagesForQuery = <span class="fn">stripSignatureBlocks</span>(messagesForQuery)
+}</code></pre>
+      <p>切模型前对历史里的 thinking 签名进行剥除。注释:"thinking 签名与模型绑定:把受保护 thinking 重放到不兼容 fallback 模型会 400"。
+      给 fallback 模型一份"干净"的历史,让它能继续接力。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="fallback">
+      <h2><span class="num">11</span>FallbackTriggeredError 模型切换</h2>
+      <p class="lead">这是 withRetry 跟 queryLoop 之间的特殊"信号":withRetry 自己<strong>不切模型</strong>,而是抛出特殊异常让 queryLoop 处理。</p>
+
+      <h3>11.1 为什么 withRetry 不切模型</h3>
+      <div class="box note">
+        <div class="title">分层职责</div>
+        切模型涉及:1) 清空已发的孤儿 tool_use;2) 剥除 thinking 签名;3) 重置 streamingToolExecutor;4) 给用户发系统消息。
+        这些都涉及 messages 状态和 UI 通知,withRetry 不应该知道这些细节,所以只负责抛信号。
+      </div>
+
+      <h3>11.2 处理流程(query.ts:898)</h3>
+      <pre><code><span class="kw">} catch</span> (innerError) {
+  <span class="kw">if</span> (innerError <span class="kw">instanceof</span> <span class="ty">FallbackTriggeredError</span> &amp;&amp; fallbackModel) {
+    currentModel = fallbackModel
+    attemptWithFallback = <span class="kw">true</span>           <span class="com">// 内层 while 重试</span>
+
+    <span class="com">// 1. 清掉所有可能孤儿的 tool_use</span>
+    <span class="kw">yield</span>* <span class="fn">yieldMissingToolResultBlocks</span>(assistantMessages, <span class="str">'Model fallback triggered'</span>)
+    assistantMessages.length = <span class="num">0</span>
+    toolResults.length = <span class="num">0</span>
+    toolUseBlocks.length = <span class="num">0</span>
+    needsFollowUp = <span class="kw">false</span>
+
+    <span class="com">// 2. 重建执行器</span>
+    streamingToolExecutor?.<span class="fn">discard</span>()
+    streamingToolExecutor = <span class="kw">new</span> <span class="ty">StreamingToolExecutor</span>(...)
+
+    <span class="com">// 3. 更新 toolUseContext 中的当前模型</span>
+    toolUseContext.options.mainLoopModel = fallbackModel
+
+    <span class="com">// 4. ant-only:剥签名</span>
+    <span class="kw">if</span> (process.env.USER_TYPE === <span class="str">'ant'</span>) {
+      messagesForQuery = <span class="fn">stripSignatureBlocks</span>(messagesForQuery)
+    }
+
+    <span class="com">// 5. 埋点</span>
+    <span class="fn">logEvent</span>(<span class="str">'tengu_model_fallback_triggered'</span>, { original_model, fallback_model, ... })
+
+    <span class="com">// 6. 给用户友好提示</span>
+    <span class="kw">yield</span> <span class="fn">createSystemMessage</span>(
+      <span class="str">`Switched to ${renderModelName(fallbackModel)} due to high demand for ${renderModelName(originalModel)}`</span>,
+      <span class="str">'warning'</span>,  <span class="com">// 默认可见</span>
+    )
+
+    <span class="kw">continue</span>  <span class="com">// 内层 while 重新跑请求</span>
+  }
+  <span class="kw">throw</span> innerError  <span class="com">// 其他错误冒泡到外层 catch</span>
+}</code></pre>
+
+      <h3>11.3 fallback 触发条件</h3>
+      <ul>
+        <li>用户启用了 <code>FALLBACK_FOR_ALL_PRIMARY_MODELS</code> 或</li>
+        <li>非订阅用户 + 用 Opus 模型(<code>isNonCustomOpusModel</code>)且</li>
+        <li>连续 3 次 529(<code>MAX_529_RETRIES</code>)且</li>
+        <li>有 fallbackModel 配置</li>
+      </ul>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="tool">
+      <h2><span class="num">12</span>第 4 层:工具执行错误</h2>
+      <p class="lead"><span class="path">src/services/tools/toolExecution.ts</span>:工具内部的失败<strong>永远不会</strong>让 query 循环崩溃。
+      所有失败都被翻译成一条 <code>tool_result(is_error: true)</code>,模型下一回合可以读到错误并自我修复。</p>
+
+      <h3>12.1 工具失败的种类与处理</h3>
+      <table>
+        <thead>
+          <tr><th>失败种类</th><th>翻译为 tool_result.content</th><th>位置</th></tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>工具不存在(typo / MCP 断连)</td>
+          <td><code>&lt;tool_use_error&gt;Error: No such tool available: {name}&lt;/tool_use_error&gt;</code></td>
+          <td>L425</td>
+        </tr>
+        <tr>
+          <td>调用前已 abort</td>
+          <td><code>createToolResultStopMessage</code> + <code>CANCEL_MESSAGE</code></td>
+          <td>L472</td>
+        </tr>
+        <tr>
+          <td>Zod 输入 schema 校验失败</td>
+          <td><code>&lt;tool_use_error&gt;InputValidationError: ...&lt;/tool_use_error&gt;</code> + <code>schemaHint</code></td>
+          <td>L712</td>
+        </tr>
+        <tr>
+          <td>tool 自定义 <code>validateInput</code> 拒绝</td>
+          <td><code>&lt;tool_use_error&gt;{validationMessage}&lt;/tool_use_error&gt;</code></td>
+          <td>L765</td>
+        </tr>
+        <tr>
+          <td>PreToolUse hook 拒绝</td>
+          <td>tool_result(is_error) + 附带图像块(若有)</td>
+          <td>L1075</td>
+        </tr>
+        <tr>
+          <td>工具运行时异常</td>
+          <td><code>formatError(error)</code> + 跑 PostToolUseFailure hook</td>
+          <td>L1801</td>
+        </tr>
+        <tr>
+          <td>MCP 鉴权过期(<code>McpAuthError</code>)</td>
+          <td>同上,且把 client 状态置为 <code>needs-auth</code>(<code>/mcp</code> 显示重新授权)</td>
+          <td>L1687</td>
+        </tr>
+        <tr>
+          <td>外层 try/catch(runToolUse 内部)</td>
+          <td>tool_result(is_error) <code>"Error calling tool ({name}): {message}"</code></td>
+          <td>L498</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>12.2 完整结构示例</h3>
+      <pre><code><span class="com">// toolExecution.ts:1801 — 工具运行时抛异常的处理</span>
+<span class="kw">return</span> [
+  {
+    message: <span class="fn">createUserMessage</span>({
+      content: [{
+        type: <span class="str">'tool_result'</span>,
+        content,                         <span class="com">// formatError(error) 的结果</span>
+        is_error: <span class="kw">true</span>,                 <span class="com">// ← 关键标志</span>
+        tool_use_id: toolUseID,          <span class="com">// 必须配对</span>
+      }],
+      toolUseResult: <span class="str">`Error: ${content}`</span>,
+      mcpMeta: error <span class="kw">instanceof</span> <span class="ty">McpToolCallError</span> ? error.mcpMeta : <span class="kw">undefined</span>,
+      sourceToolAssistantUUID: assistantMessage.uuid,
+    }),
+  },
+  ...hookMessages,                       <span class="com">// PostToolUseFailure 的输出</span>
+]</code></pre>
+
+      <h3>12.3 多重观测</h3>
+      <p>每条工具错误都同时:</p>
+      <ul>
+        <li><strong>Statsig 埋点</strong>:<code>tengu_tool_use_error</code>,带 <code>classifyToolError</code> 分类</li>
+        <li><strong>Langfuse</strong>:<code>recordToolObservation({ isError: true, parentBatchSpan })</code></li>
+        <li><strong>OTLP</strong>:<code>logOTelEvent('tool_result', { success: 'false', duration_ms, error })</code></li>
+        <li><strong>本地日志</strong>:<code>logForDebugging</code> + <code>logError</code>(若不是 ShellError 这类常见错误)</li>
+      </ul>
+
+      <h3>12.4 classifyToolError 的反混淆</h3>
+      <div class="box info">
+        <div class="title">为什么需要专门的分类函数</div>
+        <pre><code><span class="kw">export function</span> <span class="fn">classifyToolError</span>(error: <span class="ty">unknown</span>): <span class="ty">string</span> {
+  <span class="com">// 1. TelemetrySafeError:开发者显式声明的安全字符串</span>
+  <span class="kw">if</span> (error <span class="kw">instanceof</span> <span class="ty">TelemetrySafeError</span>) <span class="kw">return</span> error.telemetryMessage.<span class="fn">slice</span>(<span class="num">0</span>, <span class="num">200</span>)
+
+  <span class="com">// 2. Node.js fs 错误:用 errno code(ENOENT, EACCES…)</span>
+  <span class="kw">const</span> errnoCode = <span class="fn">getErrnoCode</span>(error)
+  <span class="kw">if</span> (errnoCode) <span class="kw">return</span> errnoCode
+
+  <span class="com">// 3. 自定义错误类型:用 name(只在未压缩时有效)</span>
+  <span class="kw">if</span> (error.name &amp;&amp; error.name !== <span class="str">'Error'</span> &amp;&amp; error.name.length &gt; <span class="num">3</span>)
+    <span class="kw">return</span> error.name.<span class="fn">slice</span>(<span class="num">0</span>, <span class="num">60</span>)
+
+  <span class="kw">return</span> <span class="str">'unknown'</span>
+}</code></pre>
+        <strong>问题</strong>:压缩构建里 <code>error.constructor.name</code> 会被 mangled 成 <code>"a"</code>、<code>"b"</code> 这种,
+        埋点完全没用。所以专门做了这套反混淆 fallback 链。
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="abort">
+      <h2><span class="num">13</span>中断处理</h2>
+      <p class="lead">中断(用户按 Ctrl+C、esc esc)可能在<strong>任何阶段</strong>发生:模型流式中、工具执行中、附件注入前。
+      Claude Code 在每个阶段都有专门的清理逻辑,确保协议配对完整。</p>
+
+      <h3>13.1 流式阶段中断(query.ts:1012)</h3>
+      <pre><code><span class="kw">if</span> (toolUseContext.abortController.signal.aborted) {
+  <span class="kw">if</span> (streamingToolExecutor) {
+    <span class="com">// 消费剩余结果:executeTool() 内会检查 abort 信号</span>
+    <span class="com">// 并自动生成"中断型 tool_result"</span>
+    <span class="kw">for await</span> (<span class="kw">const</span> update <span class="kw">of</span> streamingToolExecutor.<span class="fn">getRemainingResults</span>()) {
+      <span class="kw">if</span> (update.message) <span class="kw">yield</span> update.message
+    }
+  } <span class="kw">else</span> {
+    <span class="com">// 退化路径:用 yieldMissingToolResultBlocks 补</span>
+    <span class="kw">yield</span>* <span class="fn">yieldMissingToolResultBlocks</span>(assistantMessages, <span class="str">'Interrupted by user'</span>)
+  }
+
+  <span class="com">// chicago MCP:中断时自动 unhide + 释放锁</span>
+  <span class="kw">if</span> (feature(<span class="str">'CHICAGO_MCP'</span>) &amp;&amp; !toolUseContext.agentId) {
+    <span class="kw">try</span> {
+      <span class="kw">await</span> <span class="fn">cleanupComputerUseAfterTurn</span>(toolUseContext)
+    } <span class="kw">catch</span> {}
+  }
+
+  <span class="com">// submit-interrupt 跳过中断提示(后续排队消息已表达上下文)</span>
+  <span class="kw">if</span> (toolUseContext.abortController.signal.reason !== <span class="str">'interrupt'</span>) {
+    <span class="kw">yield</span> <span class="fn">createUserInterruptionMessage</span>({ toolUse: <span class="kw">false</span> })
+  }
+  <span class="kw">return</span> { reason: <span class="str">'aborted_streaming'</span> }
+}</code></pre>
+
+      <h3>13.2 工具执行阶段中断(query.ts:1467)</h3>
+      <p>工具批次执行完成后再次检查 abort:</p>
+      <pre><code><span class="kw">if</span> (toolUseContext.abortController.signal.aborted) {
+  <span class="com">// chicago MCP 清理(同上)</span>
+  ...
+  <span class="kw">if</span> (signal.reason !== <span class="str">'interrupt'</span>) {
+    <span class="kw">yield</span> <span class="fn">createUserInterruptionMessage</span>({ toolUse: <span class="kw">true</span> })   <span class="com">// ← 注意 toolUse: true</span>
+  }
+  <span class="com">// 中断返回前仍检查 maxTurns,保证行为一致</span>
+  <span class="kw">if</span> (maxTurns &amp;&amp; nextTurnCountOnAbort &gt; maxTurns) {
+    <span class="kw">yield</span> <span class="fn">createAttachmentMessage</span>({ type: <span class="str">'max_turns_reached'</span>, ... })
+  }
+  <span class="kw">return</span> { reason: <span class="str">'aborted_tools'</span> }
+}</code></pre>
+
+      <h3>13.3 两种 abort 信号源</h3>
+      <table>
+        <thead><tr><th>signal.reason</th><th>触发场景</th><th>是否 yield 中断提示</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>(undefined)</td><td>用户 Ctrl+C / esc esc</td>
+            <td><span class="lbl ok">是</span> 显示"Interrupted by user"</td>
+          </tr>
+          <tr>
+            <td><code>'interrupt'</code></td><td>submit-interrupt:用户在模型流式时直接发新消息</td>
+            <td><span class="lbl warn">否</span> 后续排队消息已表达上下文</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="terminal">
+      <h2><span class="num">14</span>终态枚举</h2>
+      <p class="lead">queryLoop 永远以 <code>Terminal</code> 类型结束,每个终态对应一类原因。这让外层(REPL、SDK consumer)可以做精细的差异化处理。</p>
+
+      <table>
+        <thead>
+          <tr><th>reason</th><th>含义</th><th>外层行为</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>'completed'</code></td>
+            <td>正常完成,模型不再产生 tool_use</td>
+            <td>等待下一次用户输入</td>
+          </tr>
+          <tr>
+            <td><code>'aborted_streaming'</code></td>
+            <td>模型流式阶段被中断</td>
+            <td>Langfuse trace 标记 interrupted</td>
+          </tr>
+          <tr>
+            <td><code>'aborted_tools'</code></td>
+            <td>工具执行阶段被中断</td>
+            <td>同上 + 检查 maxTurns</td>
+          </tr>
+          <tr>
+            <td><code>'blocking_limit'</code></td>
+            <td>预检阶段就发现 token 超阈,且禁了 autocompact</td>
+            <td>引导用户手动 /compact</td>
+          </tr>
+          <tr>
+            <td><code>'image_error'</code></td>
+            <td>图像处理错误(本地 ImageSizeError 或 reactive compact 媒体恢复失败)</td>
+            <td>提示用户用更小的图</td>
+          </tr>
+          <tr>
+            <td><code>'prompt_too_long'</code></td>
+            <td>PTL 两层恢复都失败</td>
+            <td>引导 /compact 或重启会话</td>
+          </tr>
+          <tr>
+            <td><code>'model_error'</code></td>
+            <td>顶层 catch:不可识别的运行时错误</td>
+            <td>暴露原始 error.message,ant 内部高声量日志</td>
+          </tr>
+          <tr>
+            <td><code>'stop_hook_prevented'</code></td>
+            <td>stop hook 主动阻止续轮</td>
+            <td>正常结束,不计入错误</td>
+          </tr>
+          <tr>
+            <td><code>'hook_stopped'</code></td>
+            <td>PreToolUse hook 阻止续轮(<code>hook_stopped_continuation</code> 附件)</td>
+            <td>同上</td>
+          </tr>
+          <tr>
+            <td><code>'max_turns'</code></td>
+            <td>达到 maxTurns 上限</td>
+            <td>显示 max_turns_reached 附件</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>14.1 顶层 query() 的 finally 处理</h3>
+      <pre><code><span class="kw">try</span> {
+  terminal = <span class="kw">yield</span>* <span class="fn">queryLoop</span>(paramsWithTrace, consumedCommandUuids)
+} <span class="kw">finally</span> {
+  <span class="kw">if</span> (ownsTrace) {
+    <span class="kw">const</span> isAborted =
+      terminal?.reason === <span class="str">'aborted_streaming'</span> ||
+      terminal?.reason === <span class="str">'aborted_tools'</span>
+    <span class="fn">endTrace</span>(langfuseTrace, <span class="kw">undefined</span>, isAborted ? <span class="str">'interrupted'</span> : <span class="kw">undefined</span>)
+  }
+}
+
+<span class="com">// 仅当 queryLoop 正常 return 时才会到这里</span>
+<span class="com">// throw 与 .return() 都会跳过</span>
+<span class="com">// 故意保留"started 但未 completed"的不对称信号,便于追因</span>
+<span class="kw">for</span> (<span class="kw">const</span> uuid <span class="kw">of</span> consumedCommandUuids) {
+  <span class="fn">notifyCommandLifecycle</span>(uuid, <span class="str">'completed'</span>)
+}</code></pre>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="e2e">
+      <h2><span class="num">15</span>端到端示例</h2>
+      <p class="lead">用一个具体场景串起所有机制。</p>
+
+      <h3>场景:用户发送一个长会话,触发 PTL,且模型已经流出了一半 tool_use</h3>
+
+      <ol class="steps">
+        <li>
+          <strong>用户输入</strong>
+          <pre><code>"基于我们整个对话历史,生成一个总结报告"</code></pre>
+          <p>此时对话已经累积到 ~135k token,接近 Sonnet-4.5 的限制。</p>
+        </li>
+        <li>
+          <strong>queryLoop 第一轮:预处理</strong>
+          <p>autocompact 被禁用(用户配置),阻塞限阈预检通过(还差 200 token 触发)。开始流式调用。</p>
+        </li>
+        <li>
+          <strong>模型流式响应</strong>
+          <p>模型先输出了 thinking + 一个 Read tool_use(<code>id: toolu_X</code>),正在等待 tool_result 返回。</p>
+        </li>
+        <li>
+          <strong>工具执行注入了大文件</strong>
+          <p>Read 工具读了一个 50k token 的文件,作为 tool_result 注入。下一轮请求 messages 现在 ~185k token。</p>
+        </li>
+        <li>
+          <strong>第二轮请求 → 413 Prompt is too long</strong>
+          <p>API 返回错误:<code>"prompt is too long: 187234 tokens > 200000 maximum"</code>。
+          getAssistantMessageFromError 把它翻译成:</p>
+          <pre><code>{
+  type: <span class="str">'assistant'</span>,
+  isApiErrorMessage: <span class="kw">true</span>,
+  content: [{ type: <span class="str">'text'</span>, text: <span class="str">'Prompt is too long'</span> }],
+  apiError: <span class="kw">undefined</span>,
+  error: <span class="str">'invalid_request'</span>,
+  errorDetails: <span class="str">'prompt is too long: 187234 tokens > 200000 maximum'</span>,
+}</code></pre>
+        </li>
+        <li>
+          <strong>withheld 触发</strong>
+          <p><code>contextCollapse.isWithheldPromptTooLong()</code> 返回 true。错误消息<strong>没有 yield 出去</strong>,
+          但被 push 进 assistantMessages,UI 端用户还在转圈圈,以为模型还在思考。</p>
+        </li>
+        <li>
+          <strong>检查恢复链 - 第 1 层 collapse drain</strong>
+          <pre><code><span class="kw">const</span> drained = contextCollapse.<span class="fn">recoverFromOverflow</span>(messagesForQuery, querySource)
+<span class="com">// drained = { committed: 12, messages: [...缩短后的 messages] }</span></code></pre>
+          <p>collapse 找到 12 个分组提交摘要,messages 从 185k → 145k。</p>
+          <p><strong>state 更新</strong>:<code>transition: { reason: 'collapse_drain_retry' }</code>,continue 重发。</p>
+        </li>
+        <li>
+          <strong>重发 → 仍 PTL</strong>
+          <p>压缩后还是 145k,Sonnet-4.5 上限 200k 应该够,但因为有大量 tool_use 块的元数据,实际仍 207k。再次返回 PTL。</p>
+        </li>
+        <li>
+          <strong>state.transition === 'collapse_drain_retry'</strong>,<strong>跳过</strong>第 1 层(已经试过)
+          <p>直接进入第 2 层 reactive compact。</p>
+        </li>
+        <li>
+          <strong>第 2 层 reactive compact</strong>
+          <pre><code><span class="kw">const</span> compacted = <span class="kw">await</span> reactiveCompact.<span class="fn">tryReactiveCompact</span>({
+  hasAttempted: <span class="kw">false</span>,
+  ...
+})
+<span class="com">// 启动一个 fork agent,生成历史摘要</span>
+<span class="com">// compacted = { summaryMessages: [3 条 summary], ... }</span></code></pre>
+          <p>messages 被压缩到 50k token,注入"Compacted history"系统消息。</p>
+          <p><strong>state 更新</strong>:<code>hasAttemptedReactiveCompact: true, transition: 'reactive_compact_retry'</code></p>
+        </li>
+        <li>
+          <strong>重发 → 成功</strong>
+          <p>50k token 远低于上限,API 正常返回。模型基于压缩后的历史生成报告。用户视角:转圈了 8 秒,然后看到完整回答。
+          所有 PTL 错误对用户都是<strong>不可见</strong>的。</p>
+        </li>
+        <li>
+          <strong>对比:如果 reactive compact 也失败</strong>
+          <pre><code><span class="kw">yield</span> lastMessage  <span class="com">// 这时才把 withheld 的 PTL 错误暴露给 UI</span>
+<span class="kw">void</span> <span class="fn">executeStopFailureHooks</span>(lastMessage, toolUseContext)
+<span class="kw">return</span> { reason: <span class="str">'prompt_too_long'</span> }</code></pre>
+          <p>用户看到"Prompt is too long"错误消息,系统提示运行 <code>/compact</code> 或重启会话。</p>
+        </li>
+      </ol>
+
+      <h3>关键时间线</h3>
+      <figure>
+        <svg viewBox="0 0 880 220" xmlns="http://www.w3.org/2000/svg">
+          <!-- timeline -->
+          <line x1="40" y1="100" x2="840" y2="100" stroke="#4A413A" stroke-width="2"/>
+
+          <!-- markers -->
+          <g>
+            <circle cx="80" cy="100" r="8" fill="#5BA67A"/>
+            <text x="80" y="80" text-anchor="middle" font-size="11">用户输入</text>
+            <text x="80" y="125" text-anchor="middle" font-size="10" fill="#87796F">t=0</text>
+          </g>
+          <g>
+            <circle cx="200" cy="100" r="8" fill="#5769F7"/>
+            <text x="200" y="80" text-anchor="middle" font-size="11">第 1 次请求</text>
+            <text x="200" y="125" text-anchor="middle" font-size="10" fill="#87796F">+0.3s</text>
+            <text x="200" y="140" text-anchor="middle" font-size="10" fill="#5769F7">tool_use</text>
+          </g>
+          <g>
+            <circle cx="320" cy="100" r="8" fill="#5BA67A"/>
+            <text x="320" y="80" text-anchor="middle" font-size="11">tool_result</text>
+            <text x="320" y="125" text-anchor="middle" font-size="10" fill="#87796F">+1.5s</text>
+          </g>
+          <g>
+            <circle cx="440" cy="100" r="8" fill="#C9534D"/>
+            <text x="440" y="80" text-anchor="middle" font-size="11">PTL 1</text>
+            <text x="440" y="125" text-anchor="middle" font-size="10" fill="#87796F">+2.1s</text>
+            <text x="440" y="140" text-anchor="middle" font-size="10" fill="#C9534D">withheld</text>
+          </g>
+          <g>
+            <circle cx="540" cy="100" r="8" fill="#D77757"/>
+            <text x="540" y="80" text-anchor="middle" font-size="11">collapse drain</text>
+            <text x="540" y="125" text-anchor="middle" font-size="10" fill="#87796F">+2.3s</text>
+          </g>
+          <g>
+            <circle cx="620" cy="100" r="8" fill="#C9534D"/>
+            <text x="620" y="80" text-anchor="middle" font-size="11">PTL 2</text>
+            <text x="620" y="125" text-anchor="middle" font-size="10" fill="#87796F">+2.8s</text>
+          </g>
+          <g>
+            <circle cx="720" cy="100" r="8" fill="#D77757"/>
+            <text x="720" y="80" text-anchor="middle" font-size="11">reactive compact</text>
+            <text x="720" y="125" text-anchor="middle" font-size="10" fill="#87796F">+5.2s</text>
+            <text x="720" y="140" text-anchor="middle" font-size="10" fill="#D77757">fork agent</text>
+          </g>
+          <g>
+            <circle cx="820" cy="100" r="8" fill="#5BA67A"/>
+            <text x="820" y="80" text-anchor="middle" font-size="11">成功响应</text>
+            <text x="820" y="125" text-anchor="middle" font-size="10" fill="#87796F">+8.0s</text>
+          </g>
+
+          <!-- annotation -->
+          <rect x="40" y="170" width="800" height="40" rx="6" fill="#E2F0E8" stroke="#5BA67A" stroke-width="1"/>
+          <text x="440" y="194" text-anchor="middle" font-size="12" fill="#5BA67A" font-weight="600">用户视角:仅一个 8 秒的"思考中"动画,看不到任何错误</text>
+        </svg>
+        <figcaption>端到端时间线:两次 PTL、两层恢复,对用户完全透明</figcaption>
+      </figure>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="principles">
+      <h2><span class="num">16</span>核心设计原则</h2>
+      <p class="lead">把整套机制提炼成 6 条可迁移到其他 agent 系统的设计原则。</p>
+
+      <ol class="steps">
+        <li>
+          <strong>withheld 优先于 yield</strong>
+          <p>SDK 调用方收到 <code>error</code> 字段就会断开。所以可恢复错误<strong>先压住,确认恢复失败再暴露</strong>,
+          否则会出现"前端关、后端跑、token 烧"的分裂状态。</p>
+        </li>
+        <li>
+          <strong>协议配对永远修复</strong>
+          <p>tool_use 一旦发出,无论后续怎么失败,都要保证有对应 tool_result(中断型/错误型/合成型)。
+          否则下一次请求会因 schema 校验 400,会话进入死锁。<code>yieldMissingToolResultBlocks</code> 在所有可能断裂的地方都做了兜底。</p>
+        </li>
+        <li>
+          <strong>恢复链单步上限 + transition 标记</strong>
+          <p><code>hasAttemptedReactiveCompact</code> / <code>maxOutputTokensRecoveryCount</code> /
+          <code>state.transition.reason</code> 共同防止"错误→恢复→再错误"死循环。每层恢复策略只允许试一次,
+          失败就升级到下一层。</p>
+        </li>
+        <li>
+          <strong>API 错误绕过 stop hooks</strong>
+          <p>错误响应不是可评估产物(模型并没有真正完成回合),继续跑 hook 还会注入 token 触发更多错误,形成无限循环。
+          所以 <code>if (lastMessage?.isApiErrorMessage)</code> 就直接 return,跳过 hook 阶段。</p>
+        </li>
+        <li>
+          <strong>统一状态机而非递归</strong>
+          <p>所有恢复路径(compact、fallback、stop-hook、token-budget、中断)都通过 <code>state = { ... }; continue</code> 提交,
+          降低分支爆炸与遗漏字段重置的风险。每条恢复路径只是一次状态赋值,容易测试、容易追因。</p>
+        </li>
+        <li>
+          <strong>错误最终以"伪 assistant message"形式存活</strong>
+          <p><code>createAssistantAPIErrorMessage</code> 生成 <code>isApiErrorMessage: true</code> 的 assistant 消息,
+          既能在 transcript / UI 显式显示,又能被下游分类、被 stop hook 识别为"非有效产物"。
+          这是把"异常"变成"对话流的一部分"的关键转换。</p>
+        </li>
+      </ol>
+
+      <div class="box note">
+        <div class="title">最重要的一条:让模型看见错误</div>
+        Claude Code 的核心理念是<strong>把工具失败、API 错误、协议异常都变成模型可以读到的 tool_result 或 assistant message</strong>,
+        而不是让它们冒泡到用户。模型读到 <code>&lt;tool_use_error&gt;ENOENT: no such file&lt;/tool_use_error&gt;</code> 时,
+        会自然地下一回合用 <code>ls</code> 检查路径再重试 —— 这种"自我修复"行为来自把错误信息保留在对话流里,
+        而不是某种特殊的"重试 prompt"。当系统设计得恰当时,错误处理几乎是不可见的。
+      </div>
+    </section>
+
+    <footer style="margin-top:80px; padding-top:32px; border-top:1px solid var(--gray-300); color:var(--gray-500); font-size:13px;">
+      <p>本文基于 Claude Code 反编译版源码(commit 1173a62)。
+      关键文件:<span class="path">src/query.ts</span>、
+      <span class="path">src/services/api/withRetry.ts</span>、
+      <span class="path">src/services/api/errors.ts</span>、
+      <span class="path">src/services/tools/toolExecution.ts</span>、
+      <span class="path">src/utils/messages.ts</span>。</p>
+    </footer>
+  </main>
+</div>
+</body>
+</html>

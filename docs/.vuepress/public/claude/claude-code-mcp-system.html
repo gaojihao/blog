@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code MCP 系统详解</title>
+<style>
+  :root {
+    --orange: #D77757; --orange-soft: #F4E5DD; --orange-deep: #B0552F;
+    --blue: #5769F7; --blue-soft: #E5E8FE;
+    --green: #5BA67A; --green-soft: #E2F0E8;
+    --red: #C9534D; --red-soft: #F5DEDC;
+    --yellow: #D9A441; --yellow-soft: #F7ECD3;
+    --purple: #8B5CF6; --purple-soft: #EDE7F8;
+    --teal: #2BA89E; --teal-soft: #D6F0ED;
+    --gray-900: #1F1B17; --gray-700: #4A413A; --gray-500: #87796F;
+    --gray-300: #D9D0C7; --gray-100: #F6F1EC; --gray-50: #FBF8F4;
+    --bg: #FBF8F4;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif; color: var(--gray-900); background: var(--bg); line-height: 1.7; }
+  .layout { display: grid; grid-template-columns: 280px 1fr; max-width: 1400px; margin: 0 auto; }
+  nav.toc { position: sticky; top: 0; height: 100vh; overflow-y: auto; padding: 32px 20px; border-right: 1px solid var(--gray-300); background: var(--gray-50); font-size: 14px; }
+  nav.toc h3 { margin: 0 0 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray-500); }
+  nav.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: section; }
+  nav.toc ol li { counter-increment: section; margin-bottom: 6px; }
+  nav.toc ol li a { display: block; padding: 6px 10px; color: var(--gray-700); text-decoration: none; border-radius: 6px; border-left: 2px solid transparent; transition: all 0.15s; }
+  nav.toc ol li a::before { content: counter(section, decimal-leading-zero) "  "; color: var(--gray-500); font-variant-numeric: tabular-nums; font-size: 12px; }
+  nav.toc ol li a:hover { background: var(--orange-soft); color: var(--orange-deep); border-left-color: var(--orange); }
+  main { padding: 56px 56px 120px; max-width: 980px; }
+  header.hero { margin-bottom: 56px; padding-bottom: 32px; border-bottom: 1px solid var(--gray-300); }
+  header.hero .eyebrow { color: var(--orange); font-size: 13px; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px; font-weight: 600; }
+  header.hero h1 { font-size: 40px; margin: 0 0 12px; letter-spacing: -0.01em; }
+  header.hero p { font-size: 17px; color: var(--gray-700); max-width: 720px; }
+  section { margin-bottom: 64px; scroll-margin-top: 24px; }
+  section > h2 { font-size: 28px; margin: 0 0 8px; padding-top: 16px; border-top: 3px solid var(--orange); display: inline-block; padding-right: 64px; }
+  section > h2 .num { color: var(--orange); font-variant-numeric: tabular-nums; margin-right: 12px; }
+  section > .lead { color: var(--gray-700); font-size: 16px; margin-bottom: 28px; max-width: 760px; }
+  h3 { font-size: 20px; margin: 32px 0 12px; }
+  h4 { font-size: 16px; margin: 20px 0 8px; color: var(--gray-700); }
+  code { font-family: "SF Mono", "Menlo", monospace; font-size: 13px; background: var(--gray-100); padding: 1px 6px; border-radius: 4px; color: var(--orange-deep); }
+  pre { background: #1F1B17; color: #E8E1D9; padding: 18px 22px; border-radius: 10px; overflow-x: auto; font-size: 13px; line-height: 1.6; margin: 16px 0; }
+  pre code { background: transparent; color: inherit; padding: 0; font-size: 13px; }
+  pre .kw { color: #E5A77B; } pre .str { color: #C8E0B4; } pre .com { color: #6F665D; font-style: italic; }
+  pre .fn { color: #93B5E0; } pre .num { color: #E5A77B; } pre .ty { color: #D7B5E5; }
+  .box { border-left: 4px solid var(--gray-300); padding: 16px 20px; border-radius: 6px; margin: 18px 0; background: white; box-shadow: 0 1px 2px rgba(31,27,23,0.04); }
+  .box.info { border-color: var(--blue); background: var(--blue-soft); }
+  .box.warn { border-color: var(--yellow); background: var(--yellow-soft); }
+  .box.error { border-color: var(--red); background: var(--red-soft); }
+  .box.ok { border-color: var(--green); background: var(--green-soft); }
+  .box.note { border-color: var(--orange); background: var(--orange-soft); }
+  .box.purple { border-color: var(--purple); background: var(--purple-soft); }
+  .box.teal { border-color: var(--teal); background: var(--teal-soft); }
+  .box .title { font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .box.info .title { color: var(--blue); } .box.warn .title { color: var(--yellow); }
+  .box.error .title { color: var(--red); } .box.ok .title { color: var(--green); }
+  .box.note .title { color: var(--orange-deep); } .box.purple .title { color: var(--purple); }
+  .box.teal .title { color: var(--teal); }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; background: white; box-shadow: 0 1px 2px rgba(31,27,23,0.04); border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--gray-300); vertical-align: top; }
+  th { background: var(--gray-100); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-700); }
+  tr:last-child td { border-bottom: none; }
+  td code { font-size: 12px; }
+  figure { margin: 24px 0; padding: 24px; background: white; border: 1px solid var(--gray-300); border-radius: 12px; text-align: center; }
+  figure svg { max-width: 100%; height: auto; }
+  figcaption { margin-top: 14px; font-size: 13px; color: var(--gray-500); font-style: italic; }
+  .steps { list-style: none; padding: 0; counter-reset: step; }
+  .steps li { counter-increment: step; position: relative; padding: 14px 18px 14px 56px; background: white; border: 1px solid var(--gray-300); border-radius: 8px; margin-bottom: 10px; }
+  .steps li::before { content: counter(step); position: absolute; left: 14px; top: 12px; width: 30px; height: 30px; border-radius: 50%; background: var(--orange); color: white; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .steps li strong { display: block; margin-bottom: 4px; }
+  .path { font-family: "SF Mono", monospace; font-size: 12px; color: var(--blue); background: var(--blue-soft); padding: 2px 8px; border-radius: 4px; }
+  .lbl { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; margin-right: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .lbl.ok { background: var(--green-soft); color: var(--green); }
+  .lbl.fail { background: var(--red-soft); color: var(--red); }
+  .lbl.warn { background: var(--yellow-soft); color: #8a6520; }
+  .lbl.info { background: var(--blue-soft); color: var(--blue); }
+  @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } nav.toc { display: none; } main { padding: 32px 24px 80px; } }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h3>目录</h3>
+    <ol>
+      <li><a href="#intro">MCP 是什么,为何是行业标准</a></li>
+      <li><a href="#jsonrpc">协议基础 — JSON-RPC 2.0</a></li>
+      <li><a href="#transport">三种传输层对比</a></li>
+      <li><a href="#lifecycle">连接生命周期</a></li>
+      <li><a href="#config">配置 7 层来源</a></li>
+      <li><a href="#memo">connectToServer 的 memoize</a></li>
+      <li><a href="#oauth">OAuth + DCR 完整流程</a></li>
+      <li><a href="#tool">原语 1 — tool</a></li>
+      <li><a href="#resource">原语 2 — resource</a></li>
+      <li><a href="#prompt">原语 3 — prompt</a></li>
+      <li><a href="#sampling">原语 4 — sampling</a></li>
+      <li><a href="#elicit">Elicitation 动态参数</a></li>
+      <li><a href="#notify">通知系统</a></li>
+      <li><a href="#retry">错误恢复</a></li>
+      <li><a href="#isolate">权限隔离与命名空间</a></li>
+      <li><a href="#integration">与 Agent 系统的集成</a></li>
+      <li><a href="#hello">实战:20 行写一个 MCP server</a></li>
+      <li><a href="#principles">可迁移设计原则</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="hero">
+      <div class="eyebrow">Claude Code 源码深度讲解 · 必修篇 1/5</div>
+      <h1>MCP (Model Context Protocol) 系统详解</h1>
+      <p>MCP 是 Anthropic 2024 年推出、现已被 Cursor / Cline / Continue / Zed / Goose 等多家产品采纳的 <strong>agent 工具生态事实标准</strong>。
+      理解它既是做 AI agent 开发必过的一关,也是简历上最硬的 20% 差异化知识点。本文从 JSON-RPC 底层一路讲到实战写一个 MCP server。</p>
+    </header>
+
+    <section id="intro">
+      <h2><span class="num">01</span>MCP 是什么,为何是行业标准</h2>
+      <p class="lead">MCP = Model Context Protocol。它解决一个核心问题:<strong>LLM 客户端</strong>(Claude Code、Cursor、ChatGPT Desktop...)<strong>如何统一地连接到任意工具服务</strong>(GitHub、Slack、数据库、搜索引擎...)。</p>
+      <h3>1.1 MCP 要解决的"N×M 问题"</h3>
+      <figure>
+        <svg viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg">
+          <rect x="20" y="10" width="860" height="240" rx="10" fill="white" stroke="#D9D0C7"/>
+          <text x="450" y="35" text-anchor="middle" font-size="14" font-weight="700">没有 MCP:N × M 对连接</text>
+          <g>
+            <circle cx="150" cy="90" r="28" fill="#E5E8FE" stroke="#5769F7"/><text x="150" y="95" text-anchor="middle" font-size="11">Claude</text>
+            <circle cx="150" cy="160" r="28" fill="#E5E8FE" stroke="#5769F7"/><text x="150" y="165" text-anchor="middle" font-size="11">Cursor</text>
+            <circle cx="150" cy="230" r="28" fill="#E5E8FE" stroke="#5769F7"/><text x="150" y="235" text-anchor="middle" font-size="11">Cline</text>
+            <circle cx="700" cy="70" r="24" fill="#F4E5DD" stroke="#D77757"/><text x="700" y="74" text-anchor="middle" font-size="10">GitHub</text>
+            <circle cx="700" cy="130" r="24" fill="#F4E5DD" stroke="#D77757"/><text x="700" y="134" text-anchor="middle" font-size="10">Slack</text>
+            <circle cx="700" cy="190" r="24" fill="#F4E5DD" stroke="#D77757"/><text x="700" y="194" text-anchor="middle" font-size="10">DB</text>
+            <circle cx="700" cy="250" r="24" fill="#F4E5DD" stroke="#D77757"/><text x="700" y="254" text-anchor="middle" font-size="10">Files</text>
+            <g stroke="#C9534D" stroke-width="1" opacity="0.6">
+              <line x1="178" y1="90" x2="676" y2="70"/><line x1="178" y1="90" x2="676" y2="130"/><line x1="178" y1="90" x2="676" y2="190"/><line x1="178" y1="90" x2="676" y2="250"/>
+              <line x1="178" y1="160" x2="676" y2="70"/><line x1="178" y1="160" x2="676" y2="130"/><line x1="178" y1="160" x2="676" y2="190"/><line x1="178" y1="160" x2="676" y2="250"/>
+              <line x1="178" y1="230" x2="676" y2="70"/><line x1="178" y1="230" x2="676" y2="130"/><line x1="178" y1="230" x2="676" y2="190"/><line x1="178" y1="230" x2="676" y2="250"/>
+            </g>
+            <text x="420" y="140" text-anchor="middle" font-size="11" fill="#C9534D">12 条定制集成</text>
+          </g>
+        </svg>
+        <figcaption>引入 MCP 前:3 个客户端 × 4 个工具 = 12 个特定集成;引入后:3+4=7 个协议实现即可</figcaption>
+      </figure>
+      <h3>1.2 类比:MCP 之于 LLM 工具 = LSP 之于编辑器语言</h3>
+      <p>LSP(Language Server Protocol)让 VSCode / Vim / Emacs / IntelliJ 能共用一套"语言服务器"。
+      MCP 用同样的思路让<strong>任意 LLM 客户端</strong>能共用一套"工具服务器"。</p>
+      <h3>1.3 为什么简历要写它</h3>
+      <ul>
+        <li><strong>标准化</strong>:Anthropic、Google、Microsoft 都在支持</li>
+        <li><strong>可写可调</strong>:官方 SDK 有 TypeScript / Python / Go</li>
+        <li><strong>面试热点</strong>:涉及 JSON-RPC、OAuth、异步消息、schema 设计</li>
+        <li><strong>工程密度高</strong>:auth.ts 单文件 88KB,有大量生产级决策</li>
+      </ul>
+    </section>
+
+    <section id="jsonrpc">
+      <h2><span class="num">02</span>协议基础 — JSON-RPC 2.0</h2>
+      <p class="lead">MCP 底层是 JSON-RPC 2.0,一个极其轻量的 RPC 协议。三种消息类型、一个 id 字段,就把所有交互都统一了。</p>
+      <h3>2.1 三种消息类型</h3>
+      <pre><code><span class="com">// Request(请求) — 必须带 id</span>
+{ <span class="str">"jsonrpc"</span>: <span class="str">"2.0"</span>, <span class="str">"id"</span>: <span class="num">1</span>, <span class="str">"method"</span>: <span class="str">"tools/list"</span>, <span class="str">"params"</span>: {} }
+
+<span class="com">// Response(响应) — 必须带对应 id</span>
+{ <span class="str">"jsonrpc"</span>: <span class="str">"2.0"</span>, <span class="str">"id"</span>: <span class="num">1</span>, <span class="str">"result"</span>: { <span class="str">"tools"</span>: [...] } }
+<span class="com">// 或错误响应</span>
+{ <span class="str">"jsonrpc"</span>: <span class="str">"2.0"</span>, <span class="str">"id"</span>: <span class="num">1</span>, <span class="str">"error"</span>: { <span class="str">"code"</span>: -<span class="num">32601</span>, <span class="str">"message"</span>: <span class="str">"Method not found"</span> } }
+
+<span class="com">// Notification(通知) — 无 id,无需响应</span>
+{ <span class="str">"jsonrpc"</span>: <span class="str">"2.0"</span>, <span class="str">"method"</span>: <span class="str">"notifications/tools/list_changed"</span> }</code></pre>
+      <h3>2.2 MCP 定义的方法清单</h3>
+      <table>
+        <thead><tr><th>方法</th><th>方向</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td><code>initialize</code></td><td>client → server</td><td>握手,交换 capabilities</td></tr>
+          <tr><td><code>notifications/initialized</code></td><td>client → server</td><td>握手完成通知</td></tr>
+          <tr><td><code>tools/list</code></td><td>client → server</td><td>列出工具</td></tr>
+          <tr><td><code>tools/call</code></td><td>client → server</td><td>调用工具</td></tr>
+          <tr><td><code>resources/list</code></td><td>client → server</td><td>列出资源</td></tr>
+          <tr><td><code>resources/read</code></td><td>client → server</td><td>读取资源内容</td></tr>
+          <tr><td><code>prompts/list</code></td><td>client → server</td><td>列出 prompt 模板</td></tr>
+          <tr><td><code>prompts/get</code></td><td>client → server</td><td>实例化 prompt</td></tr>
+          <tr><td><code>sampling/createMessage</code></td><td><strong>server → client</strong></td><td>server 请求 client 调 LLM</td></tr>
+          <tr><td><code>elicitation/create</code></td><td>server → client</td><td>server 向 client 索要缺失参数</td></tr>
+          <tr><td><code>notifications/tools/list_changed</code></td><td>server → client</td><td>工具列表变化</td></tr>
+          <tr><td><code>notifications/resources/updated</code></td><td>server → client</td><td>资源内容更新</td></tr>
+        </tbody>
+      </table>
+      <h3>2.3 握手序列</h3>
+      <figure>
+        <svg viewBox="0 0 860 260" xmlns="http://www.w3.org/2000/svg">
+          <line x1="200" y1="30" x2="200" y2="240" stroke="#5769F7" stroke-width="2"/>
+          <line x1="660" y1="30" x2="660" y2="240" stroke="#D77757" stroke-width="2"/>
+          <text x="200" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#5769F7">Client</text>
+          <text x="660" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#D77757">Server</text>
+          <g stroke="#4A413A" stroke-width="1" fill="none">
+            <line x1="200" y1="60" x2="655" y2="60" marker-end="url(#ah1)"/>
+            <line x1="660" y1="100" x2="205" y2="100" marker-end="url(#ah2)"/>
+            <line x1="200" y1="140" x2="655" y2="140" marker-end="url(#ah1)"/>
+            <line x1="200" y1="180" x2="655" y2="180" marker-end="url(#ah1)"/>
+            <line x1="660" y1="220" x2="205" y2="220" marker-end="url(#ah2)"/>
+          </g>
+          <defs>
+            <marker id="ah1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/></marker>
+            <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/></marker>
+          </defs>
+          <text x="430" y="55" text-anchor="middle" font-size="11">initialize(clientCapabilities)</text>
+          <text x="430" y="95" text-anchor="middle" font-size="11">serverCapabilities + serverInfo</text>
+          <text x="430" y="135" text-anchor="middle" font-size="11" fill="#87796F">notifications/initialized(无响应)</text>
+          <text x="430" y="175" text-anchor="middle" font-size="11">tools/list (request)</text>
+          <text x="430" y="215" text-anchor="middle" font-size="11">{ tools: [...] }</text>
+        </svg>
+        <figcaption>建立连接后的四次交互:握手 + 能力交换 + 工具发现</figcaption>
+      </figure>
+    </section>
+
+    <section id="transport">
+      <h2><span class="num">03</span>三种传输层对比</h2>
+      <p class="lead">JSON-RPC 消息通过什么物理通道传输?MCP 支持 3+ 种,Claude Code 都实现了(<span class="path">src/services/mcp/types.ts:24</span>)。</p>
+      <h3>3.1 传输类型对照(<span class="path">types.ts</span>)</h3>
+      <table>
+        <thead><tr><th>Transport</th><th>进程模型</th><th>网络</th><th>适合场景</th></tr></thead>
+        <tbody>
+          <tr><td><code>stdio</code></td><td>子进程</td><td>无(管道)</td><td>本地工具、CLI 集成、最安全</td></tr>
+          <tr><td><code>sse</code></td><td>远端服务</td><td>HTTP + Server-Sent Events</td><td>旧版远程 server(向后兼容)</td></tr>
+          <tr><td><code>http</code></td><td>远端服务</td><td>HTTP(streamable)</td><td>现代远程 server(推荐)</td></tr>
+          <tr><td><code>ws</code></td><td>远端服务</td><td>WebSocket</td><td>低延迟双向</td></tr>
+          <tr><td><code>sse-ide</code></td><td>IDE 插件</td><td>localhost</td><td>内部:IDE 扩展暴露工具</td></tr>
+          <tr><td><code>ws-ide</code></td><td>IDE 插件</td><td>localhost</td><td>内部:WebSocket IDE</td></tr>
+          <tr><td><code>sdk</code></td><td><strong>同进程</strong></td><td>无</td><td>in-process MCP(SDK 宿主)</td></tr>
+          <tr><td><code>claudeai-proxy</code></td><td>Claude.ai 转发</td><td>HTTP</td><td>内部:订阅用户用</td></tr>
+        </tbody>
+      </table>
+      <h3>3.2 stdio 详解(最常见)</h3>
+      <pre><code><span class="com">// ~/.claude/mcp.json 配置</span>
+{
+  <span class="str">"mcpServers"</span>: {
+    <span class="str">"filesystem"</span>: {
+      <span class="str">"command"</span>: <span class="str">"npx"</span>,
+      <span class="str">"args"</span>: [<span class="str">"-y"</span>, <span class="str">"@modelcontextprotocol/server-filesystem"</span>, <span class="str">"/tmp"</span>],
+      <span class="str">"env"</span>: { <span class="str">"LOG_LEVEL"</span>: <span class="str">"debug"</span> }
+    }
+  }
+}</code></pre>
+      <p>Claude Code 启动时会 <code>spawn('npx', args, { env })</code> 起子进程,通过 stdin/stdout 交换 JSON-RPC 消息,以换行 <code>\n</code> 分隔。</p>
+      <div class="box info">
+        <div class="title">为什么 stdio 最安全</div>
+        子进程只能访问被显式授予的资源(通过 args 和 env)。没有监听端口 → 没有网络攻击面。
+        父进程退出子进程自动终止。适合文件、数据库、本地 API 等场景。
+      </div>
+      <h3>3.3 SSE vs streamable HTTP 区别</h3>
+      <table>
+        <thead><tr><th>方面</th><th>SSE(旧)</th><th>streamable HTTP(新)</th></tr></thead>
+        <tbody>
+          <tr><td>连接数</td><td>2 个(GET 长连接 + POST 短连接)</td><td>1 个(可复用)</td></tr>
+          <tr><td>请求-响应</td><td>分两条路径</td><td>同一个 HTTP 请求内完成</td></tr>
+          <tr><td>代理友好度</td><td>差(SSE 易被代理超时关)</td><td>好(普通 HTTP)</td></tr>
+          <tr><td>推荐程度</td><td><span class="lbl warn">legacy</span></td><td><span class="lbl ok">新项目</span></td></tr>
+        </tbody>
+      </table>
+      <h3>3.4 Claude Code 的长连接特殊处理</h3>
+      <pre><code><span class="com">// client.ts:648 — SSE EventSource 的 fetch 不能用 timeout wrapper</span>
+<span class="com">// 因为 EventSource 是长连接,60 秒 timeout 会杀掉它</span>
+transportOptions.eventSourceInit = {
+  fetch: <span class="fn">async</span> (url, init) =&gt; {
+    <span class="kw">const</span> tokens = <span class="kw">await</span> authProvider.<span class="fn">tokens</span>()
+    <span class="kw">if</span> (tokens) authHeaders.Authorization = <span class="str">`Bearer ${tokens.access_token}`</span>
+    <span class="kw">return</span> <span class="fn">fetch</span>(url, { ...init, headers: { ...init.headers, ...authHeaders } })
+  },
+}
+<span class="com">// POST 则使用带 timeout 的 wrapFetchWithTimeout</span></code></pre>
+    </section>
+
+    <section id="lifecycle">
+      <h2><span class="num">04</span>连接生命周期</h2>
+      <p class="lead">每个 MCP server 都是一个有限状态机,Claude Code 在 <span class="path">src/services/mcp/types.ts:180-226</span> 定义了 5 种状态。</p>
+      <h3>4.1 五种状态</h3>
+      <figure>
+        <svg viewBox="0 0 880 380" xmlns="http://www.w3.org/2000/svg">
+          <defs><marker id="armcp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/></marker></defs>
+          <rect x="40" y="30" width="140" height="50" rx="8" fill="#F7ECD3" stroke="#D9A441"/>
+          <text x="110" y="50" text-anchor="middle" font-size="13" font-weight="700" fill="#8a6520">pending</text>
+          <text x="110" y="68" text-anchor="middle" font-size="10">正在连接</text>
+
+          <rect x="370" y="30" width="140" height="50" rx="8" fill="#E2F0E8" stroke="#5BA67A"/>
+          <text x="440" y="50" text-anchor="middle" font-size="13" font-weight="700" fill="#5BA67A">connected</text>
+          <text x="440" y="68" text-anchor="middle" font-size="10">已连接,工具可用</text>
+
+          <rect x="700" y="30" width="140" height="50" rx="8" fill="#F5DEDC" stroke="#C9534D"/>
+          <text x="770" y="50" text-anchor="middle" font-size="13" font-weight="700" fill="#C9534D">failed</text>
+          <text x="770" y="68" text-anchor="middle" font-size="10">永久失败</text>
+
+          <rect x="40" y="170" width="140" height="50" rx="8" fill="#EDE7F8" stroke="#8B5CF6"/>
+          <text x="110" y="190" text-anchor="middle" font-size="13" font-weight="700" fill="#8B5CF6">needs-auth</text>
+          <text x="110" y="208" text-anchor="middle" font-size="10">需要 OAuth</text>
+
+          <rect x="370" y="170" width="140" height="50" rx="8" fill="white" stroke="#87796F"/>
+          <text x="440" y="190" text-anchor="middle" font-size="13" font-weight="700">disabled</text>
+          <text x="440" y="208" text-anchor="middle" font-size="10">被策略禁用</text>
+
+          <g stroke="#4A413A" fill="none">
+            <line x1="180" y1="55" x2="365" y2="55" marker-end="url(#armcp)"/>
+            <line x1="510" y1="55" x2="695" y2="55" marker-end="url(#armcp)"/>
+            <line x1="180" y1="70" x2="110" y2="165" marker-end="url(#armcp)"/>
+            <line x1="110" y1="220" x2="440" y2="50" marker-end="url(#armcp)" stroke-dasharray="3 3"/>
+          </g>
+          <text x="270" y="45" text-anchor="middle" font-size="10">握手成功</text>
+          <text x="600" y="45" text-anchor="middle" font-size="10">异常</text>
+          <text x="80" y="135" font-size="10" fill="#8B5CF6">401/403</text>
+          <text x="290" y="155" font-size="10" fill="#87796F">OAuth 完成后重试</text>
+
+          <!-- disabled comes from policy -->
+          <line x1="365" y1="195" x2="185" y2="195" stroke="#87796F" stroke-dasharray="3 3" marker-end="url(#armcp)"/>
+          <text x="270" y="250" font-size="10" fill="#87796F">不会自动转换到其他状态</text>
+
+          <rect x="40" y="280" width="800" height="80" rx="8" fill="white" stroke="#D9D0C7"/>
+          <text x="60" y="305" font-size="12" font-weight="700">状态字段差异</text>
+          <text x="60" y="325" font-size="11">• connected: 带 client / capabilities / cleanup 函数</text>
+          <text x="60" y="340" font-size="11">• failed: 带 error 原因字符串</text>
+          <text x="60" y="355" font-size="11">• pending: 带 reconnectAttempt / maxReconnectAttempts</text>
+        </svg>
+        <figcaption>MCPServerConnection 五种状态,disabled 是特殊的"用户禁用",不参与自动转换</figcaption>
+      </figure>
+      <h3>4.2 ConnectedMCPServer 完整结构</h3>
+      <pre><code><span class="com">// types.ts:180</span>
+<span class="kw">type</span> <span class="ty">ConnectedMCPServer</span> = {
+  client: <span class="ty">Client</span>                      <span class="com">// MCP SDK Client 实例</span>
+  name: <span class="ty">string</span>                        <span class="com">// server 配置里的 key</span>
+  type: <span class="str">'connected'</span>
+  capabilities: <span class="ty">ServerCapabilities</span>    <span class="com">// server 声明的能力</span>
+  serverInfo?: { name: <span class="ty">string</span>, version: <span class="ty">string</span> }
+  instructions?: <span class="ty">string</span>              <span class="com">// server 的 system 级提示</span>
+  config: <span class="ty">ScopedMcpServerConfig</span>       <span class="com">// 原始配置 + 来源 scope</span>
+  cleanup: () =&gt; <span class="ty">Promise</span>&lt;<span class="kw">void</span>&gt;         <span class="com">// 关闭连接</span>
+}</code></pre>
+      <h3>4.3 状态转换触发点</h3>
+      <table>
+        <thead><tr><th>转换</th><th>触发源</th><th>代码位置</th></tr></thead>
+        <tbody>
+          <tr><td>pending → connected</td><td><code>connectToServer</code> 握手成功</td><td>client.ts:595</td></tr>
+          <tr><td>pending → failed</td><td>任意非 401 异常</td><td>catch 分支</td></tr>
+          <tr><td>pending → needs-auth</td><td>401 + OAuth 配置</td><td>auth.ts:340</td></tr>
+          <tr><td>connected → needs-auth</td><td>工具调用遇 401</td><td><code>McpAuthError</code> 抛出后</td></tr>
+          <tr><td>needs-auth → connected</td><td>用户完成 OAuth 后重连</td><td>reconnectMcpServerImpl</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="config">
+      <h2><span class="num">05</span>配置 7 层来源</h2>
+      <p class="lead">MCP server 配置可以来自 7 个不同地方,按优先级合并(<span class="path">src/services/mcp/types.ts:10</span>)。</p>
+      <h3>5.1 ConfigScope 7 层</h3>
+      <pre><code><span class="com">// types.ts:10</span>
+<span class="ty">ConfigScope</span> = <span class="str">'local'</span>         <span class="com">// ~/.claude/mcp.json 用户全局</span>
+            | <span class="str">'user'</span>          <span class="com">// 用户级 settings</span>
+            | <span class="str">'project'</span>       <span class="com">// .claude/mcp.json 项目级</span>
+            | <span class="str">'dynamic'</span>       <span class="com">// agent 运行时 inline 定义</span>
+            | <span class="str">'enterprise'</span>    <span class="com">// 企业级(MDM)</span>
+            | <span class="str">'claudeai'</span>      <span class="com">// Claude.ai 集成</span>
+            | <span class="str">'managed'</span>       <span class="com">// 托管策略</span></code></pre>
+      <h3>5.2 合并优先级(由低到高)</h3>
+      <ol class="steps">
+        <li><strong>local</strong>:用户个人的 <code>~/.claude/mcp.json</code></li>
+        <li><strong>user</strong>:<code>~/.claude/settings.json</code> 里的 <code>mcpServers</code></li>
+        <li><strong>project</strong>:项目目录 <code>.claude/mcp.json</code>(团队共享)</li>
+        <li><strong>dynamic</strong>:agent 在 frontmatter 里 inline 定义的 MCP server,用完即销毁</li>
+        <li><strong>claudeai</strong>:Claude.ai 订阅用户的托管 MCP 集成</li>
+        <li><strong>managed</strong>:<code>managed-settings.json</code> 的托管配置</li>
+        <li><strong>enterprise</strong>(最高):MDM 推送的策略,用户无法覆盖</li>
+      </ol>
+      <h3>5.3 策略过滤 — allowlist / denylist</h3>
+      <pre><code><span class="com">// config.ts:364 — 企业可以全局禁用某些 server</span>
+<span class="kw">function</span> <span class="fn">isMcpServerDenied</span>(name, config, denylist) {
+  <span class="com">// 按名字匹配 / 按 URL pattern 匹配</span>
+  <span class="kw">if</span> (denylist.names?.<span class="fn">includes</span>(name)) <span class="kw">return</span> <span class="kw">true</span>
+  <span class="kw">const</span> url = <span class="fn">getServerUrl</span>(config)
+  <span class="kw">if</span> (url &amp;&amp; denylist.urlPatterns?.<span class="fn">some</span>(p =&gt; <span class="fn">urlMatchesPattern</span>(url, p))) <span class="kw">return</span> <span class="kw">true</span>
+  <span class="kw">return</span> <span class="kw">false</span>
+}</code></pre>
+      <h3>5.4 env 变量展开</h3>
+      <pre><code><span class="com">// config.ts:556 — env 值里支持 ${VAR_NAME} 引用</span>
+{
+  <span class="str">"command"</span>: <span class="str">"node"</span>,
+  <span class="str">"args"</span>: [<span class="str">"server.js"</span>],
+  <span class="str">"env"</span>: {
+    <span class="str">"API_KEY"</span>: <span class="str">"${MY_API_KEY}"</span>,    <span class="com">// ← 从 process.env 展开</span>
+    <span class="str">"DB_URL"</span>: <span class="str">"postgres://..."</span>
+  }
+}</code></pre>
+    </section>
+
+    <section id="memo">
+      <h2><span class="num">06</span>connectToServer 的 memoize</h2>
+      <p class="lead"><code>connectToServer</code> 被 lodash <code>memoize</code> 包装,cache key 是 <code>name + JSON.stringify(config)</code>。这个看似简单的优化解决了一个关键工程问题。</p>
+      <h3>6.1 为什么要 memoize</h3>
+      <pre><code><span class="com">// client.ts:581</span>
+<span class="kw">export function</span> <span class="fn">getServerCacheKey</span>(name, serverRef) {
+  <span class="kw">return</span> <span class="str">`${name}-${jsonStringify(serverRef)}`</span>
+}
+
+<span class="kw">export const</span> connectToServer = <span class="fn">memoize</span>(
+  <span class="kw">async</span> (name, serverRef, serverStats) =&gt; { ... },
+  getServerCacheKey
+)</code></pre>
+      <div class="box info">
+        <div class="title">设计考量</div>
+        同一个 MCP server 可能被<strong>多个 agent 引用</strong>:主线程、子 agent 1、子 agent 2 都可能用 <code>github</code> server。
+        如果每个 agent 各自 spawn 一次 npx,会有:
+        <ul>
+          <li>同一 OAuth token 的三次并行 refresh</li>
+          <li>子进程开销(npx 冷启动 ~2s)×3</li>
+          <li>文件锁 / 端口冲突</li>
+        </ul>
+        memoize 保证同名 + 同配置的 server 只连一次,多个 agent 共享 client 实例。
+      </div>
+      <h3>6.2 反面:什么时候必须新建连接</h3>
+      <p>agent frontmatter 里写的 inline server(scope='dynamic')会带上 agent 特定的配置。这种情况 cacheKey 不同,会新建一个连接,跟着 agent 生命周期走 —— 这在 multi-agent 篇的 <code>initializeAgentMcpServers</code> 里已经讲过。</p>
+      <h3>6.3 clearServerCache 的用法</h3>
+      <pre><code><span class="com">// client.ts:1650</span>
+<span class="kw">export async function</span> <span class="fn">clearServerCache</span>(name: <span class="ty">string</span>, config?: <span class="ty">ScopedMcpServerConfig</span>) {
+  <span class="com">// 先关闭该连接的所有资源</span>
+  <span class="com">// 然后 connectToServer.cache.delete(key)</span>
+  <span class="com">// 下一次 connectToServer 调用会重新建立连接</span>
+}</code></pre>
+      <p>用途:OAuth token 更新后、用户改动配置后、reconnect 命令等。</p>
+    </section>
+
+    <section id="oauth">
+      <h2><span class="num">07</span>OAuth + DCR 完整流程</h2>
+      <p class="lead">远端 MCP server 要做 OAuth 认证。Claude Code 用的是 OAuth 2.1 + PKCE + Dynamic Client Registration 组合。整个 <span class="path">auth.ts</span> 有 88KB,处理各种边缘情况。</p>
+      <h3>7.1 完整流程</h3>
+      <figure>
+        <svg viewBox="0 0 920 460" xmlns="http://www.w3.org/2000/svg">
+          <defs><marker id="aroauth" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4A413A"/></marker></defs>
+          <line x1="100" y1="40" x2="100" y2="430" stroke="#5769F7" stroke-width="2"/>
+          <line x1="450" y1="40" x2="450" y2="430" stroke="#D77757" stroke-width="2"/>
+          <line x1="800" y1="40" x2="800" y2="430" stroke="#8B5CF6" stroke-width="2"/>
+          <text x="100" y="30" text-anchor="middle" font-size="12" font-weight="700" fill="#5769F7">Client (Claude Code)</text>
+          <text x="450" y="30" text-anchor="middle" font-size="12" font-weight="700" fill="#D77757">MCP Server</text>
+          <text x="800" y="30" text-anchor="middle" font-size="12" font-weight="700" fill="#8B5CF6">Auth Server</text>
+
+          <g stroke="#4A413A" fill="none">
+            <line x1="100" y1="70" x2="445" y2="70" marker-end="url(#aroauth)"/>
+            <line x1="450" y1="105" x2="105" y2="105" marker-end="url(#aroauth)"/>
+            <line x1="100" y1="140" x2="795" y2="140" marker-end="url(#aroauth)"/>
+            <line x1="800" y1="175" x2="105" y2="175" marker-end="url(#aroauth)"/>
+            <line x1="100" y1="210" x2="795" y2="210" marker-end="url(#aroauth)"/>
+            <line x1="800" y1="245" x2="105" y2="245" marker-end="url(#aroauth)"/>
+            <line x1="100" y1="285" x2="795" y2="285" marker-end="url(#aroauth)"/>
+            <line x1="800" y1="320" x2="105" y2="320" marker-end="url(#aroauth)"/>
+            <line x1="100" y1="360" x2="445" y2="360" marker-end="url(#aroauth)"/>
+            <line x1="450" y1="395" x2="105" y2="395" marker-end="url(#aroauth)"/>
+          </g>
+          <text x="275" y="65" text-anchor="middle" font-size="10">① GET /sse 无 token</text>
+          <text x="275" y="100" text-anchor="middle" font-size="10">② 401 + WWW-Authenticate resource_metadata_url</text>
+          <text x="450" y="135" text-anchor="middle" font-size="10">③ 获取 resource metadata 拿到 auth server URL</text>
+          <text x="450" y="170" text-anchor="middle" font-size="10">④ 获取 /.well-known/oauth-authorization-server</text>
+          <text x="450" y="205" text-anchor="middle" font-size="10">⑤ POST /register(DCR,动态注册 client)</text>
+          <text x="450" y="240" text-anchor="middle" font-size="10">⑥ 返回 client_id + client_secret</text>
+          <text x="450" y="280" text-anchor="middle" font-size="10">⑦ 浏览器打开 /authorize + PKCE code_challenge</text>
+          <text x="450" y="315" text-anchor="middle" font-size="10">⑧ 用户授权,callback + code 回到本地端口</text>
+          <text x="275" y="355" text-anchor="middle" font-size="10">⑨ POST /token + code_verifier(PKCE)</text>
+          <text x="275" y="390" text-anchor="middle" font-size="10">⑩ access_token + refresh_token 存入 keychain</text>
+        </svg>
+        <figcaption>完整 OAuth + DCR 流程,10 步内完成从"未认证"到"拿到 token"</figcaption>
+      </figure>
+      <h3>7.2 PKCE 为什么重要</h3>
+      <p>没有 PKCE(Proof Key for Code Exchange),攻击者可以拦截 authorization code 换 token。PKCE 让 client 在 /authorize 时发送 <code>code_challenge = SHA256(random_verifier)</code>,在 /token 时发送原始 <code>code_verifier</code>。服务端校验后才发 token。</p>
+      <h3>7.3 DCR(动态客户端注册)</h3>
+      <p>传统 OAuth 要求 client 预先在 provider 那注册拿 client_id。但 MCP 是<strong>动态发现</strong>的 —— 用户今天才知道要用这个 server。DCR(RFC 7591)允许 client 自动 POST 到 <code>/register</code> 端点动态拿 client_id,解决这个 chicken-and-egg 问题。</p>
+      <h3>7.4 Token 刷新</h3>
+      <pre><code><span class="com">// ClaudeAuthProvider(auth.ts:1376)是 MCP SDK 的 OAuthClientProvider 实现</span>
+<span class="kw">class</span> <span class="ty">ClaudeAuthProvider</span> <span class="kw">implements</span> <span class="ty">OAuthClientProvider</span> {
+  <span class="kw">async</span> <span class="fn">tokens</span>(): <span class="ty">Promise</span>&lt;<span class="ty">OAuthTokens</span> | <span class="kw">undefined</span>&gt;
+  <span class="kw">async</span> <span class="fn">saveTokens</span>(tokens): <span class="ty">Promise</span>&lt;<span class="kw">void</span>&gt;
+  <span class="kw">async</span> <span class="fn">redirectToAuthorization</span>(url): <span class="ty">Promise</span>&lt;<span class="kw">void</span>&gt;  <span class="com">// 打开浏览器</span>
+  <span class="kw">async</span> <span class="fn">saveCodeVerifier</span>(verifier): <span class="ty">Promise</span>&lt;<span class="kw">void</span>&gt;
+  <span class="kw">async</span> <span class="fn">codeVerifier</span>(): <span class="ty">Promise</span>&lt;<span class="ty">string</span>&gt;
+}</code></pre>
+      <p>Token 用本地系统 keychain 保存(macOS Keychain / Windows Credential / libsecret),不写明文文件。</p>
+      <h3>7.5 Step-Up Authentication</h3>
+      <p>某些 API 需要"加强认证"。server 返回 403 + <code>insufficient_scope</code>,client 需要重新走一次 OAuth 但带上 <code>scope=higher</code>。<code>wrapFetchWithStepUpDetection</code>(auth.ts:1354) 在 fetch 层做拦截。</p>
+    </section>
+
+    <section id="tool">
+      <h2><span class="num">08</span>原语 1 — tool</h2>
+      <p class="lead">Tool 是最常用的原语,90% 的 MCP server 只提供 tool。</p>
+      <h3>8.1 tool 的生命周期</h3>
+      <ol class="steps">
+        <li><strong>discover</strong>:<code>tools/list</code> 返回 [{name, description, inputSchema}]</li>
+        <li><strong>normalize</strong>:服务端工具名可能含非法字符,client 做规范化(<span class="path">normalization.ts</span>)。规则:name → <code>mcp__&lt;server&gt;__&lt;normalizedName&gt;</code></li>
+        <li><strong>register</strong>:包装成 Claude Code 的 Tool 接口,加入 tool pool</li>
+        <li><strong>call</strong>:<code>tools/call</code> 传入 {name, arguments},返回 {content, isError}</li>
+      </ol>
+      <h3>8.2 名字规范化</h3>
+      <pre><code><span class="com">// 服务端原始名</span>
+<span class="str">"create-issue"</span>  (含连字符)
+<span class="str">"github.search"</span> (含点)
+
+<span class="com">// 经过规范化</span>
+<span class="str">"mcp__github__create_issue"</span>
+<span class="str">"mcp__github__github_search"</span>
+
+<span class="com">// 规则:下划线化,加前缀,保留原名供反查</span></code></pre>
+      <h3>8.3 Content 类型</h3>
+      <pre><code><span class="com">// tool 结果可以是多种内容类型混合</span>
+<span class="ty">MCPToolResult</span> = {
+  content: <span class="ty">Array</span>&lt;
+    | { type: <span class="str">'text'</span>, text: <span class="ty">string</span> }
+    | { type: <span class="str">'image'</span>, data: <span class="ty">string</span>, mimeType: <span class="ty">string</span> }    <span class="com">// base64</span>
+    | { type: <span class="str">'resource'</span>, resource: { uri, mimeType, text? / blob? } }
+  &gt;
+  isError?: <span class="ty">boolean</span>
+  _meta?: <span class="ty">Record</span>&lt;<span class="ty">string</span>, <span class="ty">unknown</span>&gt;    <span class="com">// 非模型可见元数据</span>
+}</code></pre>
+      <h3>8.4 client 侧 transformResultContent</h3>
+      <pre><code><span class="com">// client.ts:2480 — 处理 resource 嵌套、blob 持久化</span>
+<span class="kw">export async function</span> <span class="fn">transformResultContent</span>(content, toolName, serverName) {
+  <span class="com">// 1. text 直接透传</span>
+  <span class="com">// 2. image 检查 size &lt; 限制,否则截断</span>
+  <span class="com">// 3. resource(blob) 先落盘到 /tmp,content 替换为 "[saved to /tmp/xxx]"</span>
+  <span class="com">// 4. resource(text) 内嵌</span>
+}</code></pre>
+    </section>
+
+    <section id="resource">
+      <h2><span class="num">09</span>原语 2 — resource</h2>
+      <p class="lead">Resource 是 server 暴露给 client 的"可读内容",用 URI 标识。像 REST 的 GET,只是没有 body。</p>
+      <h3>9.1 例子</h3>
+      <pre><code><span class="com">// filesystem MCP server 暴露文件为 resource</span>
+{ uri: <span class="str">"file:///Users/me/project/README.md"</span>, name: <span class="str">"README"</span>, mimeType: <span class="str">"text/markdown"</span> }
+{ uri: <span class="str">"file:///Users/me/project/src/index.ts"</span>, ... }
+
+<span class="com">// PostgreSQL MCP 暴露表</span>
+{ uri: <span class="str">"postgres://users"</span>, name: <span class="str">"users table"</span>, mimeType: <span class="str">"application/json"</span> }
+
+<span class="com">// Git MCP 暴露 branch</span>
+{ uri: <span class="str">"git://branch/main"</span>, name: <span class="str">"main branch"</span>, ... }</code></pre>
+      <h3>9.2 URI template(RFC 6570)</h3>
+      <p>server 可以返回 URI template,client 按模板填参:</p>
+      <pre><code>{ uriTemplate: <span class="str">"file:///{path}"</span> }
+<span class="com">// client 填参数:file:///Users/me/specific.txt</span></code></pre>
+      <h3>9.3 订阅变化</h3>
+      <pre><code><span class="com">// client 订阅</span>
+{ method: <span class="str">"resources/subscribe"</span>, params: { uri: <span class="str">"file:///watched/log.txt"</span> } }
+
+<span class="com">// server 内容变化时推送 notification</span>
+{ method: <span class="str">"notifications/resources/updated"</span>, params: { uri: <span class="str">"file:///watched/log.txt"</span> } }
+
+<span class="com">// client 收到通知后重新 resources/read</span></code></pre>
+      <h3>9.4 Resource 在 Claude Code 的使用</h3>
+      <p>Claude Code 通过 <code>prefetchAllMcpResources</code>(<span class="path">client.ts:2410</span>)在连接建立后预取资源列表,展示在 UI 里供用户 <code>@</code> 引用。</p>
+    </section>
+
+    <section id="prompt">
+      <h2><span class="num">10</span>原语 3 — prompt</h2>
+      <p class="lead">Prompt 是 server 提供的"prompt 模板",类似 slash command。用户/agent 用参数实例化,得到完整消息。</p>
+      <h3>10.1 例子</h3>
+      <pre><code><span class="com">// Git MCP server 提供 prompt</span>
+{
+  name: <span class="str">"review_pr"</span>,
+  description: <span class="str">"Review a pull request for issues"</span>,
+  arguments: [
+    { name: <span class="str">"pr_number"</span>, required: <span class="kw">true</span> },
+    { name: <span class="str">"focus"</span>, required: <span class="kw">false</span> }
+  ]
+}
+
+<span class="com">// client 调用:</span>
+{ method: <span class="str">"prompts/get"</span>, params: { name: <span class="str">"review_pr"</span>, arguments: { pr_number: <span class="str">"123"</span> } } }
+
+<span class="com">// server 返回实例化后的消息:</span>
+{
+  messages: [
+    { role: <span class="str">"user"</span>, content: { type: <span class="str">"text"</span>, text: <span class="str">"Review PR #123 carefully..."</span> } }
+  ]
+}</code></pre>
+      <h3>10.2 为什么单独的原语</h3>
+      <div class="box info">
+        <div class="title">把"怎么问"也变成 server 的能力</div>
+        常规模式是 client 写 prompt → 调 server 的工具。但很多 server 希望自己控制"使用说明"。
+        prompts/get 让 server 能把"查询专家提示词"、"代码 review 清单"等模板化提示随工具一起分发,
+        不需要用户自己背记。
+      </div>
+    </section>
+
+    <section id="sampling">
+      <h2><span class="num">11</span>原语 4 — sampling(反向调用)</h2>
+      <p class="lead">Sampling 是 MCP 最反直觉的原语:<strong>server 请求 client 用 LLM</strong>。方向反了。</p>
+      <h3>11.1 场景</h3>
+      <pre><code><span class="com">// 一个"代码审查" MCP server 的内部逻辑:</span>
+<span class="com">// 1. 用户调工具 reviewCode(code)</span>
+<span class="com">// 2. server 自己需要调 LLM 分析(但 server 没有 API key!)</span>
+<span class="com">// 3. server 发 sampling/createMessage 给 client:</span>
+{
+  method: <span class="str">"sampling/createMessage"</span>,
+  params: {
+    messages: [{ role: <span class="str">"user"</span>, content: <span class="str">"Analyze: ..."</span> }],
+    maxTokens: <span class="num">2000</span>,
+    systemPrompt: <span class="str">"You are a code reviewer..."</span>
+  }
+}
+<span class="com">// 4. client 用自己的 LLM 跑(消耗用户 API 配额)</span>
+<span class="com">// 5. 结果返回给 server</span>
+<span class="com">// 6. server 综合后返回给调用工具的那一方</span></code></pre>
+      <h3>11.2 为什么有这个</h3>
+      <ul>
+        <li>server 不需要自己持有 LLM 凭证</li>
+        <li>用户可以控制模型选择、成本、cache</li>
+        <li>隐私:敏感数据不需要发给 server 再发给 LLM</li>
+      </ul>
+      <div class="box warn">
+        <div class="title">安全风险</div>
+        恶意 server 可能用 sampling 偷你的 LLM 配额做任意事。MCP 规范要求 client <strong>在 sampling 请求前显示预览给用户 approve</strong>。Claude Code 目前<strong>不默认支持 sampling</strong>,只在白名单 server 上启用。
+      </div>
+    </section>
+
+    <section id="elicit">
+      <h2><span class="num">12</span>Elicitation 动态参数</h2>
+      <p class="lead">工具调用时 server 发现参数不全,可以<strong>向 client 反问</strong>要缺失的参数。</p>
+      <h3>12.1 流程</h3>
+      <pre><code><span class="com">// 模型调:createFile({ path: "foo.ts" })  — 少了 content 参数</span>
+<span class="com">// server 不是返回 error,而是:</span>
+{
+  method: <span class="str">"elicitation/create"</span>,
+  params: {
+    message: <span class="str">"What should be the file content?"</span>,
+    requestedSchema: { type: <span class="str">"object"</span>, properties: { content: { type: <span class="str">"string"</span> } } }
+  }
+}
+<span class="com">// client 收到后:</span>
+<span class="com">//   - 打开一个对话框让用户填(UI mode)</span>
+<span class="com">//   - 或传给模型让它填(auto mode)</span>
+<span class="com">// 然后发回 server,server 继续执行工具</span></code></pre>
+      <h3>12.2 URL Elicitation 特例</h3>
+      <pre><code><span class="com">// client.ts:2815 — 专门处理"打开 URL 让用户点击"型 elicitation</span>
+<span class="kw">async function</span> <span class="fn">callMCPToolWithUrlElicitationRetry</span>({ ..., handleElicitation }) {
+  <span class="kw">for</span> (<span class="kw">let</span> attempt = <span class="num">0</span>; ; attempt++) {
+    <span class="kw">try</span> { <span class="kw">return await</span> <span class="fn">callToolFn</span>(...) }
+    <span class="kw">catch</span> (error) {
+      <span class="kw">if</span> (!(error <span class="kw">instanceof</span> <span class="ty">McpError</span>) ||
+          error.code !== ErrorCode.UrlElicitationRequired) <span class="kw">throw</span> error
+      <span class="kw">if</span> (attempt &gt;= MAX_URL_ELICITATION_RETRIES) <span class="kw">throw</span> error
+      <span class="kw">await</span> <span class="fn">handleElicitation</span>(serverName, params, signal)
+      <span class="com">// 然后循环重试,希望这次 server 不再需要</span>
+    }
+  }
+}</code></pre>
+    </section>
+
+    <section id="notify">
+      <h2><span class="num">13</span>通知系统</h2>
+      <p class="lead">server 可以主动通知 client 状态变化,无需 client 轮询。</p>
+      <h3>13.1 主要通知类型</h3>
+      <table>
+        <thead><tr><th>通知</th><th>触发</th><th>Claude Code 响应</th></tr></thead>
+        <tbody>
+          <tr><td><code>tools/list_changed</code></td><td>server 动态加减工具</td><td>重新 tools/list,更新 tool pool</td></tr>
+          <tr><td><code>resources/list_changed</code></td><td>资源列表变</td><td>重新 resources/list</td></tr>
+          <tr><td><code>resources/updated</code></td><td>订阅的资源内容变</td><td>通知订阅方,重新 resources/read</td></tr>
+          <tr><td><code>prompts/list_changed</code></td><td>prompt 变化</td><td>刷新 prompts 列表</td></tr>
+          <tr><td><code>progress</code></td><td>长任务进度</td><td>onProgress 回调更新 UI</td></tr>
+          <tr><td><code>log/message</code></td><td>server 打日志</td><td>记录到 client 调试日志</td></tr>
+        </tbody>
+      </table>
+      <h3>13.2 progress 通知的特殊处理</h3>
+      <pre><code><span class="com">// server 在执行 reviewCode 时每完成一个文件发一次 progress</span>
+{ method: <span class="str">"notifications/progress"</span>, params: {
+  progressToken: <span class="str">"req-42"</span>,       <span class="com">// 关联到哪个 request</span>
+  progress: <span class="num">30</span>, total: <span class="num">100</span>,
+  message: <span class="str">"Reviewed src/foo.ts"</span>
+}}
+<span class="com">// client 通过 onProgress 回调显示进度条</span></code></pre>
+    </section>
+
+    <section id="retry">
+      <h2><span class="num">14</span>错误恢复</h2>
+      <p class="lead">MCP 的错误有三个层级:传输层、协议层、应用层。每种都有不同恢复策略。</p>
+      <h3>14.1 传输层错误</h3>
+      <table>
+        <thead><tr><th>错误</th><th>原因</th><th>恢复</th></tr></thead>
+        <tbody>
+          <tr><td>ECONNRESET</td><td>连接断</td><td>reconnectMcpServerImpl 重连</td></tr>
+          <tr><td>ETIMEDOUT</td><td>超时</td><td>指数退避重试</td></tr>
+          <tr><td>stdio pipe closed</td><td>子进程死了</td><td>重新 spawn,重新握手</td></tr>
+        </tbody>
+      </table>
+      <h3>14.2 协议层错误(JSON-RPC)</h3>
+      <pre><code><span class="com">// 标准错误码</span>
+-<span class="num">32700</span> Parse error
+-<span class="num">32600</span> Invalid Request
+-<span class="num">32601</span> Method not found
+-<span class="num">32602</span> Invalid params
+-<span class="num">32603</span> Internal error
+
+<span class="com">// MCP 扩展码</span>
+ErrorCode.UrlElicitationRequired   <span class="com">// 需要 URL elicitation</span>
+ErrorCode.AuthorizationRequired    <span class="com">// 需要认证</span></code></pre>
+      <h3>14.3 应用层(tools/call 的 isError)</h3>
+      <p>工具返回 <code>isError: true</code> 不是协议错误 —— 而是"工具说执行失败"。client 应该把它作为 tool_result 喂给模型,让模型自己决定怎么办。这跟<strong>协议错误</strong>截然不同。</p>
+      <h3>14.4 重试次数上限</h3>
+      <pre><code><span class="com">// URL elicitation 重试 3 次</span>
+<span class="kw">const</span> MAX_URL_ELICITATION_RETRIES = <span class="num">3</span>
+
+<span class="com">// 连接重试通过 reconnectAttempt / maxReconnectAttempts</span>
+<span class="com">// 失败后转 failed 状态,用户需要手动 /mcp reconnect</span></code></pre>
+    </section>
+
+    <section id="isolate">
+      <h2><span class="num">15</span>权限隔离与命名空间</h2>
+      <p class="lead">一个 client 连多个 MCP server 时,如何防止工具名冲突、权限串扰?</p>
+      <h3>15.1 命名空间</h3>
+      <pre><code><span class="com">// 服务端原始工具名 "create_issue"</span>
+<span class="com">// 在 client 侧一律带 server 前缀:</span>
+<span class="str">"mcp__github__create_issue"</span>
+<span class="str">"mcp__gitlab__create_issue"</span>
+
+<span class="com">// 这样权限规则可以按 server 粒度控制:</span>
+<span class="str">"mcp__github(*)"</span>   <span class="com">// 允许 GitHub 所有工具</span>
+<span class="str">"mcp__gitlab(create_issue)"</span>   <span class="com">// 只允许 GitLab 创建 issue</span></code></pre>
+      <h3>15.2 channelPermissions</h3>
+      <p><span class="path">channelPermissions.ts</span> 负责"哪些 MCP server 的工具可以在什么 context 下使用"。比如 plugin 提供的 MCP server 只能被该 plugin 的 agent 用,不被其他 agent 看到。</p>
+      <h3>15.3 admin-trusted gate</h3>
+      <pre><code><span class="com">// runAgent.ts:124 — 企业策略可锁 MCP 为 "plugin-only"</span>
+<span class="kw">const</span> agentIsAdminTrusted = <span class="fn">isSourceAdminTrusted</span>(agentDefinition.source)
+<span class="kw">if</span> (<span class="fn">isRestrictedToPluginOnly</span>(<span class="str">'mcp'</span>) &amp;&amp; !agentIsAdminTrusted) {
+  <span class="com">// 用户自定义 agent 不能引入 MCP server</span>
+  <span class="kw">return</span> { clients: parentClients, tools: [], cleanup: <span class="fn">async</span>() =&gt; {} }
+}</code></pre>
+    </section>
+
+    <section id="integration">
+      <h2><span class="num">16</span>与 Agent 系统的集成</h2>
+      <p class="lead">MCP client 产出的 Tool 如何流入 Claude Code 的主循环?</p>
+      <h3>16.1 启动期发现</h3>
+      <pre><code><span class="com">// bootstrap 阶段</span>
+<span class="kw">const</span> configs = <span class="kw">await</span> <span class="fn">getAllMcpConfigs</span>()      <span class="com">// 合并 7 层配置</span>
+<span class="kw">const</span> clients = <span class="kw">await</span> <span class="fn">Promise.all</span>(
+  Object.<span class="fn">entries</span>(configs).<span class="fn">map</span>(([name, config]) =&gt; <span class="fn">connectToServer</span>(name, config))
+)
+<span class="com">// clients: Array&lt;MCPServerConnection&gt;</span>
+
+<span class="kw">const</span> mcpTools = <span class="kw">await</span> <span class="fn">getMcpToolsCommandsAndResources</span>(clients)
+<span class="com">// mcpTools: Array&lt;Tool&gt;</span></code></pre>
+      <h3>16.2 注入主线程 tool pool</h3>
+      <pre><code><span class="com">// assembleToolPool(tools.ts)</span>
+<span class="kw">function</span> <span class="fn">assembleToolPool</span>(permissionContext, mcpTools) {
+  <span class="kw">return</span> [
+    ...BUILTIN_TOOLS,
+    ...mcpTools,              <span class="com">// MCP 工具作为一等公民</span>
+  ].<span class="fn">filter</span>(t =&gt; isAllowedByMode(t, permissionContext))
+}</code></pre>
+      <h3>16.3 agent 私有 MCP server</h3>
+      <p>见 multi-agent 篇的 <code>initializeAgentMcpServers</code> —— agent frontmatter 可以 inline 定义 server,仅在该 agent 生命周期内存在。</p>
+      <h3>16.4 runtime 添加 server(/mcp add)</h3>
+      <p>用户可在 REPL 里 <code>/mcp add</code> 动态添加一个 server,系统会:</p>
+      <ol>
+        <li>写配置到 <code>~/.claude/mcp.json</code>(或 project <code>.claude/mcp.json</code>)</li>
+        <li>调 <code>connectToServer</code> 建立连接</li>
+        <li>通过 <code>refreshTools</code> 把新工具加入 tool pool</li>
+        <li>下一回合模型就能看到新工具</li>
+      </ol>
+    </section>
+
+    <section id="hello">
+      <h2><span class="num">17</span>实战:20 行写一个 MCP server</h2>
+      <p class="lead">理解协议最好的方式是写一个。下面是一个完整的 echo server。</p>
+      <h3>17.1 package.json</h3>
+      <pre><code>{
+  <span class="str">"name"</span>: <span class="str">"echo-mcp-server"</span>,
+  <span class="str">"version"</span>: <span class="str">"1.0.0"</span>,
+  <span class="str">"type"</span>: <span class="str">"module"</span>,
+  <span class="str">"bin"</span>: { <span class="str">"echo-mcp"</span>: <span class="str">"./index.js"</span> },
+  <span class="str">"dependencies"</span>: { <span class="str">"@modelcontextprotocol/sdk"</span>: <span class="str">"^1.0.0"</span> }
+}</code></pre>
+      <h3>17.2 index.js</h3>
+      <pre><code><span class="com">// #!/usr/bin/env node</span>
+<span class="kw">import</span> { Server } <span class="kw">from</span> <span class="str">"@modelcontextprotocol/sdk/server/index.js"</span>
+<span class="kw">import</span> { StdioServerTransport } <span class="kw">from</span> <span class="str">"@modelcontextprotocol/sdk/server/stdio.js"</span>
+
+<span class="kw">const</span> server = <span class="kw">new</span> <span class="ty">Server</span>(
+  { name: <span class="str">"echo"</span>, version: <span class="str">"1.0.0"</span> },
+  { capabilities: { tools: {} } }
+)
+
+server.<span class="fn">setRequestHandler</span>(<span class="str">"tools/list"</span>, <span class="fn">async</span> () =&gt; ({
+  tools: [{
+    name: <span class="str">"echo"</span>,
+    description: <span class="str">"Echo the input text"</span>,
+    inputSchema: {
+      type: <span class="str">"object"</span>,
+      properties: { text: { type: <span class="str">"string"</span> } },
+      required: [<span class="str">"text"</span>]
+    }
+  }]
+}))
+
+server.<span class="fn">setRequestHandler</span>(<span class="str">"tools/call"</span>, <span class="fn">async</span> (req) =&gt; ({
+  content: [{ type: <span class="str">"text"</span>, text: req.params.arguments.text }]
+}))
+
+<span class="kw">const</span> transport = <span class="kw">new</span> <span class="ty">StdioServerTransport</span>()
+<span class="kw">await</span> server.<span class="fn">connect</span>(transport)</code></pre>
+      <h3>17.3 在 Claude Code 里用</h3>
+      <pre><code><span class="com">// ~/.claude/mcp.json</span>
+{
+  <span class="str">"mcpServers"</span>: {
+    <span class="str">"echo"</span>: {
+      <span class="str">"command"</span>: <span class="str">"node"</span>,
+      <span class="str">"args"</span>: [<span class="str">"/absolute/path/to/index.js"</span>]
+    }
+  }
+}</code></pre>
+      <p>重启 Claude Code,模型即可调 <code>mcp__echo__echo({ text: "hello" })</code>。</p>
+      <div class="box ok">
+        <div class="title">调试技巧</div>
+        server 的 stdout 是协议通道,stderr 是日志通道。用 <code>console.error()</code> 打日志,
+        Claude Code 会在 <code>/mcp logs</code> 里显示。永远不要用 <code>console.log()</code>,会污染协议流。
+      </div>
+    </section>
+
+    <section id="principles">
+      <h2><span class="num">18</span>可迁移设计原则</h2>
+      <p class="lead">从 MCP 学到的 6 条可迁移到任何 agent 系统的原则。</p>
+      <ol class="steps">
+        <li>
+          <strong>标准化接口胜过更强的 SDK</strong>
+          <p>Anthropic 本可以为 Claude 做一套独占 SDK。选择开放标准意味着"我可能会失去定价权,但会赢得生态"。
+          事实证明生态效应远大于短期锁定。对 AI agent 开发者:<strong>优先选择开放标准而非单一厂商 SDK</strong>。</p>
+        </li>
+        <li>
+          <strong>JSON-RPC 的简洁胜过 gRPC / 自定义协议</strong>
+          <p>JSON-RPC 文本、自描述、易调试、易嵌入任何语言。gRPC 性能更好但重量十倍。在 LLM 场景,网络延迟远大于序列化,JSON-RPC 是绝配。</p>
+        </li>
+        <li>
+          <strong>能力协商胜过固定接口</strong>
+          <p><code>initialize</code> 阶段 client/server 各自声明 capabilities,后续只调用双方都支持的方法。这让协议能无缝演进:新增能力不破坏旧 client。</p>
+        </li>
+        <li>
+          <strong>反向 RPC(sampling)是生态杀手锏</strong>
+          <p>允许 server 调 client 的 LLM 从根本上改变了权力关系 —— server 不再需要持有模型凭证,用户控制成本。
+          <strong>设计协议时多考虑双向性</strong>。</p>
+        </li>
+        <li>
+          <strong>Elicitation:对话式工具调用</strong>
+          <p>传统工具"参数不全就报错",elicitation 让 server 能反问 client。这是把"工具调用"从<strong>一次性 RPC</strong>升级到<strong>多轮对话</strong>的关键设计。</p>
+        </li>
+        <li>
+          <strong>命名空间防冲突胜过全局工具名</strong>
+          <p><code>mcp__&lt;server&gt;__&lt;tool&gt;</code> 的三段式名字让权限规则可按 server 粒度控制,也让多个 server 可以有同名工具(github/create_issue vs gitlab/create_issue)。
+          <strong>多租户协议必须命名空间化</strong>。</p>
+        </li>
+      </ol>
+      <div class="box note">
+        <div class="title">MCP 的未来方向</div>
+        2025 年活跃的演进包括:streamable HTTP 替代 SSE、sampling 的安全模型、多 root 支持、
+        WebTransport 低延迟传输、plugin-based MCP marketplace。
+        跟进 MCP 规范就是跟进整个 AI agent 生态。
+      </div>
+    </section>
+
+    <footer style="margin-top:80px; padding-top:32px; border-top:1px solid var(--gray-300); color:var(--gray-500); font-size:13px;">
+      <p>本文基于 Claude Code 反编译版源码(commit 1173a62)。
+      关键文件:<span class="path">src/services/mcp/{client.ts, auth.ts, config.ts, types.ts, normalization.ts, elicitationHandler.ts}</span>、
+      <span class="path">packages/mcp-client/</span>、<span class="path">@modelcontextprotocol/sdk</span>。</p>
+    </footer>
+  </main>
+</div>
+</body>
+</html>

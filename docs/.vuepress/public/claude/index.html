@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Claude Code 源码解析索引</title>
+<style>
+:root {
+  --bg: #03050b;
+  --panel: rgba(12, 18, 32, 0.72);
+  --line: rgba(216, 185, 130, 0.18);
+  --text: rgba(232, 238, 247, 0.9);
+  --muted: rgba(169, 181, 199, 0.72);
+  --gold: #d8b982;
+  --blue: #9ccdf8;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background:
+    radial-gradient(circle at 12% 7%, rgba(156, 205, 248, 0.13), transparent 30rem),
+    radial-gradient(circle at 82% 16%, rgba(216, 185, 130, 0.11), transparent 28rem),
+    linear-gradient(135deg, #03050b 0%, #07101d 46%, #02030a 100%);
+}
+a { color: inherit; text-decoration: none; }
+.wrap { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 72px 0; }
+.back { display: inline-flex; margin-bottom: 36px; color: var(--muted); font-weight: 700; }
+.back:hover { color: var(--gold); }
+.eyebrow { color: var(--gold); font-size: 12px; font-weight: 900; letter-spacing: .24em; text-transform: uppercase; }
+h1 {
+  margin: 12px 0 14px;
+  color: transparent;
+  font-size: clamp(38px, 7vw, 78px);
+  line-height: 1;
+  letter-spacing: -0.08em;
+  background: linear-gradient(120deg, #fff 0%, #dce7f5 42%, var(--blue) 72%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.desc { max-width: 720px; color: var(--muted); font-size: 18px; line-height: 1.8; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 42px; }
+.card {
+  min-height: 168px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(12, 18, 32, 0.72), rgba(7, 11, 21, 0.56));
+  box-shadow: 0 28px 78px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.055);
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+.card:hover { transform: translateY(-4px); border-color: rgba(216, 185, 130, 0.38); box-shadow: 0 34px 82px rgba(0, 0, 0, 0.34), 0 0 42px rgba(216, 185, 130, 0.06); }
+.card-index { display: block; color: var(--gold); font-weight: 900; margin-bottom: 18px; }
+.card strong { display: block; font-size: 20px; line-height: 1.35; }
+.card small { display: block; margin-top: 12px; color: var(--muted); word-break: break-all; }
+@media (max-width: 900px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .wrap { width: min(100% - 28px, 560px); padding: 42px 0; } .grid { grid-template-columns: 1fr; } .card { min-height: 140px; } }
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <a class="back" href="/">← 返回首页</a>
+    <p class="eyebrow">Claude Code Notes</p>
+    <h1>Claude Code 源码解析</h1>
+    <p class="desc">这是一个隐藏入口，不会显示在站点导航中。你可以从这里访问 Claude Code 相关的各个源码解析页面。</p>
+    <section class="grid" aria-label="Claude Code 页面索引">
+        <a class="card" href="./claude-code-agent-loop.html">
+          <span class="card-index">01</span>
+          <strong>Claude Code Agent Loop — 源码深度解析</strong>
+          <small>claude-code-agent-loop.html</small>
+        </a>
+        <a class="card" href="./claude-code-context-management.html">
+          <span class="card-index">02</span>
+          <strong>Claude Code 上下文管理 — 源码深度解析</strong>
+          <small>claude-code-context-management.html</small>
+        </a>
+        <a class="card" href="./claude-code-error-recovery.html">
+          <span class="card-index">03</span>
+          <strong>Claude Code Agent Loop 错误恢复机制详解</strong>
+          <small>claude-code-error-recovery.html</small>
+        </a>
+        <a class="card" href="./claude-code-hook-system.html">
+          <span class="card-index">04</span>
+          <strong>Claude Code Hook 系统详解</strong>
+          <small>claude-code-hook-system.html</small>
+        </a>
+        <a class="card" href="./claude-code-mcp-system.html">
+          <span class="card-index">05</span>
+          <strong>Claude Code MCP 系统详解</strong>
+          <small>claude-code-mcp-system.html</small>
+        </a>
+        <a class="card" href="./claude-code-memory-system.html">
+          <span class="card-index">06</span>
+          <strong>Claude Code Memory System — 源码深度解析</strong>
+          <small>claude-code-memory-system.html</small>
+        </a>
+        <a class="card" href="./claude-code-multi-agent.html">
+          <span class="card-index">07</span>
+          <strong>Claude Code 多 Agent 协作系统详解</strong>
+          <small>claude-code-multi-agent.html</small>
+        </a>
+        <a class="card" href="./claude-code-permission-system.html">
+          <span class="card-index">08</span>
+          <strong>Claude Code Permission 决策系统详解</strong>
+          <small>claude-code-permission-system.html</small>
+        </a>
+        <a class="card" href="./claude-code-session-storage.html">
+          <span class="card-index">09</span>
+          <strong>Claude Code Session 存储与 Resume 详解</strong>
+          <small>claude-code-session-storage.html</small>
+        </a>
+        <a class="card" href="./claude-code-task-management.html">
+          <span class="card-index">10</span>
+          <strong>Claude Code 任务管理系统详解 — TodoWrite &amp; Tasks</strong>
+          <small>claude-code-task-management.html</small>
+        </a>
+        <a class="card" href="./claude-code-tool-system.html">
+          <span class="card-index">11</span>
+          <strong>Claude Code 工具系统详解</strong>
+          <small>claude-code-tool-system.html</small>
+        </a>
+    </section>
+  </main>
+</body>
+</html>
