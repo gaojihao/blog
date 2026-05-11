@@ -10,7 +10,11 @@ const pages = usePages()
 const navs = useNavs(pages)
 const menuList = getMenuList(navs)
 const themeOptions = useThemeOptions()
-const navbar = themeOptions.value.navbar || menuList
+const isBlogEnabled = computed(() => themeOptions.value.enableBlog !== false)
+const isSearchEnabled = computed(() => themeOptions.value.enableSearch !== false)
+const navbar = computed(() =>
+  themeOptions.value.navbar || (isBlogEnabled.value ? menuList : [])
+)
 
 const darkMode = useDarkMode()
 const themeIcon = computed(() => (darkMode.value ? 'icon-night' : 'icon-sun'))
@@ -60,7 +64,7 @@ onBeforeUnmount(() => {
       @click="toggleNavListActive"
     ></i>
     <ul ref="navListEle" class="nav-list" :class="{ active: isNavListActive }">
-      <li class="nav-item">
+      <li v-if="isBlogEnabled" class="nav-item">
         <NavbarBloger />
       </li>
       <li v-for="item in navbar" :key="item.text" class="nav-link nav-item">
@@ -72,7 +76,7 @@ onBeforeUnmount(() => {
           <i class="iconfont" :class="themeIcon"></i>
         </button>
       </li>
-      <li class="nav-link nav-item search-link">
+      <li v-if="isSearchEnabled" class="nav-link nav-item search-link">
         <NavbarItem
           :item="{ text: '搜索', link: '/search/' }"
           :icon="'icon-search'"

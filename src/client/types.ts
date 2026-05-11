@@ -4,6 +4,7 @@ export type LayoutType =
   | 'CategoriesLayout'
   | 'TagsLayout'
   | 'SearchLayout'
+  | 'ToolsLayout'
   | 'PostsLayout'
   | 'PostLayout'
 

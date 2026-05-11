@@ -4,8 +4,8 @@ import KnznTheme from '../../src/node'
 export default defineUserConfig({
   // 站点配置
   lang: 'zh-CN',
-  title: 'lizhi1026.top',
-  description: '大前端知识分享网站',
+  title: '栗志',
+  description: '栗志的个人主页：全栈开发工程师与 AI 从业者，关注全栈工程、AI 应用和优秀产品体验。',
   // debug: true,
   // bundler: webpackBundler(),
   theme: KnznTheme({
@@ -25,15 +25,15 @@ export default defineUserConfig({
      * 博主信息相关
      */
     // 博主名称
-    blogger: '前端程序猿',
+    blogger: '栗志',
     // 铭言
-    slogan: '种一棵树最好的时间是十年前，其次是现在！',
+    slogan: '用工程化思维连接产品、代码与 AI。',
     // 头像
     avatar: '/images/avatar.jpg',
     darkAvatar: '/images/avatar-dark.jpg',
     // 其它媒体
     medias: [
-      { link: 'mailto:lizhi1026@126.com', icon: 'email' },
+      { link: 'mailto:lizhi1026@1026.com', icon: 'email' },
       { link: 'https://github.com/gaojihao', icon: 'github' },
     ],
 
@@ -47,8 +47,18 @@ export default defineUserConfig({
     // 主页显示的标签个数
     maxTags: 10,
 
+    // 个人主页模式：隐藏博客和搜索入口，仅保留首页锚点导航
+    enableBlog: false,
+    enableSearch: false,
     // 导航
-    // navbar: [],
+    navbar: [
+      { text: '关于我', link: '/#about' },
+      { text: 'AI 实践', link: '/#ai' },
+      { text: '技术栈', link: '/#stack' },
+      { text: '关注方向', link: '/#focus' },
+      { text: '工具箱', link: '/tools/' },
+      { text: '联系我', link: '/#contact' },
+    ],
 
     /**
      *  页脚相关配置

@@ -43,12 +43,21 @@ export const assignOptions = (options: ThemeOptions): void => {
  * 添加额外的页面
  * @param app App
  */
-export const addExtraPages = async (app: App): Promise<void> => {
+export const addExtraPages = async (
+  app: App,
+  options: ThemeOptions
+): Promise<void> => {
   const extraPages = [
-    { path: '/search/', title: '搜索' },
-    { path: '/tags/', title: '标签' },
-    { path: '/categories/', title: '分类' },
-    { path: '/PostsLayout/', title: '文件夹' },
+    ...(options.enableSearch === false
+      ? []
+      : [{ path: '/search/', title: '搜索' }]),
+    ...(options.enableBlog === false
+      ? []
+      : [
+          { path: '/tags/', title: '标签' },
+          { path: '/categories/', title: '分类' },
+          { path: '/PostsLayout/', title: '文件夹' },
+        ]),
   ]
   for (const item of extraPages) {
     if (app.pages.every((page) => page.path !== item.path)) {

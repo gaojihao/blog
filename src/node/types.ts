@@ -62,6 +62,10 @@ export interface ThemeOptions {
 
   // 导航
   navbar?: MenuItem[]
+  // 是否启用博客相关入口
+  enableBlog?: boolean
+  // 是否启用搜索入口
+  enableSearch?: boolean
 
   /**
    *  页脚相关配置

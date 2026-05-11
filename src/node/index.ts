@@ -36,7 +36,9 @@ export default (options: ThemeOptions): Theme => {
           // }
 
           pageOptions.frontmatter = pageOptions.frontmatter ?? {}
-          pageOptions.frontmatter.permalink = `/${md5(pageOptions.filePath)}/`
+          if (!pageOptions.frontmatter.permalink) {
+            pageOptions.frontmatter.permalink = `/${md5(pageOptions.filePath)}/`
+          }
         }
       }
     },
@@ -98,7 +100,7 @@ export default (options: ThemeOptions): Theme => {
       }),
     ],
     async onInitialized(app) {
-      await addExtraPages(app)
+      await addExtraPages(app, options)
     },
   })
 }

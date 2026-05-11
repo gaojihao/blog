@@ -12,6 +12,7 @@ export const layoutMap: Record<string, LayoutType> = {
   '/tags/': 'TagsLayout',
   '/categories/': 'CategoriesLayout',
   '/search/': 'SearchLayout',
+  '/tools/': 'ToolsLayout',
 }
 
 export const getLayout = (path): LayoutType => {
