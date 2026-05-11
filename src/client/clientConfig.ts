@@ -9,7 +9,7 @@ import NpmBadge from './components/global/NpmBadge.vue'
 import './styles/index.scss'
 import './iconfont/iconfont.css'
 import 'animate.css'
-import { setupDarkMode, setupPages, setupScrollTop } from './hooks'
+import { setupDarkMode, setupLanguage, setupPages, setupScrollTop } from './hooks'
 // import AOS from 'aos'
 
 export default defineClientConfig({
@@ -34,6 +34,7 @@ export default defineClientConfig({
   },
   setup() {
     setupDarkMode()
+    setupLanguage()
     setupScrollTop()
     onMounted(() => {
       // AOS.init({

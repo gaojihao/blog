@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { useSiteLocaleData } from '@vuepress/client'
-import { useThemeOptions } from '../hooks'
+import { computed } from 'vue'
+import { useLanguage, useThemeOptions } from '../hooks'
 const siteLocale = useSiteLocaleData()
 const themeOptions = useThemeOptions()
+const language = useLanguage()
 
 let currentYear = new Date().getFullYear().toString()
 currentYear =
   currentYear === themeOptions.value.siteStartDate ? 'Present' : currentYear
+
+const displayTitle = computed(() =>
+  language.value === 'zh' ? siteLocale.value.title : themeOptions.value.siteTitleEn || 'Li Zhi'
+)
 </script>
 <template>
   <footer class="theme-footer">
@@ -17,7 +23,7 @@ currentYear =
       <span class="delimiter">|</span>
       <span class="info"
         >Copyright © {{ themeOptions.siteStartDate }}-{{ currentYear }}
-        {{ siteLocale.title }}</span
+        {{ displayTitle }}</span
       >
     </div>
   </footer>

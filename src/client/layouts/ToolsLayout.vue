@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import Footer from '../components/Footer.vue'
 import BackToTop from '../components/BackToTop.vue'
 import MonacoEditor from '../components/tools/MonacoEditor.vue'
+import { useLanguage } from '../hooks'
 
 type Tool = {
   id: string
@@ -28,6 +29,7 @@ type JsonValue =
 
 const route = useRoute()
 const router = useRouter()
+const language = useLanguage()
 const copied = ref(false)
 const query = ref('')
 const favoriteIds = ref<string[]>([])
@@ -43,6 +45,72 @@ const input = ref(`{
     "email": "alex@example.com"
   }
 }`)
+
+const ui = computed(() => {
+  const zh = language.value === 'zh'
+  return {
+    search: zh ? '搜索 JSON / TypeScript / YAML...' : 'Search JSON / TypeScript / YAML...',
+    favorites: zh ? '收藏' : 'Favorites',
+    recent: zh ? '最近使用' : 'Recent',
+    favorite: zh ? '☆ 收藏' : '☆ Favorite',
+    favorited: zh ? '★ 已收藏' : '★ Favorited',
+    input: zh ? '输入' : 'Input',
+    output: zh ? '输出' : 'Output',
+    clear: zh ? '清空' : 'Clear',
+    copy: zh ? '复制' : 'Copy',
+    copied: zh ? '已复制' : 'Copied',
+    conversionFailed: zh ? '转换失败' : 'Conversion failed',
+    csvObject: zh ? 'CSV 转换需要 JSON 对象或对象数组' : 'CSV conversion requires a JSON object or an array of objects',
+    yamlArray: zh ? '当前简易 YAML 解析器仅支持 key: 下的数组' : 'The simple YAML parser only supports arrays under a key',
+    yamlLine: zh ? '无法解析该 YAML 行：' : 'Unable to parse YAML line: ',
+    xmlBrowser: zh ? '请在浏览器中使用 XML 转换' : 'Please use XML conversion in the browser',
+    xmlParse: zh ? 'XML 解析失败，请检查标签是否闭合' : 'XML parsing failed. Please check whether tags are closed',
+    prismaObject: zh ? 'Prisma model 需要 JSON 对象或对象数组' : 'Prisma model requires a JSON object or an array of objects',
+    createTable: zh ? '仅支持基础 CREATE TABLE 语句' : 'Only basic CREATE TABLE statements are supported',
+  }
+})
+
+const toolText: Record<string, { zh: string; en: string; descZh: string; descEn: string }> = {
+  'json-ts': { zh: 'JSON → TypeScript', en: 'JSON → TypeScript', descZh: '根据 JSON 自动推导 TypeScript interface。', descEn: 'Infer TypeScript interfaces from JSON.' },
+  'json-schema': { zh: 'JSON → JSON Schema', en: 'JSON → JSON Schema', descZh: '把示例 JSON 转成基础 JSON Schema。', descEn: 'Generate a basic JSON Schema from sample JSON.' },
+  'json-yaml': { zh: 'JSON → YAML', en: 'JSON → YAML', descZh: '将 JSON 数据转为 YAML。', descEn: 'Convert JSON data to YAML.' },
+  'json-csv': { zh: 'JSON → CSV', en: 'JSON → CSV', descZh: '将对象或对象数组转成 CSV。', descEn: 'Convert an object or array of objects to CSV.' },
+  'json-go': { zh: 'JSON → Go Struct', en: 'JSON → Go Struct', descZh: '根据 JSON 生成 Go 结构体。', descEn: 'Generate Go structs from JSON.' },
+  'json-kotlin': { zh: 'JSON → Kotlin', en: 'JSON → Kotlin', descZh: '根据 JSON 生成 Kotlin data class。', descEn: 'Generate Kotlin data classes from JSON.' },
+  'json-swift': { zh: 'JSON → Swift', en: 'JSON → Swift', descZh: '根据 JSON 生成 Swift Codable struct。', descEn: 'Generate Swift Codable structs from JSON.' },
+  'json-rust': { zh: 'JSON → Rust', en: 'JSON → Rust', descZh: '根据 JSON 生成 Rust serde struct。', descEn: 'Generate Rust serde structs from JSON.' },
+  'json-dart': { zh: 'JSON → Dart', en: 'JSON → Dart', descZh: '根据 JSON 生成 Dart class。', descEn: 'Generate Dart classes from JSON.' },
+  'json-zod': { zh: 'JSON → Zod', en: 'JSON → Zod', descZh: '根据 JSON 生成 Zod 校验模型。', descEn: 'Generate Zod validation schemas from JSON.' },
+  'json-prisma': { zh: 'JSON → Prisma', en: 'JSON → Prisma', descZh: '根据 JSON 对象生成基础 Prisma model。', descEn: 'Generate a basic Prisma model from a JSON object.' },
+  'format-json': { zh: 'JSON Format', en: 'JSON Format', descZh: '格式化 JSON。', descEn: 'Format JSON.' },
+  'format-sql': { zh: 'SQL Format', en: 'SQL Format', descZh: '格式化常见 SQL 语句。', descEn: 'Format common SQL statements.' },
+  'format-css': { zh: 'CSS Format', en: 'CSS Format', descZh: '格式化 CSS 代码。', descEn: 'Format CSS code.' },
+  'format-html': { zh: 'HTML Format', en: 'HTML Format', descZh: '格式化 HTML 结构。', descEn: 'Format HTML markup.' },
+  'yaml-json': { zh: 'YAML → JSON', en: 'YAML → JSON', descZh: '将常见 YAML 键值结构转成 JSON。', descEn: 'Convert common YAML key-value structures to JSON.' },
+  'xml-json': { zh: 'XML → JSON', en: 'XML → JSON', descZh: '将 XML 文档转换成 JSON 对象。', descEn: 'Convert XML documents to JSON objects.' },
+  'md-html': { zh: 'Markdown → HTML', en: 'Markdown → HTML', descZh: '支持标题、段落、列表、加粗、链接、行内代码等常用语法。', descEn: 'Supports headings, paragraphs, lists, bold text, links, and inline code.' },
+  'html-jsx': { zh: 'HTML → JSX', en: 'HTML → JSX', descZh: '将 HTML 属性转换成 JSX 常用写法。', descEn: 'Convert common HTML attributes to JSX syntax.' },
+  'svg-jsx': { zh: 'SVG → JSX', en: 'SVG → JSX', descZh: '将 SVG 属性转换成 JSX 写法。', descEn: 'Convert SVG attributes to JSX syntax.' },
+  'css-js': { zh: 'CSS → JS Objects', en: 'CSS → JS Objects', descZh: '将 CSS 规则转换为可读的 JS 对象。', descEn: 'Convert CSS rules into readable JavaScript objects.' },
+  'sql-prisma': { zh: 'SQL → Prisma', en: 'SQL → Prisma', descZh: '将基础 CREATE TABLE 转成 Prisma model。', descEn: 'Convert basic CREATE TABLE statements to Prisma models.' },
+  'graphql-ts': { zh: 'GraphQL → TypeScript', en: 'GraphQL → TypeScript', descZh: '将基础 GraphQL type 转成 TypeScript interface。', descEn: 'Convert basic GraphQL types to TypeScript interfaces.' },
+}
+
+const groupText: Record<string, { zh: string; en: string }> = {
+  JSON: { zh: 'JSON', en: 'JSON' },
+  Formatters: { zh: '格式化', en: 'Formatters' },
+  Others: { zh: '其他', en: 'Others' },
+  'HTML / SVG': { zh: 'HTML / SVG', en: 'HTML / SVG' },
+  CSS: { zh: 'CSS', en: 'CSS' },
+  Database: { zh: '数据库', en: 'Database' },
+  GraphQL: { zh: 'GraphQL', en: 'GraphQL' },
+}
+
+const toolName = (tool: Tool): string => toolText[tool.id]?.[language.value] || tool.name
+const toolDescription = (tool: Tool): string =>
+  language.value === 'zh' ? toolText[tool.id]?.descZh || tool.description : toolText[tool.id]?.descEn || tool.description
+const toolGroup = (tool: Tool): string => groupText[tool.group]?.[language.value] || tool.group
+
 
 const sampleGraphql = `type User {
   id: ID!
@@ -174,7 +242,7 @@ const jsonToYaml = (source: string): string => jsonToYamlValue(safeJsonParse(sou
 const jsonToCsv = (source: string): string => {
   const root = safeJsonParse(source)
   const rows = Array.isArray(root) ? root : [root]
-  if (!rows.every(isObject)) throw new Error('CSV 转换需要 JSON 对象或对象数组')
+  if (!rows.every(isObject)) throw new Error(ui.value.csvObject)
   const keys = Array.from(new Set(rows.flatMap((row) => Object.keys(row))))
   const cell = (value: JsonValue | undefined): string => {
     if (value === undefined || value === null) return ''
@@ -331,7 +399,7 @@ const prismaType = (value: JsonValue): string => {
 const jsonToPrisma = (source: string): string => {
   const root = safeJsonParse(source)
   const obj = Array.isArray(root) ? root.find(isObject) : root
-  if (!isObject(obj)) throw new Error('Prisma model 需要 JSON 对象或对象数组')
+  if (!isObject(obj)) throw new Error(ui.value.prismaObject)
   const fields = Object.entries(obj)
     .map(([key, val]) => {
       const field = toCamelCase(key)
@@ -364,13 +432,13 @@ const simpleYamlToJsonValue = (source: string): JsonValue => {
     const parent = stack[stack.length - 1].value
 
     if (trimmed.startsWith('- ')) {
-      if (!Array.isArray(parent)) throw new Error('当前简易 YAML 解析器仅支持 key: 下的数组')
+      if (!Array.isArray(parent)) throw new Error(ui.value.yamlArray)
       parent.push(parseYamlScalar(trimmed.slice(2)))
       return
     }
 
     const splitIndex = trimmed.indexOf(':')
-    if (splitIndex === -1 || Array.isArray(parent)) throw new Error('无法解析该 YAML 行：' + line)
+    if (splitIndex === -1 || Array.isArray(parent)) throw new Error(ui.value.yamlLine + line)
     const key = trimmed.slice(0, splitIndex).trim()
     const rest = trimmed.slice(splitIndex + 1).trim()
     if (rest) {
@@ -408,9 +476,9 @@ const xmlNodeToJson = (node: Element): JsonValue => {
 }
 
 const xmlToJson = (source: string): string => {
-  if (typeof window === 'undefined') return '请在浏览器中使用 XML 转换'
+  if (typeof window === 'undefined') return ui.value.xmlBrowser
   const doc = new DOMParser().parseFromString(source, 'application/xml')
-  if (doc.querySelector('parsererror')) throw new Error('XML 解析失败，请检查标签是否闭合')
+  if (doc.querySelector('parsererror')) throw new Error(ui.value.xmlParse)
   const root = doc.documentElement
   return JSON.stringify({ [root.tagName]: xmlNodeToJson(root) }, null, 2)
 }
@@ -541,7 +609,7 @@ const sqlTypeToPrisma = (rawType: string): string => {
 
 const sqlToPrisma = (source: string): string => {
   const match = source.match(/CREATE\s+TABLE\s+[`"]?(\w+)[`"]?\s*\(([\s\S]*?)\)\s*;?/i)
-  if (!match) throw new Error('仅支持基础 CREATE TABLE 语句')
+  if (!match) throw new Error(ui.value.createTable)
   const modelName = toPascalCase(match[1])
   const fields = match[2]
     .split(',')
@@ -632,13 +700,14 @@ const isFavorite = computed(() => favoriteIds.value.includes(activeTool.value.id
 const filteredTools = computed(() => {
   const keyword = query.value.trim().toLowerCase()
   if (!keyword) return tools
-  return tools.filter((tool) => [tool.name, tool.from, tool.to, tool.group, tool.description].join(' ').toLowerCase().includes(keyword))
+  return tools.filter((tool) => [tool.name, toolText[tool.id]?.en, toolText[tool.id]?.zh, toolText[tool.id]?.descEn, toolText[tool.id]?.descZh, tool.from, tool.to, tool.group].join(' ').toLowerCase().includes(keyword))
 })
 
 const groupedTools = computed(() => {
   return filteredTools.value.reduce<Record<string, Tool[]>>((res, tool) => {
-    res[tool.group] = res[tool.group] || []
-    res[tool.group].push(tool)
+    const group = toolGroup(tool)
+    res[group] = res[group] || []
+    res[group].push(tool)
     return res
   }, {})
 })
@@ -648,7 +717,7 @@ const output = computed(() => {
   try {
     return activeTool.value.transform(input.value)
   } catch (error) {
-    return `转换失败：${error instanceof Error ? error.message : String(error)}`
+    return `${ui.value.conversionFailed}: ${error instanceof Error ? error.message : String(error)}`
   }
 })
 
@@ -719,11 +788,11 @@ watch(
     <main class="tools-shell">
       <aside class="tools-sidebar">
         <div class="tool-search">
-          <input v-model="query" type="search" placeholder="搜索 JSON / TypeScript / YAML..." />
+          <input v-model="query" type="search" :placeholder="ui.search" />
         </div>
 
         <div v-if="favoriteTools.length" class="tool-group pinned-group">
-          <h2>Favorites</h2>
+          <h2>{{ ui.favorites }}</h2>
           <button
             v-for="tool in favoriteTools"
             :key="`favorite-${tool.id}`"
@@ -732,13 +801,13 @@ watch(
             type="button"
             @click="selectTool(tool)"
           >
-            <span>★ {{ tool.name }}</span>
+            <span>★ {{ toolName(tool) }}</span>
             <small>{{ tool.from }} → {{ tool.to }}</small>
           </button>
         </div>
 
         <div v-if="recentTools.length" class="tool-group pinned-group">
-          <h2>Recent</h2>
+          <h2>{{ ui.recent }}</h2>
           <button
             v-for="tool in recentTools"
             :key="`recent-${tool.id}`"
@@ -747,7 +816,7 @@ watch(
             type="button"
             @click="selectTool(tool)"
           >
-            <span>{{ tool.name }}</span>
+            <span>{{ toolName(tool) }}</span>
           </button>
         </div>
 
@@ -761,7 +830,7 @@ watch(
             type="button"
             @click="selectTool(tool)"
           >
-            <span>{{ tool.name }}</span>
+            <span>{{ toolName(tool) }}</span>
             <small>{{ tool.from }} → {{ tool.to }}</small>
           </button>
         </div>
@@ -770,13 +839,13 @@ watch(
       <section class="tool-workspace">
         <div class="tool-header-card">
           <div>
-            <p class="tools-eyebrow">{{ activeTool.group }}</p>
-            <h2>{{ activeTool.name }}</h2>
-            <p>{{ activeTool.description }}</p>
+            <p class="tools-eyebrow">{{ toolGroup(activeTool) }}</p>
+            <h2>{{ toolName(activeTool) }}</h2>
+            <p>{{ toolDescription(activeTool) }}</p>
           </div>
           <div class="tool-actions">
             <button class="favorite-btn" type="button" @click="toggleFavorite">
-              {{ isFavorite ? '★ 已收藏' : '☆ 收藏' }}
+              {{ isFavorite ? ui.favorited : ui.favorite }}
             </button>
             <div class="tool-badge">{{ activeTool.from }} → {{ activeTool.to }}</div>
           </div>
@@ -785,8 +854,8 @@ watch(
         <div class="editor-grid">
           <div class="editor-panel">
             <div class="editor-toolbar">
-              <span>Input · {{ activeTool.from }}</span>
-              <button type="button" @click="clearInput">清空</button>
+              <span>{{ ui.input }} · {{ activeTool.from }}</span>
+              <button type="button" @click="clearInput">{{ ui.clear }}</button>
             </div>
             <MonacoEditor
               v-model="input"
@@ -796,8 +865,8 @@ watch(
           </div>
           <div class="editor-panel output-panel">
             <div class="editor-toolbar">
-              <span>Output · {{ activeTool.to }}</span>
-              <button type="button" @click="copyOutput">{{ copied ? '已复制' : '复制' }}</button>
+              <span>{{ ui.output }} · {{ activeTool.to }}</span>
+              <button type="button" @click="copyOutput">{{ copied ? ui.copied : ui.copy }}</button>
             </div>
             <MonacoEditor
               :model-value="output"

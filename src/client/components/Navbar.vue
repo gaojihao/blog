@@ -3,7 +3,7 @@ import NavbarDropdown from './NavbarDropdown.vue'
 import NavbarItem from './NavbarItem.vue'
 import NavbarBloger from './NavbarBloger.vue'
 import Medias from './Medias.vue'
-import { useDarkMode, useNavs, usePages, useThemeOptions } from '../hooks'
+import { useLanguageToggle, useNavs, usePages, useThemeOptions } from '../hooks'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { getMenuList } from '../utils'
 const pages = usePages()
@@ -16,14 +16,9 @@ const navbar = computed(() =>
   themeOptions.value.navbar || (isBlogEnabled.value ? menuList : [])
 )
 
-const darkMode = useDarkMode()
-const themeIcon = computed(() => (darkMode.value ? 'icon-night' : 'icon-sun'))
+const { label: languageLabel, toggleLanguage } = useLanguageToggle()
 const navListEle = ref<HTMLElement | null>(null)
 const menuBtn = ref(null)
-
-const toggleTheme = (): void => {
-  darkMode.value = !darkMode.value
-}
 
 const isNavListActive = ref(false)
 
@@ -72,8 +67,8 @@ onBeforeUnmount(() => {
         <NavbarItem v-else :item="item" />
       </li>
       <li class="nav-link nav-item">
-        <button class="theme-toggle" @click="toggleTheme">
-          <i class="iconfont" :class="themeIcon"></i>
+        <button class="theme-toggle language-toggle" @click="toggleLanguage">
+          {{ languageLabel }}
         </button>
       </li>
       <li v-if="isSearchEnabled" class="nav-link nav-item search-link">

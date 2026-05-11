@@ -9,6 +9,8 @@ export default defineUserConfig({
   // debug: true,
   // bundler: webpackBundler(),
   theme: KnznTheme({
+    // 英文站点标题
+    siteTitleEn: 'Li Zhi',
     // logo
     logo: '/images/logo-light.svg',
     darkLogo: '/images/logo-dark.svg',
@@ -52,12 +54,10 @@ export default defineUserConfig({
     enableSearch: false,
     // 导航
     navbar: [
-      { text: '关于我', link: '/#about' },
-      { text: 'AI 实践', link: '/#ai' },
-      { text: '技术栈', link: '/#stack' },
-      { text: '关注方向', link: '/#focus' },
-      { text: '工具箱', link: '/tools/' },
-      { text: '联系我', link: '/#contact' },
+      { text: '首页', link: '/', i18n: { zh: '首页', en: 'Home' } },
+      { text: '关于我', link: '/#/about', i18n: { zh: '关于我', en: 'About' } },
+      { text: '工具箱', link: '/tools/', i18n: { zh: '工具箱', en: 'Tools' } },
+      { text: '联系我', link: 'mailto:lizhi1026@1026.com', i18n: { zh: '联系我', en: 'Contact' } },
     ],
 
     /**

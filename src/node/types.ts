@@ -21,6 +21,8 @@ export type Comment = {
  */
 export interface ThemeOptions {
   dirname?: string
+  // 英文站点标题
+  siteTitleEn?: string
   // logo
   logo?: string
   // 暗黑模式 logo

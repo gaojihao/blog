@@ -747,8 +747,14 @@
   }
 
   .nav-item .navbar-item:hover,
+  .nav-item .navbar-item.active,
   .theme-toggle:hover {
     color: #d8b982;
+  }
+
+  .nav-item .navbar-item.active::after {
+    background: linear-gradient(90deg, #d8b982, #9ccdf8);
+    box-shadow: 0 0 18px rgba(216, 185, 130, 0.28);
   }
 
   @media (max-width: $MQNarrow) {
@@ -918,5 +924,198 @@
   .timeline-item {
     grid-template-columns: 1fr;
     gap: 8px;
+  }
+}
+
+.simple-hero {
+  min-height: 100vh;
+  padding-bottom: 90px;
+}
+
+.simple-hero-inner {
+  width: min(860px, 100%);
+  margin: 0 auto;
+  text-align: center;
+  animation: heroFadeUp 0.8s ease both;
+
+  h1 {
+    margin: 12px 0 10px;
+    color: transparent;
+    font-size: clamp(64px, 12vw, 138px);
+    line-height: 0.9;
+    letter-spacing: -0.08em;
+    background: linear-gradient(120deg, #ffffff 0%, #dce7f5 38%, var(--home-blue) 68%, var(--home-gold) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  .hero-role {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-headline {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.simple-avatar {
+  width: 118px;
+  height: 118px;
+  margin: 0 auto 22px;
+  padding: 5px;
+  border-radius: 50%;
+  background: conic-gradient(from 120deg, var(--home-gold), var(--home-blue), var(--home-violet), var(--home-gold));
+  box-shadow: 0 0 70px rgba(216, 185, 130, 0.16);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 5px solid #060b15;
+    border-radius: inherit;
+  }
+}
+
+.simple-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 28px;
+
+  span {
+    padding: 8px 12px;
+    color: var(--home-muted);
+    border: 1px solid rgba(216, 185, 130, 0.14);
+    border-radius: 999px;
+    background: rgba(4, 8, 17, 0.36);
+  }
+}
+
+.simple-actions {
+  justify-content: center;
+}
+
+.about-detail-page {
+  padding-top: 112px;
+}
+
+@media (max-width: $MQMobile) {
+  .simple-hero-inner h1 {
+    font-size: clamp(58px, 22vw, 90px);
+  }
+
+  .about-detail-page {
+    padding-top: 88px;
+  }
+}
+
+/* Compact landing page: keep the whole homepage visible within one viewport. */
+.simple-hero {
+  min-height: calc(100vh - 60px);
+  padding-top: 86px;
+  padding-bottom: 34px;
+}
+
+.simple-hero-inner {
+  h1 {
+    font-size: clamp(44px, 8vw, 92px);
+  }
+
+  .hero-headline {
+    max-width: 680px;
+    font-size: clamp(17px, 2.2vw, 24px);
+    line-height: 1.45;
+  }
+}
+
+.simple-avatar {
+  width: 86px;
+  height: 86px;
+  margin-bottom: 14px;
+}
+
+.simple-tags {
+  gap: 8px;
+  margin-top: 18px;
+
+  span {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+}
+
+.simple-actions {
+  margin-top: 24px;
+
+  a {
+    height: 42px;
+    min-width: 118px;
+    padding: 0 18px;
+  }
+}
+
+.personal-home .theme-footer {
+  min-height: 44px;
+  height: auto;
+
+  .copyright {
+    min-width: 0;
+    padding: 8px 12px;
+    text-align: center;
+  }
+
+  .beian,
+  .delimiter,
+  .info {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: $MQMobile) {
+  .simple-hero {
+    min-height: calc(100vh - 54px);
+    padding-top: 78px;
+    padding-bottom: 22px;
+  }
+
+  .simple-hero-inner {
+    h1 {
+      font-size: clamp(42px, 17vw, 68px);
+    }
+
+    .hero-headline {
+      font-size: 17px;
+      line-height: 1.42;
+    }
+  }
+
+  .simple-avatar {
+    width: 74px;
+    height: 74px;
+  }
+
+  .simple-tags {
+    margin-top: 14px;
+  }
+
+  .simple-actions {
+    gap: 10px;
+    margin-top: 18px;
+
+    a {
+      width: auto;
+      min-width: 96px;
+      height: 38px;
+      padding: 0 14px;
+      font-size: 14px;
+    }
+  }
+
+  .personal-home .theme-footer .copyright {
+    padding: 7px 10px;
   }
 }
