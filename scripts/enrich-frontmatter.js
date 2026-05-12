@@ -103,6 +103,8 @@ for (const file of targets) {
     let kw
     if (base.startsWith('asd-')) {
       kw = pickKeywords(title, body)
+    } else if (base === 'asd.md') {
+      kw = '自闭症,ASD,康复训练,行为干预,ABA,DTT,NET,IEP,新人训练师,督导,栗志'
     } else if (base === 'tools.md') {
       kw = '开发者工具,在线工具,前端工具,JSON 格式化,Base64,URL 编码,时间戳,栗志'
     } else if (base === 'claude.md') {

@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>复杂行为危机管理与安全计划手册</title>
+<style>
+:root{--bg:#f7f7fb;--paper:#fff;--ink:#1f2937;--muted:#6b7280;--brand:#2563eb;--brand2:#7c3aed;--line:#e5e7eb;--soft:#eff6ff;--warn:#fff7ed;--code:#111827;--codebg:#f3f4f6;--shadow:0 20px 60px rgba(15,23,42,.10)}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#f8fafc,#eef2ff 45%,#fdf2f8);color:var(--ink);font:16px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif}.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:26px;max-width:1440px;margin:0 auto;padding:28px}.sidebar{position:sticky;top:20px;align-self:start;max-height:calc(100vh - 40px);overflow:auto;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}.sidebar h2{font-size:16px;margin:0 0 10px}.sidebar a{display:block;color:#334155;text-decoration:none;border-radius:10px;padding:7px 9px;margin:2px 0;font-size:13px;line-height:1.35}.sidebar a:hover{background:var(--soft);color:var(--brand)}.sidebar .toc-l2{padding-left:18px}.sidebar .toc-l3{padding-left:32px;color:#64748b}.content{min-width:0;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:44px 52px}.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:28px}.badge{display:inline-flex;gap:8px;align-items:center;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;border-radius:999px;padding:8px 14px;font-size:13px}.navlink{color:var(--brand);text-decoration:none;font-weight:600}h1{font-size:34px;line-height:1.25;margin:0 0 22px;color:#0f172a}h2{font-size:26px;margin:44px 0 14px;padding-top:14px;border-top:1px solid var(--line)}h3{font-size:21px;margin:30px 0 10px}h4{font-size:18px;margin:24px 0 8px}p{margin:12px 0}blockquote{margin:18px 0;padding:14px 18px;border-left:5px solid var(--brand);background:var(--soft);border-radius:12px;color:#1e3a8a}table{width:100%;border-collapse:collapse;margin:18px 0;overflow:hidden;border-radius:14px;display:table}th,td{border:1px solid var(--line);padding:10px 12px;vertical-align:top}th{background:#f1f5f9;text-align:left}tr:nth-child(even) td{background:#fafafa}pre{background:#0b1020;color:#e5e7eb;border-radius:16px;padding:18px;overflow:auto;line-height:1.55}code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace}p code,li code,td code{background:var(--codebg);color:#be123c;padding:2px 6px;border-radius:6px}ul,ol{padding-left:1.5em}.anchor{opacity:.25;text-decoration:none;margin-right:8px;color:var(--brand)}h1:hover .anchor,h2:hover .anchor,h3:hover .anchor{opacity:1}.flowchart{margin:22px 0;padding:18px;border:1px solid #bfdbfe;background:linear-gradient(180deg,#eff6ff,#fff);border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:8px}.flow-step{width:min(640px,100%);display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid #dbeafe;border-radius:14px;padding:12px 14px;box-shadow:0 8px 22px rgba(37,99,235,.08)}.flow-num{flex:0 0 auto;width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;background:var(--brand);color:white;font-weight:700;font-size:13px}.flow-arrow{color:var(--brand);font-size:22px;font-weight:800;line-height:1}.raw-flow{margin:8px 0 20px;color:var(--muted)}.raw-flow summary{cursor:pointer}.footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}.callout{background:var(--warn);border:1px solid #fed7aa;border-radius:16px;padding:14px 16px;margin:18px 0}.page-list{columns:2;column-gap:28px}.page-list a{display:block;break-inside:avoid;text-decoration:none;color:#1d4ed8;padding:8px 0;border-bottom:1px dashed #dbeafe}.meta{color:var(--muted);font-size:14px}@media(max-width:960px){.layout{display:block;padding:14px}.sidebar{position:relative;max-height:none;margin-bottom:16px}.content{padding:26px 20px}.page-list{columns:1}h1{font-size:28px}h2{font-size:23px}table{display:block;overflow-x:auto;white-space:normal}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <h2>目录</h2>
+  <a class="navlink" href="index.html">← HTML总索引</a>
+  <a class="toc-l1" href="#复杂行为危机管理与安全计划手册">复杂行为危机管理与安全计划手册</a>
+<a class="toc-l2" href="#一、先用一句话讲清楚危机管理">一、先用一句话讲清楚危机管理</a>
+<a class="toc-l2" href="#二、哪些行为属于高风险">二、哪些行为属于高风险</a>
+<a class="toc-l3" href="#1.-严重自伤">1. 严重自伤</a>
+<a class="toc-l3" href="#2.-攻击他人">2. 攻击他人</a>
+<a class="toc-l3" href="#3.-逃跑和走失">3. 逃跑和走失</a>
+<a class="toc-l3" href="#4.-吞物和异食">4. 吞物和异食</a>
+<a class="toc-l3" href="#5.-严重破坏">5. 严重破坏</a>
+<a class="toc-l3" href="#6.-长时间崩溃">6. 长时间崩溃</a>
+<a class="toc-l2" href="#三、危机处理的黄金原则">三、危机处理的黄金原则</a>
+<a class="toc-l3" href="#原则1先安全后分析">原则1：先安全，后分析</a>
+<a class="toc-l3" href="#原则2成人先降级">原则2：成人先降级</a>
+<a class="toc-l3" href="#原则3不围观">原则3：不围观</a>
+<a class="toc-l3" href="#原则4不做羞辱性处理">原则4：不做羞辱性处理</a>
+<a class="toc-l3" href="#原则5事后必须复盘">原则5：事后必须复盘</a>
+<a class="toc-l2" href="#四、危机现场sop">四、危机现场SOP</a>
+<a class="toc-l3" href="#第一步呼叫支援">第一步：呼叫支援</a>
+<a class="toc-l3" href="#第二步清场">第二步：清场</a>
+<a class="toc-l3" href="#第三步成人分工">第三步：成人分工</a>
+<a class="toc-l3" href="#第四步低语言支持">第四步：低语言支持</a>
+<a class="toc-l3" href="#第五步提供低要求选择">第五步：提供低要求选择</a>
+<a class="toc-l3" href="#第六步恢复后记录">第六步：恢复后记录</a>
+<a class="toc-l2" href="#五、自伤安全计划">五、自伤安全计划</a>
+<a class="toc-l3" href="#现场保护">现场保护</a>
+<a class="toc-l3" href="#长期分析">长期分析</a>
+<a class="toc-l3" href="#必须转介">必须转介</a>
+<a class="toc-l2" href="#六、攻击安全计划">六、攻击安全计划</a>
+<a class="toc-l3" href="#现场">现场</a>
+<a class="toc-l3" href="#长期">长期</a>
+<a class="toc-l3" href="#数据">数据</a>
+<a class="toc-l2" href="#七、逃跑安全计划">七、逃跑安全计划</a>
+<a class="toc-l3" href="#高风险场景">高风险场景</a>
+<a class="toc-l3" href="#预防">预防</a>
+<a class="toc-l3" href="#现场-2">现场</a>
+<a class="toc-l2" href="#八、吞物和异食安全计划">八、吞物和异食安全计划</a>
+<a class="toc-l3" href="#现场-3">现场</a>
+<a class="toc-l3" href="#长期-2">长期</a>
+<a class="toc-l2" href="#九、拒学危机">九、拒学危机</a>
+<a class="toc-l3" href="#支持">支持</a>
+<a class="toc-l2" href="#十、危机前兆识别">十、危机前兆识别</a>
+<a class="toc-l2" href="#十一、危机后的复盘">十一、危机后的复盘</a>
+<a class="toc-l3" href="#和团队复盘">和团队复盘</a>
+<a class="toc-l3" href="#和孩子复盘">和孩子复盘</a>
+<a class="toc-l3" href="#和家长复盘">和家长复盘</a>
+<a class="toc-l2" href="#十二、安全计划模板">十二、安全计划模板</a>
+<a class="toc-l2" href="#十三、危机事件报告模板">十三、危机事件报告模板</a>
+<a class="toc-l2" href="#十四、危机中的禁止行为">十四、危机中的禁止行为</a>
+<a class="toc-l2" href="#十五、家长沟通话术">十五、家长沟通话术</a>
+<a class="toc-l2" href="#十六、专家必须记住的10句话">十六、专家必须记住的10句话</a>
+<a class="toc-l2" href="#十七、最后提醒">十七、最后提醒</a>
+</aside>
+<main class="content">
+  <div class="topbar"><span class="badge">ASD训练师资料库 · 第 26 篇</span><a class="navlink" href="../asd-complex-behavior-crisis-and-safety-planning.md">查看Markdown源文档</a></div>
+  <h1 id="复杂行为危机管理与安全计划手册"><a class="anchor" href="#复杂行为危机管理与安全计划手册" aria-hidden="true">#</a>复杂行为危机管理与安全计划手册</h1>
+<blockquote>
+<p>适用对象：高级训练师、督导、个案负责人、机构管理者、学校支持团队。<br>
+使用场景：严重自伤、攻击、逃跑、吞物、破坏、长时间崩溃、拒学、校园危机、家庭安全风险。<br>
+核心目的：帮助训练师建立高风险行为的安全思维、危机预案、人员分工、记录和转介流程。<br>
+重要提醒：高风险行为不适合新人单独处理。任何危机管理都必须遵守法律、伦理、机构规范和儿童保护原则。</p>
+</blockquote>
+<hr>
+<h2 id="一、先用一句话讲清楚危机管理"><a class="anchor" href="#一、先用一句话讲清楚危机管理" aria-hidden="true">#</a>一、先用一句话讲清楚危机管理</h2>
+<p>一句大白话：</p>
+<blockquote>
+<p>危机管理不是制服孩子，而是在最危险的时候保护所有人，并在事后找到更安全的长期办法。</p>
+</blockquote>
+<p>危机发生时，目标顺序是：</p>
+<ol>
+<li>保命；</li>
+<li>防伤；</li>
+<li>降刺激；</li>
+<li>稳定；</li>
+<li>记录；</li>
+<li>复盘；</li>
+<li>长期计划。</li>
+</ol>
+<hr>
+<h2 id="二、哪些行为属于高风险"><a class="anchor" href="#二、哪些行为属于高风险" aria-hidden="true">#</a>二、哪些行为属于高风险</h2>
+<h3 id="1.-严重自伤"><a class="anchor" href="#1.-严重自伤" aria-hidden="true">#</a>1. 严重自伤</h3>
+<ul>
+<li>撞头；</li>
+<li>咬自己出血；</li>
+<li>抓破皮；</li>
+<li>打头；</li>
+<li>拔头发；</li>
+<li>用物品伤自己。</li>
+</ul>
+<h3 id="2.-攻击他人"><a class="anchor" href="#2.-攻击他人" aria-hidden="true">#</a>2. 攻击他人</h3>
+<ul>
+<li>打、踢、咬、抓；</li>
+<li>扔重物；</li>
+<li>推倒他人；</li>
+<li>使用危险物。</li>
+</ul>
+<h3 id="3.-逃跑和走失"><a class="anchor" href="#3.-逃跑和走失" aria-hidden="true">#</a>3. 逃跑和走失</h3>
+<ul>
+<li>冲出教室；</li>
+<li>冲向马路；</li>
+<li>离开学校或机构；</li>
+<li>公共场所突然跑走。</li>
+</ul>
+<h3 id="4.-吞物和异食"><a class="anchor" href="#4.-吞物和异食" aria-hidden="true">#</a>4. 吞物和异食</h3>
+<ul>
+<li>吞硬币、纸、玩具、小物件；</li>
+<li>吃非食物；</li>
+<li>有窒息风险。</li>
+</ul>
+<h3 id="5.-严重破坏"><a class="anchor" href="#5.-严重破坏" aria-hidden="true">#</a>5. 严重破坏</h3>
+<ul>
+<li>砸玻璃；</li>
+<li>推倒柜子；</li>
+<li>破坏电器；</li>
+<li>拿危险物。</li>
+</ul>
+<h3 id="6.-长时间崩溃"><a class="anchor" href="#6.-长时间崩溃" aria-hidden="true">#</a>6. 长时间崩溃</h3>
+<ul>
+<li>超过30分钟；</li>
+<li>无法恢复；</li>
+<li>伴随自伤、攻击或逃跑。</li>
+</ul>
+<hr>
+<h2 id="三、危机处理的黄金原则"><a class="anchor" href="#三、危机处理的黄金原则" aria-hidden="true">#</a>三、危机处理的黄金原则</h2>
+<h3 id="原则1先安全后分析"><a class="anchor" href="#原则1先安全后分析" aria-hidden="true">#</a>原则1：先安全，后分析</h3>
+<p>危机中不要长篇分析原因。<br>
+先保护人和环境。</p>
+<h3 id="原则2成人先降级"><a class="anchor" href="#原则2成人先降级" aria-hidden="true">#</a>原则2：成人先降级</h3>
+<p>成人的吼叫会升级危机。</p>
+<p>做到：</p>
+<ul>
+<li>声音低；</li>
+<li>句子短；</li>
+<li>动作慢；</li>
+<li>人员少；</li>
+<li>距离安全。</li>
+</ul>
+<h3 id="原则3不围观"><a class="anchor" href="#原则3不围观" aria-hidden="true">#</a>原则3：不围观</h3>
+<p>围观会增加孩子压力，也会强化关注型行为。</p>
+<h3 id="原则4不做羞辱性处理"><a class="anchor" href="#原则4不做羞辱性处理" aria-hidden="true">#</a>原则4：不做羞辱性处理</h3>
+<p>不能因为危险就失去尊重。</p>
+<h3 id="原则5事后必须复盘"><a class="anchor" href="#原则5事后必须复盘" aria-hidden="true">#</a>原则5：事后必须复盘</h3>
+<p>危机结束不等于工作结束。<br>
+必须找前因、后果和长期预防。</p>
+<hr>
+<h2 id="四、危机现场sop"><a class="anchor" href="#四、危机现场sop" aria-hidden="true">#</a>四、危机现场SOP</h2>
+<h3 id="第一步呼叫支援"><a class="anchor" href="#第一步呼叫支援" aria-hidden="true">#</a>第一步：呼叫支援</h3>
+<p>如果存在自伤、攻击、逃跑风险，新人必须叫督导或同事。</p>
+<h3 id="第二步清场"><a class="anchor" href="#第二步清场" aria-hidden="true">#</a>第二步：清场</h3>
+<ul>
+<li>其他孩子离开；</li>
+<li>移开危险物；</li>
+<li>关闭危险出口；</li>
+<li>保留安全通道。</li>
+</ul>
+<h3 id="第三步成人分工"><a class="anchor" href="#第三步成人分工" aria-hidden="true">#</a>第三步：成人分工</h3>
+<p>至少明确：</p>
+<ul>
+<li>谁主沟通；</li>
+<li>谁移开其他孩子；</li>
+<li>谁看门口；</li>
+<li>谁联系家长；</li>
+<li>谁记录。</li>
+</ul>
+<h3 id="第四步低语言支持"><a class="anchor" href="#第四步低语言支持" aria-hidden="true">#</a>第四步：低语言支持</h3>
+<p>只说：</p>
+<blockquote>
+<p>“安全。”<br>
+“我在。”<br>
+“手停。”<br>
+“坐这里。”<br>
+“可以休息。”</p>
+</blockquote>
+<h3 id="第五步提供低要求选择"><a class="anchor" href="#第五步提供低要求选择" aria-hidden="true">#</a>第五步：提供低要求选择</h3>
+<blockquote>
+<p>“耳机还是坐垫？”<br>
+“喝水还是安静角？”</p>
+</blockquote>
+<h3 id="第六步恢复后记录"><a class="anchor" href="#第六步恢复后记录" aria-hidden="true">#</a>第六步：恢复后记录</h3>
+<p>不要只说“闹了一场”。<br>
+必须记录具体事实。</p>
+<hr>
+<h2 id="五、自伤安全计划"><a class="anchor" href="#五、自伤安全计划" aria-hidden="true">#</a>五、自伤安全计划</h2>
+<h3 id="现场保护"><a class="anchor" href="#现场保护" aria-hidden="true">#</a>现场保护</h3>
+<ul>
+<li>保护头部；</li>
+<li>移开硬物；</li>
+<li>使用软垫阻隔；</li>
+<li>不责骂；</li>
+<li>不强压；</li>
+<li>必要时按机构危机流程处理。</li>
+</ul>
+<h3 id="长期分析"><a class="anchor" href="#长期分析" aria-hidden="true">#</a>长期分析</h3>
+<p>看：</p>
+<ul>
+<li>疼痛；</li>
+<li>睡眠；</li>
+<li>便秘；</li>
+<li>逃避；</li>
+<li>沟通失败；</li>
+<li>感觉需求；</li>
+<li>焦虑；</li>
+<li>后果强化。</li>
+</ul>
+<h3 id="必须转介"><a class="anchor" href="#必须转介" aria-hidden="true">#</a>必须转介</h3>
+<p>频繁自伤或造成伤害，建议医学和行为专业评估。</p>
+<hr>
+<h2 id="六、攻击安全计划"><a class="anchor" href="#六、攻击安全计划" aria-hidden="true">#</a>六、攻击安全计划</h2>
+<h3 id="现场"><a class="anchor" href="#现场" aria-hidden="true">#</a>现场</h3>
+<ul>
+<li>拉开距离；</li>
+<li>保护其他儿童；</li>
+<li>移开可扔物；</li>
+<li>不抓扯对抗；</li>
+<li>用短句；</li>
+<li>等下降。</li>
+</ul>
+<h3 id="长期"><a class="anchor" href="#长期" aria-hidden="true">#</a>长期</h3>
+<ul>
+<li>功能评估；</li>
+<li>替代沟通；</li>
+<li>任务降阶；</li>
+<li>同伴规则；</li>
+<li>情绪调节；</li>
+<li>家校一致后果。</li>
+</ul>
+<h3 id="数据"><a class="anchor" href="#数据" aria-hidden="true">#</a>数据</h3>
+<p>记录：</p>
+<ul>
+<li>攻击对象；</li>
+<li>攻击方式；</li>
+<li>前因；</li>
+<li>持续时间；</li>
+<li>伤害程度；</li>
+<li>后果。</li>
+</ul>
+<hr>
+<h2 id="七、逃跑安全计划"><a class="anchor" href="#七、逃跑安全计划" aria-hidden="true">#</a>七、逃跑安全计划</h2>
+<h3 id="高风险场景"><a class="anchor" href="#高风险场景" aria-hidden="true">#</a>高风险场景</h3>
+<ul>
+<li>门口；</li>
+<li>电梯；</li>
+<li>马路；</li>
+<li>校门；</li>
+<li>商场；</li>
+<li>课间；</li>
+<li>集体活动转换。</li>
+</ul>
+<h3 id="预防"><a class="anchor" href="#预防" aria-hidden="true">#</a>预防</h3>
+<ul>
+<li>门口视觉边界；</li>
+<li>固定路线；</li>
+<li>手环或联系人卡；</li>
+<li>成人站位；</li>
+<li>提前预告；</li>
+<li>教“出去/休息”；</li>
+<li>安静区。</li>
+</ul>
+<h3 id="现场-2"><a class="anchor" href="#现场-2" aria-hidden="true">#</a>现场</h3>
+<ul>
+<li>不追逐成游戏；</li>
+<li>保持安全拦截；</li>
+<li>短句“停”；</li>
+<li>回安全点；</li>
+<li>稳定后再处理。</li>
+</ul>
+<hr>
+<h2 id="八、吞物和异食安全计划"><a class="anchor" href="#八、吞物和异食安全计划" aria-hidden="true">#</a>八、吞物和异食安全计划</h2>
+<h3 id="现场-3"><a class="anchor" href="#现场-3" aria-hidden="true">#</a>现场</h3>
+<ul>
+<li>立即移开小物件；</li>
+<li>检查环境；</li>
+<li>通知家长；</li>
+<li>必要时就医；</li>
+<li>记录吞食物和时间。</li>
+</ul>
+<h3 id="长期-2"><a class="anchor" href="#长期-2" aria-hidden="true">#</a>长期</h3>
+<ul>
+<li>环境清理；</li>
+<li>替代口腔刺激；</li>
+<li>教“不能吃”；</li>
+<li>监督；</li>
+<li>医学排查营养或消化问题。</li>
+</ul>
+<hr>
+<h2 id="九、拒学危机"><a class="anchor" href="#九、拒学危机" aria-hidden="true">#</a>九、拒学危机</h2>
+<p>拒学不是简单“不想上学”。</p>
+<p>可能原因：</p>
+<ul>
+<li>焦虑；</li>
+<li>同伴欺凌；</li>
+<li>学业压力；</li>
+<li>感觉过载；</li>
+<li>老师批评；</li>
+<li>睡眠问题；</li>
+<li>社交失败。</li>
+</ul>
+<h3 id="支持"><a class="anchor" href="#支持" aria-hidden="true">#</a>支持</h3>
+<ol>
+<li>找具体触发；</li>
+<li>降低返校要求；</li>
+<li>分阶段返校；</li>
+<li>安全人物；</li>
+<li>安静空间；</li>
+<li>学校协作；</li>
+<li>心理专业支持。</li>
+</ol>
+<hr>
+<h2 id="十、危机前兆识别"><a class="anchor" href="#十、危机前兆识别" aria-hidden="true">#</a>十、危机前兆识别</h2>
+<p>每个孩子爆发前都有信号。</p>
+<p>可能包括：</p>
+<ul>
+<li>呼吸变快；</li>
+<li>皱眉；</li>
+<li>自言自语增加；</li>
+<li>捂耳；</li>
+<li>看门；</li>
+<li>推开材料；</li>
+<li>声音变大；</li>
+<li>重复问；</li>
+<li>身体僵硬；</li>
+<li>来回走。</li>
+</ul>
+<p>训练师要在2–3分介入，不要等5分。</p>
+<hr>
+<h2 id="十一、危机后的复盘"><a class="anchor" href="#十一、危机后的复盘" aria-hidden="true">#</a>十一、危机后的复盘</h2>
+<h3 id="和团队复盘"><a class="anchor" href="#和团队复盘" aria-hidden="true">#</a>和团队复盘</h3>
+<p>问：</p>
+<ul>
+<li>前面发生了什么？</li>
+<li>是否有早期信号？</li>
+<li>哪个支持有效？</li>
+<li>哪个处理升级了危机？</li>
+<li>下次如何预防？</li>
+</ul>
+<h3 id="和孩子复盘"><a class="anchor" href="#和孩子复盘" aria-hidden="true">#</a>和孩子复盘</h3>
+<p>等完全平静后，短句：</p>
+<blockquote>
+<p>“刚才很生气。”<br>
+“手打人，会疼。”<br>
+“下次说休息。”<br>
+“我们练一次。”</p>
+</blockquote>
+<h3 id="和家长复盘"><a class="anchor" href="#和家长复盘" aria-hidden="true">#</a>和家长复盘</h3>
+<p>讲事实和计划，不甩锅。</p>
+<hr>
+<h2 id="十二、安全计划模板"><a class="anchor" href="#十二、安全计划模板" aria-hidden="true">#</a>十二、安全计划模板</h2>
+<pre><code class="language-text">儿童姓名：
+日期：
+风险行为：
+
+一、行为定义
+
+二、常见前兆
+
+三、常见触发
+
+四、预防策略
+1.
+2.
+3.
+
+五、现场分工
+主沟通人：
+安全清场人：
+门口/环境人员：
+记录人：
+家长联系人：
+
+六、现场话术
+
+七、禁止做法
+
+八、事后记录
+
+九、转介建议
+
+十、复盘日期
+</code></pre>
+<hr>
+<h2 id="十三、危机事件报告模板"><a class="anchor" href="#十三、危机事件报告模板" aria-hidden="true">#</a>十三、危机事件报告模板</h2>
+<pre><code class="language-text">日期时间：
+地点：
+参与人员：
+
+A 前因：
+B 行为：
+C 后果：
+
+持续时间：
+强度：
+是否受伤：
+是否损坏物品：
+是否通知家长：
+是否上报督导：
+处理过程：
+后续计划：
+记录人：
+</code></pre>
+<hr>
+<h2 id="十四、危机中的禁止行为"><a class="anchor" href="#十四、危机中的禁止行为" aria-hidden="true">#</a>十四、危机中的禁止行为</h2>
+<p>不允许：</p>
+<ul>
+<li>体罚；</li>
+<li>羞辱；</li>
+<li>威胁抛弃；</li>
+<li>多人围堵吼叫；</li>
+<li>拍摄传播；</li>
+<li>未授权限制身体；</li>
+<li>让其他孩子围观；</li>
+<li>事后不记录；</li>
+<li>高风险不上报。</li>
+</ul>
+<hr>
+<h2 id="十五、家长沟通话术"><a class="anchor" href="#十五、家长沟通话术" aria-hidden="true">#</a>十五、家长沟通话术</h2>
+<pre><code class="language-text">今天发生了一个高风险行为，我们已经先完成现场安全处理。
+接下来我们不会只看这一次行为，而是会记录前因、行为、后果，制定预防和替代沟通计划。
+因为这个行为涉及安全风险，也建议同步咨询相关专业人员。
+</code></pre>
+<hr>
+<h2 id="十六、专家必须记住的10句话"><a class="anchor" href="#十六、专家必须记住的10句话" aria-hidden="true">#</a>十六、专家必须记住的10句话</h2>
+<ol>
+<li>危机管理不是制服孩子。</li>
+<li>高风险行为必须团队处理。</li>
+<li>先安全，再教育。</li>
+<li>成人情绪会影响危机升级或下降。</li>
+<li>前兆识别比爆发后处理更重要。</li>
+<li>自伤、攻击、逃跑、吞物必须有安全计划。</li>
+<li>危机后必须复盘。</li>
+<li>高风险要上报和留痕。</li>
+<li>复杂行为常需要医学、心理、学校和家庭协作。</li>
+<li>尊严和安全必须同时守住。</li>
+</ol>
+<hr>
+<h2 id="十七、最后提醒"><a class="anchor" href="#十七、最后提醒" aria-hidden="true">#</a>十七、最后提醒</h2>
+<p>高风险行为不是靠勇敢硬扛。<br>
+真正专业的危机管理，是提前预防、现场分工、事后复盘、长期替代技能和多方协作。</p>
+
+  <div class="footer">由 asd-complex-behavior-crisis-and-safety-planning.md 转换生成。保留原文清单、表格、模板和代码块；流程型文本已增强为图例展示，并保留原始文本。</div>
+</main>
+</div>
+</body>
+</html>

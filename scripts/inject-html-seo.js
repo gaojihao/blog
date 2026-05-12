@@ -11,11 +11,13 @@ const SITE_OG_IMAGE = `${SITE_URL}/images/avatar.jpg`
 const KEYWORDS_BY_DIR = {
   claude: 'Claude Code,Claude Code 源码,Anthropic,Agent Loop,MCP,Hook,Memory,Permission,Tool 系统,栗志',
   expression: '表达力,沟通训练,刻意练习,演讲技巧,面试话术,述职话术,产品推销,沟通基础,栗志',
+  asd: '自闭症,ASD,康复训练,行为干预,ABA,DTT,NET,IEP,新人训练师,栗志',
 }
 
 const FALLBACK_DESC_BY_DIR = {
   claude: 'Claude Code 源码深度解析合集 —— Agent Loop、上下文管理、Hook、MCP、Memory、Permission、Tool 等系统的实现细节。',
   expression: '表达力私人教练完整体系 —— 从本质溯源、知识地图、刻意练习方案到各场景话术与 90 天沟通基础重建手册。',
+  asd: '自闭症康复训练师成长资料库 —— 从新手到专家的完整学习路径，覆盖观察、评估、教学、记录、家庭与学校协作、督导与伦理。',
 }
 
 function listHtml(dir, acc = []) {

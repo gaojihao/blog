@@ -1,0 +1,1391 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>提示与提示撤销实操手册</title>
+<style>
+:root{--bg:#f7f7fb;--paper:#fff;--ink:#1f2937;--muted:#6b7280;--brand:#2563eb;--brand2:#7c3aed;--line:#e5e7eb;--soft:#eff6ff;--warn:#fff7ed;--code:#111827;--codebg:#f3f4f6;--shadow:0 20px 60px rgba(15,23,42,.10)}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#f8fafc,#eef2ff 45%,#fdf2f8);color:var(--ink);font:16px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif}.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:26px;max-width:1440px;margin:0 auto;padding:28px}.sidebar{position:sticky;top:20px;align-self:start;max-height:calc(100vh - 40px);overflow:auto;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}.sidebar h2{font-size:16px;margin:0 0 10px}.sidebar a{display:block;color:#334155;text-decoration:none;border-radius:10px;padding:7px 9px;margin:2px 0;font-size:13px;line-height:1.35}.sidebar a:hover{background:var(--soft);color:var(--brand)}.sidebar .toc-l2{padding-left:18px}.sidebar .toc-l3{padding-left:32px;color:#64748b}.content{min-width:0;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:44px 52px}.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:28px}.badge{display:inline-flex;gap:8px;align-items:center;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;border-radius:999px;padding:8px 14px;font-size:13px}.navlink{color:var(--brand);text-decoration:none;font-weight:600}h1{font-size:34px;line-height:1.25;margin:0 0 22px;color:#0f172a}h2{font-size:26px;margin:44px 0 14px;padding-top:14px;border-top:1px solid var(--line)}h3{font-size:21px;margin:30px 0 10px}h4{font-size:18px;margin:24px 0 8px}p{margin:12px 0}blockquote{margin:18px 0;padding:14px 18px;border-left:5px solid var(--brand);background:var(--soft);border-radius:12px;color:#1e3a8a}table{width:100%;border-collapse:collapse;margin:18px 0;overflow:hidden;border-radius:14px;display:table}th,td{border:1px solid var(--line);padding:10px 12px;vertical-align:top}th{background:#f1f5f9;text-align:left}tr:nth-child(even) td{background:#fafafa}pre{background:#0b1020;color:#e5e7eb;border-radius:16px;padding:18px;overflow:auto;line-height:1.55}code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace}p code,li code,td code{background:var(--codebg);color:#be123c;padding:2px 6px;border-radius:6px}ul,ol{padding-left:1.5em}.anchor{opacity:.25;text-decoration:none;margin-right:8px;color:var(--brand)}h1:hover .anchor,h2:hover .anchor,h3:hover .anchor{opacity:1}.flowchart{margin:22px 0;padding:18px;border:1px solid #bfdbfe;background:linear-gradient(180deg,#eff6ff,#fff);border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:8px}.flow-step{width:min(640px,100%);display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid #dbeafe;border-radius:14px;padding:12px 14px;box-shadow:0 8px 22px rgba(37,99,235,.08)}.flow-num{flex:0 0 auto;width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;background:var(--brand);color:white;font-weight:700;font-size:13px}.flow-arrow{color:var(--brand);font-size:22px;font-weight:800;line-height:1}.raw-flow{margin:8px 0 20px;color:var(--muted)}.raw-flow summary{cursor:pointer}.footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}.callout{background:var(--warn);border:1px solid #fed7aa;border-radius:16px;padding:14px 16px;margin:18px 0}.page-list{columns:2;column-gap:28px}.page-list a{display:block;break-inside:avoid;text-decoration:none;color:#1d4ed8;padding:8px 0;border-bottom:1px dashed #dbeafe}.meta{color:var(--muted);font-size:14px}@media(max-width:960px){.layout{display:block;padding:14px}.sidebar{position:relative;max-height:none;margin-bottom:16px}.content{padding:26px 20px}.page-list{columns:1}h1{font-size:28px}h2{font-size:23px}table{display:block;overflow-x:auto;white-space:normal}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <h2>目录</h2>
+  <a class="navlink" href="index.html">← HTML总索引</a>
+  <a class="toc-l1" href="#提示与提示撤销实操手册">提示与提示撤销实操手册</a>
+<a class="toc-l2" href="#一、先用一句话讲清楚提示">一、先用一句话讲清楚提示</a>
+<a class="toc-l2" href="#二、提示不是替孩子做">二、提示不是替孩子做</a>
+<a class="toc-l3" href="#提示和代劳的区别">提示和代劳的区别</a>
+<a class="toc-l2" href="#三、为什么提示撤销很重要">三、为什么提示撤销很重要？</a>
+<a class="toc-l3" href="#什么是提示依赖">什么是提示依赖？</a>
+<a class="toc-l2" href="#四、常见提示类型">四、常见提示类型</a>
+<a class="toc-l3" href="#1.-身体提示">1. 身体提示</a>
+<a class="toc-l3" href="#2.-示范提示">2. 示范提示</a>
+<a class="toc-l3" href="#3.-手势提示">3. 手势提示</a>
+<a class="toc-l3" href="#4.-语言提示">4. 语言提示</a>
+<a class="toc-l3" href="#5.-视觉提示">5. 视觉提示</a>
+<a class="toc-l3" href="#6.-位置提示">6. 位置提示</a>
+<a class="toc-l3" href="#7.-线索提示">7. 线索提示</a>
+<a class="toc-l2" href="#五、提示强度阶梯">五、提示强度阶梯</a>
+<a class="toc-l2" href="#六、提示使用黄金原则">六、提示使用黄金原则</a>
+<a class="toc-l3" href="#原则1先等再帮">原则1：先等，再帮</a>
+<a class="toc-l3" href="#原则2给刚刚够的帮助">原则2：给刚刚够的帮助</a>
+<a class="toc-l3" href="#原则3提示后也要强化">原则3：提示后也要强化</a>
+<a class="toc-l3" href="#原则4独立完成要特别强化">原则4：独立完成要特别强化</a>
+<a class="toc-l3" href="#原则5提示要计划撤销">原则5：提示要计划撤销</a>
+<a class="toc-l3" href="#原则6不要重复指令当提示">原则6：不要重复指令当提示</a>
+<a class="toc-l3" href="#原则7避免无意识提示">原则7：避免无意识提示</a>
+<a class="toc-l2" href="#七、提示策略一从多到少">七、提示策略一：从多到少</a>
+<a class="toc-l3" href="#示例教“放进去”">示例：教“放进去”</a>
+<a class="toc-l3" href="#优点">优点</a>
+<a class="toc-l3" href="#风险">风险</a>
+<a class="toc-l2" href="#八、提示策略二从少到多">八、提示策略二：从少到多</a>
+<a class="toc-l3" href="#示例教“给我”">示例：教“给我”</a>
+<a class="toc-l3" href="#优点-2">优点</a>
+<a class="toc-l3" href="#风险-2">风险</a>
+<a class="toc-l2" href="#九、提示策略三时间延迟">九、提示策略三：时间延迟</a>
+<a class="toc-l3" href="#固定时间延迟">固定时间延迟</a>
+<a class="toc-l3" href="#逐步时间延迟">逐步时间延迟</a>
+<a class="toc-l3" href="#示例教孩子说“要”">示例：教孩子说“要”</a>
+<a class="toc-l2" href="#十、提示策略四错误少教学">十、提示策略四：错误少教学</a>
+<a class="toc-l2" href="#十一、提示撤销的四种方法">十一、提示撤销的四种方法</a>
+<a class="toc-l3" href="#方法1减少身体接触">方法1：减少身体接触</a>
+<a class="toc-l3" href="#方法2减少语言">方法2：减少语言</a>
+<a class="toc-l3" href="#方法3增加等待">方法3：增加等待</a>
+<a class="toc-l3" href="#方法4转为自然线索">方法4：转为自然线索</a>
+<a class="toc-l2" href="#十二、不同技能怎么提示">十二、不同技能怎么提示</a>
+<a class="toc-l1" href="#技能一叫名反应">技能一：叫名反应</a>
+<a class="toc-l2" href="#目标">目标</a>
+<a class="toc-l2" href="#sop">SOP</a>
+<a class="toc-l2" href="#避坑">避坑</a>
+<a class="toc-l1" href="#技能二模仿动作">技能二：模仿动作</a>
+<a class="toc-l2" href="#目标-2">目标</a>
+<a class="toc-l2" href="#sop-2">SOP</a>
+<a class="toc-l2" href="#提示顺序示例">提示顺序示例</a>
+<a class="toc-l2" href="#避坑-2">避坑</a>
+<a class="toc-l1" href="#技能三物品配对">技能三：物品配对</a>
+<a class="toc-l2" href="#目标-3">目标</a>
+<a class="toc-l2" href="#sop-3">SOP</a>
+<a class="toc-l2" href="#提示撤销">提示撤销</a>
+<a class="toc-l1" href="#技能四主动请求">技能四：主动请求</a>
+<a class="toc-l2" href="#目标-4">目标</a>
+<a class="toc-l2" href="#sop-4">SOP</a>
+<a class="toc-l2" href="#避坑-3">避坑</a>
+<a class="toc-l1" href="#技能五生活自理——洗手">技能五：生活自理——洗手</a>
+<a class="toc-l2" href="#目标-5">目标</a>
+<a class="toc-l2" href="#任务分析">任务分析</a>
+<a class="toc-l2" href="#sop-5">SOP</a>
+<a class="toc-l2" href="#避坑-4">避坑</a>
+<a class="toc-l2" href="#十三、提示记录怎么写">十三、提示记录怎么写</a>
+<a class="toc-l3" href="#提示等级记录表">提示等级记录表</a>
+<a class="toc-l3" href="#记录示例">记录示例</a>
+<a class="toc-l2" href="#十四、如何判断提示撤销是否成功">十四、如何判断提示撤销是否成功</a>
+<a class="toc-l3" href="#成功指标">成功指标</a>
+<a class="toc-l3" href="#例子">例子</a>
+<a class="toc-l2" href="#十五、提示依赖怎么办">十五、提示依赖怎么办？</a>
+<a class="toc-l3" href="#1.-先找原因">1. 先找原因</a>
+<a class="toc-l3" href="#2.-处理sop">2. 处理SOP</a>
+<a class="toc-l2" href="#十六、错误纠正怎么做">十六、错误纠正怎么做</a>
+<a class="toc-l3" href="#错误纠正sop">错误纠正SOP</a>
+<a class="toc-l3" href="#示例">示例</a>
+<a class="toc-l2" href="#十七、家长版解释话术">十七、家长版解释话术</a>
+<a class="toc-l3" href="#1.-解释提示">1. 解释提示</a>
+<a class="toc-l3" href="#2.-解释为什么不能一直提醒">2. 解释为什么不能一直提醒</a>
+<a class="toc-l3" href="#3.-解释提示撤销">3. 解释提示撤销</a>
+<a class="toc-l3" href="#4.-解释孩子做错怎么办">4. 解释孩子做错怎么办</a>
+<a class="toc-l2" href="#十八、课堂提示计划模板">十八、课堂提示计划模板</a>
+<a class="toc-l2" href="#十九、不同场景的提示注意事项">十九、不同场景的提示注意事项</a>
+<a class="toc-l3" href="#1.-一对一训练室">1. 一对一训练室</a>
+<a class="toc-l3" href="#2.-家庭">2. 家庭</a>
+<a class="toc-l3" href="#3.-学校">3. 学校</a>
+<a class="toc-l3" href="#4.-公共场所">4. 公共场所</a>
+<a class="toc-l2" href="#二十、新人常见错误">二十、新人常见错误</a>
+<a class="toc-l3" href="#错误1指令刚说完就帮">错误1：指令刚说完就帮</a>
+<a class="toc-l3" href="#错误2无限重复指令">错误2：无限重复指令</a>
+<a class="toc-l3" href="#错误3身体提示太多">错误3：身体提示太多</a>
+<a class="toc-l3" href="#错误4提示后不记录">错误4：提示后不记录</a>
+<a class="toc-l3" href="#错误5只帮不撤">错误5：只帮不撤</a>
+<a class="toc-l3" href="#错误6孩子错了就批评">错误6：孩子错了就批评</a>
+<a class="toc-l3" href="#错误7用眼神偷偷给答案">错误7：用眼神偷偷给答案</a>
+<a class="toc-l3" href="#错误8视觉提示用了就不撤">错误8：视觉提示用了就不撤</a>
+<a class="toc-l3" href="#错误9提示和强化不匹配">错误9：提示和强化不匹配</a>
+<a class="toc-l3" href="#错误10在情绪爆发时教新技能">错误10：在情绪爆发时教新技能</a>
+<a class="toc-l2" href="#二十一、提示与撤销自查表">二十一、提示与撤销自查表</a>
+<a class="toc-l2" href="#二十二、空白打印模板">二十二、空白打印模板</a>
+<a class="toc-l3" href="#1.-提示等级记录表">1. 提示等级记录表</a>
+<a class="toc-l3" href="#2.-提示撤销计划表">2. 提示撤销计划表</a>
+<a class="toc-l3" href="#3.-技能任务分析表">3. 技能任务分析表</a>
+<a class="toc-l2" href="#二十三、新人训练师必须记住的10句话">二十三、新人训练师必须记住的10句话</a>
+<a class="toc-l2" href="#二十四、最后给新人训练师的话">二十四、最后给新人训练师的话</a>
+</aside>
+<main class="content">
+  <div class="topbar"><span class="badge">ASD训练师资料库 · 第 07 篇</span><a class="navlink" href="../asd-prompting-and-prompt-fading.md">查看Markdown源文档</a></div>
+  <h1 id="提示与提示撤销实操手册"><a class="anchor" href="#提示与提示撤销实操手册" aria-hidden="true">#</a>提示与提示撤销实操手册</h1>
+<blockquote>
+<p>适用对象：自闭症康复训练师、助教、影子老师、融合教育老师、家长指导老师。<br>
+使用场景：儿童不会回应指令、不会模仿、不会完成任务、需要成人帮助；或者儿童已经会做但总等老师提醒，出现提示依赖。<br>
+核心目的：让新人学会“什么时候帮、怎么帮、帮多少、怎么慢慢松手”，既不让孩子反复失败，也不让孩子永远依赖大人。<br>
+重要提醒：身体提示必须温和、必要、短暂，并遵守儿童安全、隐私和伦理边界。涉及如厕、洗澡、青春期卫生、身体接触类训练时，必须符合机构规范和家长知情同意。</p>
+</blockquote>
+<hr>
+<h2 id="一、先用一句话讲清楚提示"><a class="anchor" href="#一、先用一句话讲清楚提示" aria-hidden="true">#</a>一、先用一句话讲清楚提示</h2>
+<p>一句大白话：</p>
+<blockquote>
+<p>提示就是孩子暂时不会时，大人给一点帮助，让他先做成功。</p>
+</blockquote>
+<p>比如：</p>
+<ul>
+<li>孩子不知道把积木放哪里，老师指一下盒子；</li>
+<li>孩子不会拍手，老师先示范拍手；</li>
+<li>孩子不会说“要”，老师轻声提示“要”；</li>
+<li>孩子不会洗手，老师指着水龙头图片；</li>
+<li>孩子不会穿鞋，老师轻轻扶一下他的手。</li>
+</ul>
+<p>提示像扶孩子骑自行车：</p>
+<blockquote>
+<p>刚开始扶住，是为了让他体验成功；后面慢慢松手，是为了让他自己会。</p>
+</blockquote>
+<hr>
+<h2 id="二、提示不是替孩子做"><a class="anchor" href="#二、提示不是替孩子做" aria-hidden="true">#</a>二、提示不是替孩子做</h2>
+<p>新人最容易犯的错是：</p>
+<blockquote>
+<p>看到孩子不会，就立刻替他完成。</p>
+</blockquote>
+<p>这不叫教学，这叫代劳。</p>
+<h3 id="提示和代劳的区别"><a class="anchor" href="#提示和代劳的区别" aria-hidden="true">#</a>提示和代劳的区别</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>提示</th>
+<th>代劳</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>目的</td>
+<td>帮孩子成功</td>
+<td>大人快速完成</td>
+</tr>
+<tr>
+<td>孩子参与</td>
+<td>有参与</td>
+<td>很少参与</td>
+</tr>
+<tr>
+<td>是否逐步减少</td>
+<td>会减少</td>
+<td>一直由大人做</td>
+</tr>
+<tr>
+<td>长期结果</td>
+<td>孩子独立</td>
+<td>孩子依赖</td>
+</tr>
+</tbody>
+</table>
+<p>例子：教孩子放积木进盒子。</p>
+<p>代劳：</p>
+<pre><code class="language-text">老师直接拿起孩子手里的积木放进盒子，然后说“做完了”。
+</code></pre>
+<p>提示：</p>
+<pre><code class="language-text">老师先说“放进去”，等2秒。
+孩子不动，老师指盒子。
+还不动，老师轻轻碰孩子手肘帮助启动。
+孩子完成后，马上强化。
+下一次老师先尝试只指盒子，不再碰手。
+</code></pre>
+<hr>
+<h2 id="三、为什么提示撤销很重要"><a class="anchor" href="#三、为什么提示撤销很重要" aria-hidden="true">#</a>三、为什么提示撤销很重要？</h2>
+<p>提示撤销大白话：</p>
+<blockquote>
+<p>帮助要越给越少，让孩子从“靠老师”变成“靠自己”。</p>
+</blockquote>
+<p>如果不撤提示，会出现提示依赖。</p>
+<h3 id="什么是提示依赖"><a class="anchor" href="#什么是提示依赖" aria-hidden="true">#</a>什么是提示依赖？</h3>
+<p>大白话：</p>
+<blockquote>
+<p>孩子明明会，但不等老师提示就不做。</p>
+</blockquote>
+<p>表现：</p>
+<ul>
+<li>老师不指，他不拿；</li>
+<li>老师不重复，他不回答；</li>
+<li>老师不碰手，他不动；</li>
+<li>老师不说第一个字，他不说话；</li>
+<li>每次都看老师脸色等答案；</li>
+<li>家里会做，机构不会做，或反过来。</li>
+</ul>
+<p>提示依赖不是孩子懒，常常是大人教出来的。</p>
+<hr>
+<h2 id="四、常见提示类型"><a class="anchor" href="#四、常见提示类型" aria-hidden="true">#</a>四、常见提示类型</h2>
+<h3 id="1.-身体提示"><a class="anchor" href="#1.-身体提示" aria-hidden="true">#</a>1. 身体提示</h3>
+<p>大白话：</p>
+<blockquote>
+<p>用身体接触帮助孩子完成动作。</p>
+</blockquote>
+<p>等级从重到轻：</p>
+<ul>
+<li>完全身体辅助：握手完成；</li>
+<li>部分身体辅助：扶手腕、扶手肘；</li>
+<li>轻触提示：轻碰一下手背或肩膀。</li>
+</ul>
+<p>适合：</p>
+<ul>
+<li>动作技能；</li>
+<li>生活自理；</li>
+<li>初学模仿；</li>
+<li>精细动作。</li>
+</ul>
+<p>注意：</p>
+<ul>
+<li>必须温和；</li>
+<li>不要粗暴拉拽；</li>
+<li>不要造成疼痛；</li>
+<li>避免不必要身体接触；</li>
+<li>尽快撤到更轻提示。</li>
+</ul>
+<h3 id="2.-示范提示"><a class="anchor" href="#2.-示范提示" aria-hidden="true">#</a>2. 示范提示</h3>
+<p>大白话：</p>
+<blockquote>
+<p>老师先做一遍给孩子看。</p>
+</blockquote>
+<p>例子：</p>
+<ul>
+<li>老师拍手，说“这样做”；</li>
+<li>老师把积木放进盒子；</li>
+<li>老师示范用纸巾擦嘴；</li>
+<li>老师示范说“我要水”。</li>
+</ul>
+<p>适合：</p>
+<ul>
+<li>模仿；</li>
+<li>游戏；</li>
+<li>社交动作；</li>
+<li>生活技能。</li>
+</ul>
+<h3 id="3.-手势提示"><a class="anchor" href="#3.-手势提示" aria-hidden="true">#</a>3. 手势提示</h3>
+<p>大白话：</p>
+<blockquote>
+<p>用指、点、摆手、眼神方向提醒孩子。</p>
+</blockquote>
+<p>例子：</p>
+<ul>
+<li>指向正确答案；</li>
+<li>指向椅子；</li>
+<li>指向水杯；</li>
+<li>用手势表示“给我”；</li>
+<li>用眼神看向目标物。</li>
+</ul>
+<h3 id="4.-语言提示"><a class="anchor" href="#4.-语言提示" aria-hidden="true">#</a>4. 语言提示</h3>
+<p>大白话：</p>
+<blockquote>
+<p>用话提醒孩子。</p>
+</blockquote>
+<p>例子：</p>
+<ul>
+<li>“放进去”；</li>
+<li>“说要”；</li>
+<li>“看这里”；</li>
+<li>“下一步洗手”；</li>
+<li>“先写名字”。</li>
+</ul>
+<p>语言提示很常用，但也最容易造成依赖。<br>
+因为大人太容易一直说。</p>
+<h3 id="5.-视觉提示"><a class="anchor" href="#5.-视觉提示" aria-hidden="true">#</a>5. 视觉提示</h3>
+<p>大白话：</p>
+<blockquote>
+<p>用图片、文字、符号、流程卡帮助孩子理解。</p>
+</blockquote>
+<p>例子：</p>
+<ul>
+<li>视觉日程；</li>
+<li>先后板；</li>
+<li>洗手步骤图；</li>
+<li>选择板；</li>
+<li>规则卡；</li>
+<li>情绪卡；</li>
+<li>工作清单。</li>
+</ul>
+<p>视觉提示非常适合ASD儿童，因为很多孩子“看得懂”比“听得懂”更稳定。</p>
+<h3 id="6.-位置提示"><a class="anchor" href="#6.-位置提示" aria-hidden="true">#</a>6. 位置提示</h3>
+<p>大白话：</p>
+<blockquote>
+<p>把正确答案放在更容易选的位置。</p>
+</blockquote>
+<p>例子：</p>
+<ul>
+<li>让正确卡片离孩子更近；</li>
+<li>把要拿的鞋放在最显眼位置；</li>
+<li>把目标物放在孩子惯用手一侧。</li>
+</ul>
+<p>注意：</p>
+<p>位置提示要尽快撤，否则孩子可能只学会选最近的，不是真的理解。</p>
+<h3 id="7.-线索提示"><a class="anchor" href="#7.-线索提示" aria-hidden="true">#</a>7. 线索提示</h3>
+<p>大白话：</p>
+<blockquote>
+<p>给一点点开头，让孩子接下去。</p>
+</blockquote>
+<p>例子：</p>
+<ul>
+<li>老师说：“小狗怎么叫？汪……”</li>
+<li>孩子接：“汪。”</li>
+<li>老师说：“我要……”</li>
+<li>孩子接：“水。”</li>
+</ul>
+<p>适合：</p>
+<ul>
+<li>语言表达；</li>
+<li>回答问题；</li>
+<li>熟悉句型。</li>
+</ul>
+<p>注意：</p>
+<p>不要长期每次都给第一个字，否则孩子会等你开头。</p>
+<hr>
+<h2 id="五、提示强度阶梯"><a class="anchor" href="#五、提示强度阶梯" aria-hidden="true">#</a>五、提示强度阶梯</h2>
+<p>从强到弱大致如下：</p>
+<div class="flowchart" role="group" aria-label="流程图"><div class="flow-step"><span class="flow-num">1</span><span>完全身体提示</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">2</span><span>部分身体提示</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">3</span><span>轻触提示</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">4</span><span>示范提示</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">5</span><span>手势提示</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">6</span><span>视觉提示</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">7</span><span>语言提示/线索提示</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">8</span><span>自然线索</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">9</span><span>独立完成</span></div></div>
+<details class="raw-flow"><summary>查看原始流程文本</summary>
+<pre><code class="language-text">完全身体提示
+↓
+部分身体提示
+↓
+轻触提示
+↓
+示范提示
+↓
+手势提示
+↓
+视觉提示
+↓
+语言提示/线索提示
+↓
+自然线索
+↓
+独立完成
+</code></pre>
+</details>
+<p>注意：不同任务的提示强弱不完全一样。<br>
+例如，对有些孩子来说，语言提示很弱；对另一些孩子来说，语言提示反而很强。</p>
+<p>训练师要根据孩子反应判断，而不是死背顺序。</p>
+<hr>
+<h2 id="六、提示使用黄金原则"><a class="anchor" href="#六、提示使用黄金原则" aria-hidden="true">#</a>六、提示使用黄金原则</h2>
+<h3 id="原则1先等再帮"><a class="anchor" href="#原则1先等再帮" aria-hidden="true">#</a>原则1：先等，再帮</h3>
+<p>给指令后，不要马上帮。<br>
+先等2–3秒。</p>
+<p>SOP：</p>
+<ol>
+<li>给指令：“放进去。”</li>
+<li>等2–3秒；</li>
+<li>孩子动了，立刻强化；</li>
+<li>孩子不动，再给提示。</li>
+</ol>
+<p>等待很重要。<br>
+很多孩子不是不会，而是处理速度慢。</p>
+<h3 id="原则2给刚刚够的帮助"><a class="anchor" href="#原则2给刚刚够的帮助" aria-hidden="true">#</a>原则2：给刚刚够的帮助</h3>
+<p>不要过度帮助。</p>
+<p>如果孩子只需要你指一下，就不要握着他的手。<br>
+如果孩子只需要你看一眼目标物，就不要说一大堆。</p>
+<h3 id="原则3提示后也要强化"><a class="anchor" href="#原则3提示后也要强化" aria-hidden="true">#</a>原则3：提示后也要强化</h3>
+<p>孩子在提示下完成，也是完成。<br>
+但强化强度可以比独立完成稍弱。</p>
+<p>例子：</p>
+<ul>
+<li>独立完成：强强化；</li>
+<li>手势提示完成：中等强化；</li>
+<li>身体提示完成：轻强化或自然完成。</li>
+</ul>
+<h3 id="原则4独立完成要特别强化"><a class="anchor" href="#原则4独立完成要特别强化" aria-hidden="true">#</a>原则4：独立完成要特别强化</h3>
+<p>如果孩子从需要提示变成独立完成，必须让他感受到差别。</p>
+<p>老师可以说：</p>
+<blockquote>
+<p>“你自己做的！太棒了！”</p>
+</blockquote>
+<p>并给更强强化。</p>
+<h3 id="原则5提示要计划撤销"><a class="anchor" href="#原则5提示要计划撤销" aria-hidden="true">#</a>原则5：提示要计划撤销</h3>
+<p>每次给提示时，都要想：</p>
+<blockquote>
+<p>下一次我能不能少帮一点？</p>
+</blockquote>
+<h3 id="原则6不要重复指令当提示"><a class="anchor" href="#原则6不要重复指令当提示" aria-hidden="true">#</a>原则6：不要重复指令当提示</h3>
+<p>错误：</p>
+<blockquote>
+<p>“坐下，坐下，坐下，坐下，坐下！”</p>
+</blockquote>
+<p>孩子可能学到：</p>
+<blockquote>
+<p>前几次不用听，反正老师会重复很多遍。</p>
+</blockquote>
+<p>正确：</p>
+<blockquote>
+<p>“坐下。”<br>
+等2秒。<br>
+指椅子。<br>
+必要时轻触提示。</p>
+</blockquote>
+<h3 id="原则7避免无意识提示"><a class="anchor" href="#原则7避免无意识提示" aria-hidden="true">#</a>原则7：避免无意识提示</h3>
+<p>新人常常不自觉给答案：</p>
+<ul>
+<li>眼睛盯着正确答案；</li>
+<li>身体偏向正确答案；</li>
+<li>声音在正确答案时变高；</li>
+<li>每次正确答案都放同一边；</li>
+<li>孩子看老师表情猜答案。</li>
+</ul>
+<p>训练师要学会控制自己的身体线索。</p>
+<hr>
+<h2 id="七、提示策略一从多到少"><a class="anchor" href="#七、提示策略一从多到少" aria-hidden="true">#</a>七、提示策略一：从多到少</h2>
+<p>专业上叫“最大到最小提示”。<br>
+大白话：</p>
+<blockquote>
+<p>一开始给足帮助，保证孩子成功；之后慢慢减少帮助。</p>
+</blockquote>
+<p>适合：</p>
+<ul>
+<li>新技能；</li>
+<li>孩子容易失败；</li>
+<li>错误后容易崩溃；</li>
+<li>生活自理；</li>
+<li>动作模仿。</li>
+</ul>
+<h3 id="示例教“放进去”"><a class="anchor" href="#示例教“放进去”" aria-hidden="true">#</a>示例：教“放进去”</h3>
+<p>第1轮：完全身体提示，帮助放进去。<br>
+第2轮：扶手腕。<br>
+第3轮：轻碰手肘。<br>
+第4轮：指盒子。<br>
+第5轮：只说“放进去”。<br>
+第6轮：孩子独立完成。</p>
+<h3 id="优点"><a class="anchor" href="#优点" aria-hidden="true">#</a>优点</h3>
+<ul>
+<li>成功率高；</li>
+<li>减少错误；</li>
+<li>适合初学。</li>
+</ul>
+<h3 id="风险"><a class="anchor" href="#风险" aria-hidden="true">#</a>风险</h3>
+<ul>
+<li>如果撤得慢，容易提示依赖。</li>
+</ul>
+<hr>
+<h2 id="八、提示策略二从少到多"><a class="anchor" href="#八、提示策略二从少到多" aria-hidden="true">#</a>八、提示策略二：从少到多</h2>
+<p>专业上叫“最小到最大提示”。<br>
+大白话：</p>
+<blockquote>
+<p>先给孩子机会自己做，不会再逐步加帮助。</p>
+</blockquote>
+<p>适合：</p>
+<ul>
+<li>孩子已经学过；</li>
+<li>复习任务；</li>
+<li>你不确定他会不会；</li>
+<li>想测独立能力。</li>
+</ul>
+<h3 id="示例教“给我”"><a class="anchor" href="#示例教“给我”" aria-hidden="true">#</a>示例：教“给我”</h3>
+<ol>
+<li>老师伸手说：“给我。”</li>
+<li>等2秒。</li>
+<li>孩子不动，老师看向物品。</li>
+<li>还不动，老师指物品。</li>
+<li>还不动，老师轻碰孩子手。</li>
+<li>完成后强化。</li>
+</ol>
+<h3 id="优点-2"><a class="anchor" href="#优点-2" aria-hidden="true">#</a>优点</h3>
+<ul>
+<li>给孩子独立机会；</li>
+<li>不容易过度帮助；</li>
+<li>能观察真实水平。</li>
+</ul>
+<h3 id="风险-2"><a class="anchor" href="#风险-2" aria-hidden="true">#</a>风险</h3>
+<ul>
+<li>如果孩子错误太多，会挫败；</li>
+<li>不适合完全不会的新任务。</li>
+</ul>
+<hr>
+<h2 id="九、提示策略三时间延迟"><a class="anchor" href="#九、提示策略三时间延迟" aria-hidden="true">#</a>九、提示策略三：时间延迟</h2>
+<p>大白话：</p>
+<blockquote>
+<p>指令后先等一等，让孩子有机会自己反应；不会再提示。</p>
+</blockquote>
+<h3 id="固定时间延迟"><a class="anchor" href="#固定时间延迟" aria-hidden="true">#</a>固定时间延迟</h3>
+<p>每次都等固定时间，比如3秒。</p>
+<div class="flowchart" role="group" aria-label="流程图"><div class="flow-step"><span class="flow-num">1</span><span>指令</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">2</span><span>等3秒</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">3</span><span>没反应再提示</span></div></div>
+<details class="raw-flow"><summary>查看原始流程文本</summary>
+<pre><code class="language-text">指令 → 等3秒 → 没反应再提示
+</code></pre>
+</details>
+<h3 id="逐步时间延迟"><a class="anchor" href="#逐步时间延迟" aria-hidden="true">#</a>逐步时间延迟</h3>
+<p>一开始马上提示，后来慢慢增加等待时间。</p>
+<pre><code class="language-text">第1阶段：指令后马上提示
+第2阶段：等1秒
+第3阶段：等2秒
+第4阶段：等3秒
+</code></pre>
+<p>适合：</p>
+<ul>
+<li>语言表达；</li>
+<li>图片沟通；</li>
+<li>日常流程；</li>
+<li>已经会但反应慢的孩子。</li>
+</ul>
+<h3 id="示例教孩子说“要”"><a class="anchor" href="#示例教孩子说“要”" aria-hidden="true">#</a>示例：教孩子说“要”</h3>
+<ol>
+<li>拿泡泡，孩子想要；</li>
+<li>老师看着孩子，等2秒；</li>
+<li>孩子不说，老师提示：“要”；</li>
+<li>孩子说或模仿，马上吹泡泡；</li>
+<li>后续逐渐从提示“要”变成只等待。</li>
+</ol>
+<hr>
+<h2 id="十、提示策略四错误少教学"><a class="anchor" href="#十、提示策略四错误少教学" aria-hidden="true">#</a>十、提示策略四：错误少教学</h2>
+<p>大白话：</p>
+<blockquote>
+<p>不让孩子连续错很多次，而是提前给足帮助，让他多体验正确。</p>
+</blockquote>
+<p>适合：</p>
+<ul>
+<li>容易因失败发脾气的孩子；</li>
+<li>新任务；</li>
+<li>语言和配对初学；</li>
+<li>需要建立信心的孩子。</li>
+</ul>
+<p>示例：教颜色红色。</p>
+<p>错误多教学可能是：</p>
+<blockquote>
+<p>老师问“哪个是红色？”孩子乱指，错了很多次。</p>
+</blockquote>
+<p>错误少教学是：</p>
+<ol>
+<li>先只放红色卡片；</li>
+<li>说“红色”，帮助孩子摸红色；</li>
+<li>再加入一个明显不同颜色；</li>
+<li>正确多次后再增加干扰项。</li>
+</ol>
+<p>注意：<br>
+错误少不是永远不让孩子思考，而是在初学阶段降低错误率。</p>
+<hr>
+<h2 id="十一、提示撤销的四种方法"><a class="anchor" href="#十一、提示撤销的四种方法" aria-hidden="true">#</a>十一、提示撤销的四种方法</h2>
+<h3 id="方法1减少身体接触"><a class="anchor" href="#方法1减少身体接触" aria-hidden="true">#</a>方法1：减少身体接触</h3>
+<p>从：</p>
+<pre><code class="language-text">握手完成
+</code></pre>
+<p>变成：</p>
+<div class="flowchart" role="group" aria-label="流程图"><div class="flow-step"><span class="flow-num">1</span><span>扶手腕</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">2</span><span>碰手肘</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">3</span><span>指一下</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">4</span><span>不碰</span></div></div>
+<details class="raw-flow"><summary>查看原始流程文本</summary>
+<pre><code class="language-text">扶手腕 → 碰手肘 → 指一下 → 不碰
+</code></pre>
+</details>
+<h3 id="方法2减少语言"><a class="anchor" href="#方法2减少语言" aria-hidden="true">#</a>方法2：减少语言</h3>
+<p>从：</p>
+<pre><code class="language-text">“拿杯子，放到桌上，放这里，对，就是这里。”
+</code></pre>
+<p>变成：</p>
+<pre><code class="language-text">“杯子。”
+</code></pre>
+<p>再变成：</p>
+<pre><code class="language-text">看向杯子或使用图片。
+</code></pre>
+<h3 id="方法3增加等待"><a class="anchor" href="#方法3增加等待" aria-hidden="true">#</a>方法3：增加等待</h3>
+<p>从马上提示，变成等1秒、2秒、3秒。</p>
+<h3 id="方法4转为自然线索"><a class="anchor" href="#方法4转为自然线索" aria-hidden="true">#</a>方法4：转为自然线索</h3>
+<p>最终让真实环境提示孩子。</p>
+<p>例子：</p>
+<ul>
+<li>水龙头脏手 → 提示洗手；</li>
+<li>饭前餐具 → 提示坐下吃饭；</li>
+<li>书包在门口 → 提示准备上学；</li>
+<li>门铃响 → 提示开门前问是谁。</li>
+</ul>
+<hr>
+<h2 id="十二、不同技能怎么提示"><a class="anchor" href="#十二、不同技能怎么提示" aria-hidden="true">#</a>十二、不同技能怎么提示</h2>
+<hr>
+<h1 id="技能一叫名反应"><a class="anchor" href="#技能一叫名反应" aria-hidden="true">#</a>技能一：叫名反应</h1>
+<h2 id="目标"><a class="anchor" href="#目标" aria-hidden="true">#</a>目标</h2>
+<p>孩子听到名字后转头、看人或回应。</p>
+<h2 id="sop"><a class="anchor" href="#sop" aria-hidden="true">#</a>SOP</h2>
+<ol>
+<li>站在孩子侧前方；</li>
+<li>手里拿强化物；</li>
+<li>叫名字一次；</li>
+<li>等1–2秒；</li>
+<li>不反应，用声音玩具或轻轻移动强化物到眼前；</li>
+<li>孩子一转头，马上强化；</li>
+<li>逐渐减少玩具辅助；</li>
+<li>换距离、换人、换场景。</li>
+</ol>
+<h2 id="避坑"><a class="anchor" href="#避坑" aria-hidden="true">#</a>避坑</h2>
+<ul>
+<li>不要连续叫十几遍；</li>
+<li>不要叫名后没有任何好事发生；</li>
+<li>不要每次都用手掰脸；</li>
+<li>不要把叫名变成批评开头。</li>
+</ul>
+<p>错误：</p>
+<blockquote>
+<p>“小明！小明！小明！你怎么不听！”</p>
+</blockquote>
+<p>正确：</p>
+<blockquote>
+<p>“小明。”<br>
+孩子看你。<br>
+“你看妈妈了，泡泡！”</p>
+</blockquote>
+<hr>
+<h1 id="技能二模仿动作"><a class="anchor" href="#技能二模仿动作" aria-hidden="true">#</a>技能二：模仿动作</h1>
+<h2 id="目标-2"><a class="anchor" href="#目标-2" aria-hidden="true">#</a>目标</h2>
+<p>孩子能跟着老师做动作。</p>
+<h2 id="sop-2"><a class="anchor" href="#sop-2" aria-hidden="true">#</a>SOP</h2>
+<ol>
+<li>面对孩子坐；</li>
+<li>先确保孩子注意到你；</li>
+<li>说：“这样做。”</li>
+<li>老师做动作；</li>
+<li>等2秒；</li>
+<li>不会就给身体或手势提示；</li>
+<li>做对马上强化；</li>
+<li>逐步撤提示。</li>
+</ol>
+<h2 id="提示顺序示例"><a class="anchor" href="#提示顺序示例" aria-hidden="true">#</a>提示顺序示例</h2>
+<p>拍手：</p>
+<ul>
+<li>握手拍；</li>
+<li>轻碰双手；</li>
+<li>老师夸张拍手；</li>
+<li>只说“这样做”；</li>
+<li>独立模仿。</li>
+</ul>
+<h2 id="避坑-2"><a class="anchor" href="#避坑-2" aria-hidden="true">#</a>避坑</h2>
+<ul>
+<li>孩子没看你就示范；</li>
+<li>动作太复杂；</li>
+<li>一次换太多动作；</li>
+<li>每次都握手不撤。</li>
+</ul>
+<hr>
+<h1 id="技能三物品配对"><a class="anchor" href="#技能三物品配对" aria-hidden="true">#</a>技能三：物品配对</h1>
+<h2 id="目标-3"><a class="anchor" href="#目标-3" aria-hidden="true">#</a>目标</h2>
+<p>孩子把相同物品或图片放在一起。</p>
+<h2 id="sop-3"><a class="anchor" href="#sop-3" aria-hidden="true">#</a>SOP</h2>
+<ol>
+<li>先用完全相同实物；</li>
+<li>桌面只放1个目标，减少干扰；</li>
+<li>老师说：“放一样的。”</li>
+<li>等2秒；</li>
+<li>不会就指目标位置；</li>
+<li>再不会轻扶手完成；</li>
+<li>正确后强化；</li>
+<li>逐渐增加干扰项。</li>
+</ol>
+<h2 id="提示撤销"><a class="anchor" href="#提示撤销" aria-hidden="true">#</a>提示撤销</h2>
+<ul>
+<li>从身体提示到指点；</li>
+<li>从近距离位置提示到正常距离；</li>
+<li>从1个干扰项到2–3个干扰项；</li>
+<li>从实物配实物到图片配图片。</li>
+</ul>
+<hr>
+<h1 id="技能四主动请求"><a class="anchor" href="#技能四主动请求" aria-hidden="true">#</a>技能四：主动请求</h1>
+<h2 id="目标-4"><a class="anchor" href="#目标-4" aria-hidden="true">#</a>目标</h2>
+<p>孩子用动作、图片、声音或语言表达想要。</p>
+<h2 id="sop-4"><a class="anchor" href="#sop-4" aria-hidden="true">#</a>SOP</h2>
+<ol>
+<li>找强动机物；</li>
+<li>放在孩子看得见拿不到的位置；</li>
+<li>等孩子看、伸手或发声；</li>
+<li>根据能力给提示：
+<ul>
+<li>指物；</li>
+<li>递图片；</li>
+<li>模仿“要”；</li>
+<li>说“我要+物品”；</li>
+</ul>
+</li>
+<li>孩子表达后马上给；</li>
+<li>慢慢减少语言提示，只用等待和期待眼神。</li>
+</ol>
+<h2 id="避坑-3"><a class="anchor" href="#避坑-3" aria-hidden="true">#</a>避坑</h2>
+<ul>
+<li>孩子一伸手就无条件给，错过教学机会；</li>
+<li>要求过高，必须说完整句才给；</li>
+<li>孩子哭了才提示表达；</li>
+<li>每次老师都先问“你要什么”，孩子不主动。</li>
+</ul>
+<hr>
+<h1 id="技能五生活自理——洗手"><a class="anchor" href="#技能五生活自理——洗手" aria-hidden="true">#</a>技能五：生活自理——洗手</h1>
+<h2 id="目标-5"><a class="anchor" href="#目标-5" aria-hidden="true">#</a>目标</h2>
+<p>孩子按步骤完成洗手。</p>
+<h2 id="任务分析"><a class="anchor" href="#任务分析" aria-hidden="true">#</a>任务分析</h2>
+<ol>
+<li>走到洗手池；</li>
+<li>打开水龙头；</li>
+<li>冲湿双手；</li>
+<li>挤洗手液；</li>
+<li>搓手；</li>
+<li>冲干净；</li>
+<li>关水；</li>
+<li>擦手；</li>
+<li>把毛巾/纸巾放好。</li>
+</ol>
+<h2 id="sop-5"><a class="anchor" href="#sop-5" aria-hidden="true">#</a>SOP</h2>
+<ol>
+<li>贴洗手步骤图；</li>
+<li>先观察孩子能独立做哪几步；</li>
+<li>不会的步骤给提示；</li>
+<li>每完成一步给予简短反馈；</li>
+<li>重点撤掉身体提示，转为图片提示；</li>
+<li>最后让孩子看图独立完成。</li>
+</ol>
+<h2 id="避坑-4"><a class="anchor" href="#避坑-4" aria-hidden="true">#</a>避坑</h2>
+<ul>
+<li>大人全程抓着孩子手洗；</li>
+<li>一边洗一边说太多话；</li>
+<li>没有固定流程；</li>
+<li>每次家长直接替孩子擦手。</li>
+</ul>
+<hr>
+<h2 id="十三、提示记录怎么写"><a class="anchor" href="#十三、提示记录怎么写" aria-hidden="true">#</a>十三、提示记录怎么写</h2>
+<p>提示必须记录，否则你不知道孩子有没有真正进步。</p>
+<h3 id="提示等级记录表"><a class="anchor" href="#提示等级记录表" aria-hidden="true">#</a>提示等级记录表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>目标</th>
+<th style="text-align:right">机会次数</th>
+<th style="text-align:right">独立I</th>
+<th style="text-align:right">语言V</th>
+<th style="text-align:right">手势G</th>
+<th style="text-align:right">示范M</th>
+<th style="text-align:right">身体P</th>
+<th style="text-align:right">错误E</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>符号说明：</p>
+<ul>
+<li>I = Independent 独立；</li>
+<li>V = Verbal 语言提示；</li>
+<li>G = Gesture 手势提示；</li>
+<li>M = Model 示范提示；</li>
+<li>P = Physical 身体提示；</li>
+<li>E = Error 错误。</li>
+</ul>
+<h3 id="记录示例"><a class="anchor" href="#记录示例" aria-hidden="true">#</a>记录示例</h3>
+<p>目标：听到“放进去”后把积木放入盒子。</p>
+<table>
+<thead>
+<tr>
+<th>机会</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>P</td>
+</tr>
+<tr>
+<td>2</td>
+<td>P</td>
+</tr>
+<tr>
+<td>3</td>
+<td>G</td>
+</tr>
+<tr>
+<td>4</td>
+<td>G</td>
+</tr>
+<tr>
+<td>5</td>
+<td>I</td>
+</tr>
+</tbody>
+</table>
+<p>说明：<br>
+孩子从身体提示进步到手势提示，再到独立，说明提示正在撤销。</p>
+<hr>
+<h2 id="十四、如何判断提示撤销是否成功"><a class="anchor" href="#十四、如何判断提示撤销是否成功" aria-hidden="true">#</a>十四、如何判断提示撤销是否成功</h2>
+<p>成功不是“孩子做了一次”。<br>
+要看稳定性。</p>
+<h3 id="成功指标"><a class="anchor" href="#成功指标" aria-hidden="true">#</a>成功指标</h3>
+<ol>
+<li>独立完成比例增加；</li>
+<li>身体提示减少；</li>
+<li>老师语言减少；</li>
+<li>换老师仍能做；</li>
+<li>换材料仍能做；</li>
+<li>换场景仍能做；</li>
+<li>家长也能看到类似表现。</li>
+</ol>
+<h3 id="例子"><a class="anchor" href="#例子" aria-hidden="true">#</a>例子</h3>
+<p>不稳定掌握：</p>
+<blockquote>
+<p>只在王老师面前会，只用红色积木会，只在训练室会。</p>
+</blockquote>
+<p>较稳定掌握：</p>
+<blockquote>
+<p>不同老师、不同盒子、家里和机构都能把物品放进去。</p>
+</blockquote>
+<hr>
+<h2 id="十五、提示依赖怎么办"><a class="anchor" href="#十五、提示依赖怎么办" aria-hidden="true">#</a>十五、提示依赖怎么办？</h2>
+<h3 id="1.-先找原因"><a class="anchor" href="#1.-先找原因" aria-hidden="true">#</a>1. 先找原因</h3>
+<p>常见原因：</p>
+<ul>
+<li>老师提示太快；</li>
+<li>老师重复指令太多；</li>
+<li>独立完成没有更强奖励；</li>
+<li>任务太难，孩子不敢尝试；</li>
+<li>孩子习惯看老师脸色；</li>
+<li>之前错误被批评太多。</li>
+</ul>
+<h3 id="2.-处理sop"><a class="anchor" href="#2.-处理sop" aria-hidden="true">#</a>2. 处理SOP</h3>
+<p>第一步：增加等待。</p>
+<blockquote>
+<p>指令后等3秒，不马上提示。</p>
+</blockquote>
+<p>第二步：减少语言。</p>
+<p>从“拿红色放这里”变成“找一样”。</p>
+<p>第三步：强化独立。</p>
+<p>孩子自己做，给更强强化。</p>
+<p>第四步：使用视觉提示替代成人提示。</p>
+<p>让孩子看图，不是看老师。</p>
+<p>第五步：老师身体退后。</p>
+<p>从坐旁边变成坐远一点，减少控制感。</p>
+<p>第六步：故意保持中性表情。</p>
+<p>避免孩子通过表情猜答案。</p>
+<hr>
+<h2 id="十六、错误纠正怎么做"><a class="anchor" href="#十六、错误纠正怎么做" aria-hidden="true">#</a>十六、错误纠正怎么做</h2>
+<p>孩子做错时，不要骂，也不要让他连续错。</p>
+<h3 id="错误纠正sop"><a class="anchor" href="#错误纠正sop" aria-hidden="true">#</a>错误纠正SOP</h3>
+<ol>
+<li>保持平静；</li>
+<li>简短说：“再来。”或“这个不是”；</li>
+<li>立即给更强提示；</li>
+<li>帮孩子做对；</li>
+<li>做对后轻强化；</li>
+<li>下一轮降低难度再试。</li>
+</ol>
+<h3 id="示例"><a class="anchor" href="#示例" aria-hidden="true">#</a>示例</h3>
+<p>老师说：“拿苹果。”<br>
+孩子拿了香蕉。</p>
+<p>错误处理：</p>
+<blockquote>
+<p>“这个是香蕉。再来。”<br>
+老师指苹果。<br>
+孩子拿苹果。<br>
+“对，苹果。”</p>
+</blockquote>
+<p>不要说：</p>
+<blockquote>
+<p>“你怎么又错了？刚才不是教过了吗？苹果苹果苹果！”</p>
+</blockquote>
+<hr>
+<h2 id="十七、家长版解释话术"><a class="anchor" href="#十七、家长版解释话术" aria-hidden="true">#</a>十七、家长版解释话术</h2>
+<h3 id="1.-解释提示"><a class="anchor" href="#1.-解释提示" aria-hidden="true">#</a>1. 解释提示</h3>
+<pre><code class="language-text">提示就是孩子还不会时，我们给一点帮助。
+但这个帮助不是替他做，而是让他在帮助下成功，然后慢慢少帮一点。
+</code></pre>
+<h3 id="2.-解释为什么不能一直提醒"><a class="anchor" href="#2.-解释为什么不能一直提醒" aria-hidden="true">#</a>2. 解释为什么不能一直提醒</h3>
+<pre><code class="language-text">如果每次都提醒，孩子会学会等大人，而不是自己想下一步。
+所以我们会先等几秒，再给刚刚够的帮助。
+</code></pre>
+<h3 id="3.-解释提示撤销"><a class="anchor" href="#3.-解释提示撤销" aria-hidden="true">#</a>3. 解释提示撤销</h3>
+<pre><code class="language-text">提示撤销就像教孩子骑车。
+一开始扶着，后来扶少一点，再后来只在旁边看着。
+最终目标是孩子自己会，不是永远靠我们提醒。
+</code></pre>
+<h3 id="4.-解释孩子做错怎么办"><a class="anchor" href="#4.-解释孩子做错怎么办" aria-hidden="true">#</a>4. 解释孩子做错怎么办</h3>
+<pre><code class="language-text">孩子做错不是故意捣乱，说明他还没真正学会。
+我们会少批评、多示范，让他马上看到正确做法。
+</code></pre>
+<hr>
+<h2 id="十八、课堂提示计划模板"><a class="anchor" href="#十八、课堂提示计划模板" aria-hidden="true">#</a>十八、课堂提示计划模板</h2>
+<pre><code class="language-text">儿童姓名：
+日期：
+训练师：
+
+目标技能：
+
+当前水平：
+□ 完全不会
+□ 在身体提示下能完成
+□ 在手势提示下能完成
+□ 在语言提示下能完成
+□ 偶尔独立完成
+□ 稳定独立完成
+
+计划使用的提示类型：
+□ 身体提示
+□ 示范提示
+□ 手势提示
+□ 语言提示
+□ 视觉提示
+□ 位置提示
+□ 时间延迟
+
+提示策略：
+□ 从多到少
+□ 从少到多
+□ 时间延迟
+□ 错误少教学
+
+撤销计划：
+第一阶段：
+第二阶段：
+第三阶段：
+
+强化方式：
+
+数据记录方式：
+
+泛化计划：
+□ 换老师
+□ 换材料
+□ 换房间
+□ 回家练习
+□ 学校练习
+</code></pre>
+<hr>
+<h2 id="十九、不同场景的提示注意事项"><a class="anchor" href="#十九、不同场景的提示注意事项" aria-hidden="true">#</a>十九、不同场景的提示注意事项</h2>
+<h3 id="1.-一对一训练室"><a class="anchor" href="#1.-一对一训练室" aria-hidden="true">#</a>1. 一对一训练室</h3>
+<p>优势：干扰少，容易控制。<br>
+风险：孩子只在训练室会。</p>
+<p>注意：</p>
+<ul>
+<li>学会后要换材料；</li>
+<li>换老师；</li>
+<li>换桌子位置；</li>
+<li>尽快泛化。</li>
+</ul>
+<h3 id="2.-家庭"><a class="anchor" href="#2.-家庭" aria-hidden="true">#</a>2. 家庭</h3>
+<p>优势：自然机会多。<br>
+风险：家长容易代劳或重复提醒。</p>
+<p>注意：</p>
+<ul>
+<li>每次只练一个小目标；</li>
+<li>家长语言要短；</li>
+<li>给孩子等待时间；</li>
+<li>不要急着替孩子做。</li>
+</ul>
+<h3 id="3.-学校"><a class="anchor" href="#3.-学校" aria-hidden="true">#</a>3. 学校</h3>
+<p>优势：真实集体环境。<br>
+风险：老师没时间一对一提示。</p>
+<p>注意：</p>
+<ul>
+<li>多用视觉提示；</li>
+<li>用同伴示范；</li>
+<li>简化语言；</li>
+<li>给固定座位和流程；</li>
+<li>影子老师逐渐退后。</li>
+</ul>
+<h3 id="4.-公共场所"><a class="anchor" href="#4.-公共场所" aria-hidden="true">#</a>4. 公共场所</h3>
+<p>优势：真实生活泛化。<br>
+风险：刺激多、容易崩溃。</p>
+<p>注意：</p>
+<ul>
+<li>提前预告；</li>
+<li>使用规则卡；</li>
+<li>指令短；</li>
+<li>安全第一；</li>
+<li>不在崩溃时教学新技能。</li>
+</ul>
+<hr>
+<h2 id="二十、新人常见错误"><a class="anchor" href="#二十、新人常见错误" aria-hidden="true">#</a>二十、新人常见错误</h2>
+<h3 id="错误1指令刚说完就帮"><a class="anchor" href="#错误1指令刚说完就帮" aria-hidden="true">#</a>错误1：指令刚说完就帮</h3>
+<p>孩子没有独立机会。</p>
+<p>改法：<br>
+等2–3秒。</p>
+<h3 id="错误2无限重复指令"><a class="anchor" href="#错误2无限重复指令" aria-hidden="true">#</a>错误2：无限重复指令</h3>
+<p>孩子学会等第5遍才动。</p>
+<p>改法：<br>
+说一次，等待，提示。</p>
+<h3 id="错误3身体提示太多"><a class="anchor" href="#错误3身体提示太多" aria-hidden="true">#</a>错误3：身体提示太多</h3>
+<p>孩子容易被动，甚至抗拒。</p>
+<p>改法：<br>
+尽快撤到轻触、手势或视觉提示。</p>
+<h3 id="错误4提示后不记录"><a class="anchor" href="#错误4提示后不记录" aria-hidden="true">#</a>错误4：提示后不记录</h3>
+<p>看不出是否进步。</p>
+<p>改法：<br>
+记录I、V、G、M、P。</p>
+<h3 id="错误5只帮不撤"><a class="anchor" href="#错误5只帮不撤" aria-hidden="true">#</a>错误5：只帮不撤</h3>
+<p>孩子形成依赖。</p>
+<p>改法：<br>
+每次问自己：下一轮能不能少帮一点？</p>
+<h3 id="错误6孩子错了就批评"><a class="anchor" href="#错误6孩子错了就批评" aria-hidden="true">#</a>错误6：孩子错了就批评</h3>
+<p>孩子更怕尝试。</p>
+<p>改法：<br>
+立即示范正确，降低难度。</p>
+<h3 id="错误7用眼神偷偷给答案"><a class="anchor" href="#错误7用眼神偷偷给答案" aria-hidden="true">#</a>错误7：用眼神偷偷给答案</h3>
+<p>孩子学会看老师，不看材料。</p>
+<p>改法：<br>
+控制表情和身体方向。</p>
+<h3 id="错误8视觉提示用了就不撤"><a class="anchor" href="#错误8视觉提示用了就不撤" aria-hidden="true">#</a>错误8：视觉提示用了就不撤</h3>
+<p>孩子永远看图，不会自然完成。</p>
+<p>改法：<br>
+从完整图片步骤，逐渐减少到关键词、符号、自然线索。</p>
+<h3 id="错误9提示和强化不匹配"><a class="anchor" href="#错误9提示和强化不匹配" aria-hidden="true">#</a>错误9：提示和强化不匹配</h3>
+<p>孩子独立完成和被动完成得到一样奖励。</p>
+<p>改法：<br>
+独立完成给更强强化。</p>
+<h3 id="错误10在情绪爆发时教新技能"><a class="anchor" href="#错误10在情绪爆发时教新技能" aria-hidden="true">#</a>错误10：在情绪爆发时教新技能</h3>
+<p>孩子大脑已经过载。</p>
+<p>改法：<br>
+先降温，恢复后再练。</p>
+<hr>
+<h2 id="二十一、提示与撤销自查表"><a class="anchor" href="#二十一、提示与撤销自查表" aria-hidden="true">#</a>二十一、提示与撤销自查表</h2>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>是/否</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>我是否在指令后等待了2–3秒？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否给了刚刚够的帮助，而不是过度帮助？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否避免重复指令？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否记录了提示等级？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否强化了独立反应？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否计划下一步减少提示？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否避免无意识眼神或位置提示？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否把身体提示逐步撤为更轻提示？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否使用视觉提示帮助理解？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否在孩子情绪稳定时教学？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否把技能泛化到不同人、材料、场景？</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="二十二、空白打印模板"><a class="anchor" href="#二十二、空白打印模板" aria-hidden="true">#</a>二十二、空白打印模板</h2>
+<h3 id="1.-提示等级记录表"><a class="anchor" href="#1.-提示等级记录表" aria-hidden="true">#</a>1. 提示等级记录表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>目标</th>
+<th style="text-align:right">机会</th>
+<th style="text-align:right">独立I</th>
+<th style="text-align:right">语言V</th>
+<th style="text-align:right">手势G</th>
+<th style="text-align:right">示范M</th>
+<th style="text-align:right">身体P</th>
+<th style="text-align:right">错误E</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">1</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">2</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">3</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">4</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">5</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">6</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">7</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">8</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">9</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">10</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="2.-提示撤销计划表"><a class="anchor" href="#2.-提示撤销计划表" aria-hidden="true">#</a>2. 提示撤销计划表</h3>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>当前提示</th>
+<th>撤销目标</th>
+<th>达标标准</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第一阶段</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>第二阶段</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>第三阶段</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>第四阶段</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="3.-技能任务分析表"><a class="anchor" href="#3.-技能任务分析表" aria-hidden="true">#</a>3. 技能任务分析表</h3>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>技能步骤</th>
+<th>当前提示等级</th>
+<th>目标提示等级</th>
+<th>是否掌握</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>5</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>6</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>8</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="二十三、新人训练师必须记住的10句话"><a class="anchor" href="#二十三、新人训练师必须记住的10句话" aria-hidden="true">#</a>二十三、新人训练师必须记住的10句话</h2>
+<ol>
+<li>提示是帮助，不是代劳。</li>
+<li>先等，再帮。</li>
+<li>只给刚刚够的帮助。</li>
+<li>帮了以后要计划撤。</li>
+<li>不要无限重复指令。</li>
+<li>独立完成要更强强化。</li>
+<li>身体提示要温和、短暂、必要。</li>
+<li>视觉提示能减少语言轰炸。</li>
+<li>提示等级必须记录。</li>
+<li>最终目标不是孩子在你提示下会，而是没有你也会。</li>
+</ol>
+<hr>
+<h2 id="二十四、最后给新人训练师的话"><a class="anchor" href="#二十四、最后给新人训练师的话" aria-hidden="true">#</a>二十四、最后给新人训练师的话</h2>
+<p>提示就像一只扶着孩子过桥的手。<br>
+扶得太少，孩子可能摔倒；扶得太久，孩子学不会自己走。</p>
+<p>优秀训练师的本事，不是一直帮孩子完成，<br>
+而是精准判断：</p>
+<blockquote>
+<p>此刻他需要我帮多少？<br>
+下一次我能不能少帮一点？<br>
+最后怎样让环境和孩子自己接管？</p>
+</blockquote>
+<p>当孩子从“等老师提醒”变成“我自己会做”，<br>
+提示才真正完成了它的使命。</p>
+
+  <div class="footer">由 asd-prompting-and-prompt-fading.md 转换生成。保留原文清单、表格、模板和代码块；流程型文本已增强为图例展示，并保留原始文本。</div>
+</main>
+</div>
+</body>
+</html>

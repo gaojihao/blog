@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>数据记录与进展报告实操手册</title>
+<style>
+:root{--bg:#f7f7fb;--paper:#fff;--ink:#1f2937;--muted:#6b7280;--brand:#2563eb;--brand2:#7c3aed;--line:#e5e7eb;--soft:#eff6ff;--warn:#fff7ed;--code:#111827;--codebg:#f3f4f6;--shadow:0 20px 60px rgba(15,23,42,.10)}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#f8fafc,#eef2ff 45%,#fdf2f8);color:var(--ink);font:16px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif}.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:26px;max-width:1440px;margin:0 auto;padding:28px}.sidebar{position:sticky;top:20px;align-self:start;max-height:calc(100vh - 40px);overflow:auto;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}.sidebar h2{font-size:16px;margin:0 0 10px}.sidebar a{display:block;color:#334155;text-decoration:none;border-radius:10px;padding:7px 9px;margin:2px 0;font-size:13px;line-height:1.35}.sidebar a:hover{background:var(--soft);color:var(--brand)}.sidebar .toc-l2{padding-left:18px}.sidebar .toc-l3{padding-left:32px;color:#64748b}.content{min-width:0;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:44px 52px}.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:28px}.badge{display:inline-flex;gap:8px;align-items:center;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;border-radius:999px;padding:8px 14px;font-size:13px}.navlink{color:var(--brand);text-decoration:none;font-weight:600}h1{font-size:34px;line-height:1.25;margin:0 0 22px;color:#0f172a}h2{font-size:26px;margin:44px 0 14px;padding-top:14px;border-top:1px solid var(--line)}h3{font-size:21px;margin:30px 0 10px}h4{font-size:18px;margin:24px 0 8px}p{margin:12px 0}blockquote{margin:18px 0;padding:14px 18px;border-left:5px solid var(--brand);background:var(--soft);border-radius:12px;color:#1e3a8a}table{width:100%;border-collapse:collapse;margin:18px 0;overflow:hidden;border-radius:14px;display:table}th,td{border:1px solid var(--line);padding:10px 12px;vertical-align:top}th{background:#f1f5f9;text-align:left}tr:nth-child(even) td{background:#fafafa}pre{background:#0b1020;color:#e5e7eb;border-radius:16px;padding:18px;overflow:auto;line-height:1.55}code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace}p code,li code,td code{background:var(--codebg);color:#be123c;padding:2px 6px;border-radius:6px}ul,ol{padding-left:1.5em}.anchor{opacity:.25;text-decoration:none;margin-right:8px;color:var(--brand)}h1:hover .anchor,h2:hover .anchor,h3:hover .anchor{opacity:1}.flowchart{margin:22px 0;padding:18px;border:1px solid #bfdbfe;background:linear-gradient(180deg,#eff6ff,#fff);border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:8px}.flow-step{width:min(640px,100%);display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid #dbeafe;border-radius:14px;padding:12px 14px;box-shadow:0 8px 22px rgba(37,99,235,.08)}.flow-num{flex:0 0 auto;width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;background:var(--brand);color:white;font-weight:700;font-size:13px}.flow-arrow{color:var(--brand);font-size:22px;font-weight:800;line-height:1}.raw-flow{margin:8px 0 20px;color:var(--muted)}.raw-flow summary{cursor:pointer}.footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}.callout{background:var(--warn);border:1px solid #fed7aa;border-radius:16px;padding:14px 16px;margin:18px 0}.page-list{columns:2;column-gap:28px}.page-list a{display:block;break-inside:avoid;text-decoration:none;color:#1d4ed8;padding:8px 0;border-bottom:1px dashed #dbeafe}.meta{color:var(--muted);font-size:14px}@media(max-width:960px){.layout{display:block;padding:14px}.sidebar{position:relative;max-height:none;margin-bottom:16px}.content{padding:26px 20px}.page-list{columns:1}h1{font-size:28px}h2{font-size:23px}table{display:block;overflow-x:auto;white-space:normal}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <h2>目录</h2>
+  <a class="navlink" href="index.html">← HTML总索引</a>
+  <a class="toc-l1" href="#数据记录与进展报告实操手册">数据记录与进展报告实操手册</a>
+<a class="toc-l2" href="#一、先用一句话讲清楚数据记录">一、先用一句话讲清楚数据记录</a>
+<a class="toc-l2" href="#二、为什么新人必须会记录数据">二、为什么新人必须会记录数据</a>
+<a class="toc-l2" href="#三、常用数据类型">三、常用数据类型</a>
+<a class="toc-l3" href="#1.-正确率">1. 正确率</a>
+<a class="toc-l3" href="#2.-频率">2. 频率</a>
+<a class="toc-l3" href="#3.-持续时间">3. 持续时间</a>
+<a class="toc-l3" href="#4.-提示等级">4. 提示等级</a>
+<a class="toc-l3" href="#5.-强度">5. 强度</a>
+<a class="toc-l3" href="#6.-abc记录">6. ABC记录</a>
+<a class="toc-l2" href="#四、记录要写事实不写评价">四、记录要写事实，不写评价</a>
+<a class="toc-l3" href="#错误记录">错误记录</a>
+<a class="toc-l3" href="#正确记录">正确记录</a>
+<a class="toc-l2" href="#五、dtt数据记录">五、DTT数据记录</a>
+<a class="toc-l3" href="#单目标10回合表">单目标10回合表</a>
+<a class="toc-l3" href="#示例">示例</a>
+<a class="toc-l2" href="#六、net数据记录">六、NET数据记录</a>
+<a class="toc-l3" href="#net机会记录表">NET机会记录表</a>
+<a class="toc-l3" href="#示例-2">示例</a>
+<a class="toc-l2" href="#七、abc行为记录">七、ABC行为记录</a>
+<a class="toc-l3" href="#表格">表格</a>
+<a class="toc-l3" href="#记录重点">记录重点</a>
+<a class="toc-l2" href="#八、提示等级记录">八、提示等级记录</a>
+<a class="toc-l3" href="#符号">符号</a>
+<a class="toc-l3" href="#表格-2">表格</a>
+<a class="toc-l3" href="#判断进步">判断进步</a>
+<a class="toc-l2" href="#九、生活技能任务分析记录">九、生活技能任务分析记录</a>
+<a class="toc-l2" href="#十、情绪行为数据记录">十、情绪行为数据记录</a>
+<a class="toc-l3" href="#1.-频率">1. 频率</a>
+<a class="toc-l3" href="#2.-持续时间">2. 持续时间</a>
+<a class="toc-l3" href="#3.-强度">3. 强度</a>
+<a class="toc-l2" href="#十一、如何判断目标是否掌握">十一、如何判断目标是否掌握</a>
+<a class="toc-l3" href="#不能只看一次成功">不能只看一次成功</a>
+<a class="toc-l2" href="#十二、数据怎么看趋势">十二、数据怎么看趋势</a>
+<a class="toc-l3" href="#1.-上升趋势">1. 上升趋势</a>
+<a class="toc-l3" href="#2.-下降趋势">2. 下降趋势</a>
+<a class="toc-l3" href="#3.-平稳不变">3. 平稳不变</a>
+<a class="toc-l3" href="#4.-忽高忽低">4. 忽高忽低</a>
+<a class="toc-l3" href="#5.-退步">5. 退步</a>
+<a class="toc-l2" href="#十三、什么时候调整目标">十三、什么时候调整目标</a>
+<a class="toc-l3" href="#需要提高难度">需要提高难度</a>
+<a class="toc-l3" href="#需要降低难度">需要降低难度</a>
+<a class="toc-l3" href="#需要换教学方法">需要换教学方法</a>
+<a class="toc-l2" href="#十四、课后反馈怎么用数据说话">十四、课后反馈怎么用数据说话</a>
+<a class="toc-l3" href="#不专业反馈">不专业反馈</a>
+<a class="toc-l3" href="#专业反馈">专业反馈</a>
+<a class="toc-l2" href="#十五、周报告模板">十五、周报告模板</a>
+<a class="toc-l2" href="#十六、阶段报告模板">十六、阶段报告模板</a>
+<a class="toc-l2" href="#十七、图表化表达">十七、图表化表达</a>
+<a class="toc-l2" href="#十八、数据伦理">十八、数据伦理</a>
+<a class="toc-l2" href="#十九、新人常见错误">十九、新人常见错误</a>
+<a class="toc-l3" href="#错误1只凭感觉">错误1：只凭感觉</a>
+<a class="toc-l3" href="#错误2只记对错不记提示">错误2：只记对错，不记提示</a>
+<a class="toc-l3" href="#错误3记录太复杂坚持不了">错误3：记录太复杂坚持不了</a>
+<a class="toc-l3" href="#错误4数据写得不客观">错误4：数据写得不客观</a>
+<a class="toc-l3" href="#错误5有数据不分析">错误5：有数据不分析</a>
+<a class="toc-l3" href="#错误6把提示正确算独立正确">错误6：把提示正确算独立正确</a>
+<a class="toc-l3" href="#错误7只报好消息">错误7：只报好消息</a>
+<a class="toc-l3" href="#错误8不做泛化记录">错误8：不做泛化记录</a>
+<a class="toc-l2" href="#二十、数据记录计划模板">二十、数据记录计划模板</a>
+<a class="toc-l2" href="#二十一、课堂自查表">二十一、课堂自查表</a>
+<a class="toc-l2" href="#二十二、空白打印模板">二十二、空白打印模板</a>
+<a class="toc-l3" href="#1.-通用目标记录表">1. 通用目标记录表</a>
+<a class="toc-l3" href="#2.-行为频率表">2. 行为频率表</a>
+<a class="toc-l3" href="#3.-阶段总结数据表">3. 阶段总结数据表</a>
+<a class="toc-l2" href="#二十三、新人必须记住的10句话">二十三、新人必须记住的10句话</a>
+<a class="toc-l2" href="#二十四、最后给新人训练师的话">二十四、最后给新人训练师的话</a>
+</aside>
+<main class="content">
+  <div class="topbar"><span class="badge">ASD训练师资料库 · 第 10 篇</span><a class="navlink" href="../asd-data-recording-and-progress-reporting.md">查看Markdown源文档</a></div>
+  <h1 id="数据记录与进展报告实操手册"><a class="anchor" href="#数据记录与进展报告实操手册" aria-hidden="true">#</a>数据记录与进展报告实操手册</h1>
+<blockquote>
+<p>适用对象：自闭症康复训练师、助教、个案负责人、督导、机构管理者。<br>
+使用场景：DTT记录、NET记录、ABC行为记录、提示等级记录、目标达成判断、阶段报告、家长反馈、督导复盘。<br>
+核心目的：帮助新人把“感觉孩子进步了”变成“用数据证明孩子哪里进步、哪里卡住、下一步怎么调”。<br>
+重要提醒：数据不是为了给孩子打分，而是为了让教学更清楚、更负责、更可调整。</p>
+</blockquote>
+<hr>
+<h2 id="一、先用一句话讲清楚数据记录"><a class="anchor" href="#一、先用一句话讲清楚数据记录" aria-hidden="true">#</a>一、先用一句话讲清楚数据记录</h2>
+<p>一句大白话：</p>
+<blockquote>
+<p>数据记录就是把孩子做到了什么、需要多少帮助、问题行为发生多少次，用数字和事实记下来。</p>
+</blockquote>
+<p>没有数据时，老师容易说：</p>
+<ul>
+<li>“今天挺好”；</li>
+<li>“最近进步了”；</li>
+<li>“还是不太配合”；</li>
+<li>“好像会了”。</li>
+</ul>
+<p>有数据时，老师可以说：</p>
+<ul>
+<li>“10次请求中，独立完成6次”；</li>
+<li>“尖叫从每天8次降到3次”；</li>
+<li>“身体提示从8次降到2次”；</li>
+<li>“在机构会，在家还需要提示”。</li>
+</ul>
+<p>这才是专业。</p>
+<hr>
+<h2 id="二、为什么新人必须会记录数据"><a class="anchor" href="#二、为什么新人必须会记录数据" aria-hidden="true">#</a>二、为什么新人必须会记录数据</h2>
+<p>数据可以帮助你：</p>
+<ol>
+<li>判断目标是否有效；</li>
+<li>判断孩子是否真正掌握；</li>
+<li>发现提示依赖；</li>
+<li>找到行为规律；</li>
+<li>给家长具体反馈；</li>
+<li>给督导提供依据；</li>
+<li>避免凭感觉乱改目标；</li>
+<li>保护训练师专业边界。</li>
+</ol>
+<p>记住：</p>
+<blockquote>
+<p>没有数据，教学就容易变成印象。</p>
+</blockquote>
+<hr>
+<h2 id="三、常用数据类型"><a class="anchor" href="#三、常用数据类型" aria-hidden="true">#</a>三、常用数据类型</h2>
+<h3 id="1.-正确率"><a class="anchor" href="#1.-正确率" aria-hidden="true">#</a>1. 正确率</h3>
+<p>适合：</p>
+<ul>
+<li>指认；</li>
+<li>命名；</li>
+<li>配对；</li>
+<li>模仿；</li>
+<li>回答问题；</li>
+<li>学业任务。</li>
+</ul>
+<p>公式：</p>
+<pre><code class="language-text">独立正确次数 ÷ 总机会次数 × 100%
+</code></pre>
+<h3 id="2.-频率"><a class="anchor" href="#2.-频率" aria-hidden="true">#</a>2. 频率</h3>
+<p>记录发生几次。</p>
+<p>适合：</p>
+<ul>
+<li>尖叫；</li>
+<li>打人；</li>
+<li>自伤；</li>
+<li>主动请求；</li>
+<li>看人；</li>
+<li>逃跑；</li>
+<li>替代表达。</li>
+</ul>
+<h3 id="3.-持续时间"><a class="anchor" href="#3.-持续时间" aria-hidden="true">#</a>3. 持续时间</h3>
+<p>记录一次持续多久。</p>
+<p>适合：</p>
+<ul>
+<li>哭闹；</li>
+<li>崩溃；</li>
+<li>坐住；</li>
+<li>独立游戏；</li>
+<li>等待；</li>
+<li>作业持续。</li>
+</ul>
+<h3 id="4.-提示等级"><a class="anchor" href="#4.-提示等级" aria-hidden="true">#</a>4. 提示等级</h3>
+<p>记录孩子需要多少帮助。</p>
+<p>适合：</p>
+<ul>
+<li>生活技能；</li>
+<li>DTT；</li>
+<li>课堂任务；</li>
+<li>自理流程。</li>
+</ul>
+<h3 id="5.-强度"><a class="anchor" href="#5.-强度" aria-hidden="true">#</a>5. 强度</h3>
+<p>记录行为严重程度。</p>
+<p>适合：</p>
+<ul>
+<li>情绪爆发；</li>
+<li>攻击；</li>
+<li>自伤；</li>
+<li>崩溃。</li>
+</ul>
+<h3 id="6.-abc记录"><a class="anchor" href="#6.-abc记录" aria-hidden="true">#</a>6. ABC记录</h3>
+<p>记录行为前、行为中、行为后。</p>
+<p>适合：</p>
+<ul>
+<li>不清楚功能的问题行为。</li>
+</ul>
+<hr>
+<h2 id="四、记录要写事实不写评价"><a class="anchor" href="#四、记录要写事实不写评价" aria-hidden="true">#</a>四、记录要写事实，不写评价</h2>
+<h3 id="错误记录"><a class="anchor" href="#错误记录" aria-hidden="true">#</a>错误记录</h3>
+<pre><code class="language-text">孩子今天不乖。
+孩子很闹。
+孩子脾气差。
+家长不配合。
+</code></pre>
+<h3 id="正确记录"><a class="anchor" href="#正确记录" aria-hidden="true">#</a>正确记录</h3>
+<pre><code class="language-text">当老师收走小车并要求做配对时，孩子尖叫2分钟，并把卡片推到地上。老师提示递休息卡后，孩子休息1分钟并回到座位。
+</code></pre>
+<p>记录原则：</p>
+<blockquote>
+<p>摄像头能拍到的，才是好记录。</p>
+</blockquote>
+<hr>
+<h2 id="五、dtt数据记录"><a class="anchor" href="#五、dtt数据记录" aria-hidden="true">#</a>五、DTT数据记录</h2>
+<h3 id="单目标10回合表"><a class="anchor" href="#单目标10回合表" aria-hidden="true">#</a>单目标10回合表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>目标</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+<th>10</th>
+<th style="text-align:right">正确率</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>符号：</p>
+<ul>
+<li>
+<ul>
+<li>独立正确；</li>
+</ul>
+</li>
+<li>P 提示正确；</li>
+<li>
+<ul>
+<li>错误；</li>
+</ul>
+</li>
+<li>NR 无反应；</li>
+<li>B 问题行为。</li>
+</ul>
+<h3 id="示例"><a class="anchor" href="#示例" aria-hidden="true">#</a>示例</h3>
+<pre><code class="language-text">目标：拿苹果
+记录：+ + P - + + P + + +
+独立正确：7/10 = 70%
+备注：苹果和香蕉仍混淆，手势提示后能完成。
+</code></pre>
+<hr>
+<h2 id="六、net数据记录"><a class="anchor" href="#六、net数据记录" aria-hidden="true">#</a>六、NET数据记录</h2>
+<p>NET不用像DTT那样每秒记录，但要记录机会。</p>
+<h3 id="net机会记录表"><a class="anchor" href="#net机会记录表" aria-hidden="true">#</a>NET机会记录表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>活动</th>
+<th>目标</th>
+<th style="text-align:right">机会数</th>
+<th style="text-align:right">独立</th>
+<th style="text-align:right">提示</th>
+<th style="text-align:right">无反应</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>泡泡</td>
+<td>还要</td>
+<td style="text-align:right">5</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="示例-2"><a class="anchor" href="#示例-2" aria-hidden="true">#</a>示例</h3>
+<pre><code class="language-text">泡泡游戏中，5次停顿机会，孩子独立说“还要”2次，语言提示后说2次，无反应1次。
+</code></pre>
+<hr>
+<h2 id="七、abc行为记录"><a class="anchor" href="#七、abc行为记录" aria-hidden="true">#</a>七、ABC行为记录</h2>
+<h3 id="表格"><a class="anchor" href="#表格" aria-hidden="true">#</a>表格</h3>
+<table>
+<thead>
+<tr>
+<th>时间</th>
+<th>地点</th>
+<th>A 前因</th>
+<th>B 行为</th>
+<th>C 后果</th>
+<th>持续时间</th>
+<th>初步功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="记录重点"><a class="anchor" href="#记录重点" aria-hidden="true">#</a>记录重点</h3>
+<ul>
+<li>A：行为前具体发生什么；</li>
+<li>B：孩子具体做了什么；</li>
+<li>C：行为后大人和环境怎么反应；</li>
+<li>不要只写“发脾气”。</li>
+</ul>
+<hr>
+<h2 id="八、提示等级记录"><a class="anchor" href="#八、提示等级记录" aria-hidden="true">#</a>八、提示等级记录</h2>
+<h3 id="符号"><a class="anchor" href="#符号" aria-hidden="true">#</a>符号</h3>
+<ul>
+<li>I：独立；</li>
+<li>V：语言提示；</li>
+<li>G：手势提示；</li>
+<li>M：示范提示；</li>
+<li>P：身体提示；</li>
+<li>E：错误。</li>
+</ul>
+<h3 id="表格-2"><a class="anchor" href="#表格-2" aria-hidden="true">#</a>表格</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>目标</th>
+<th style="text-align:right">I</th>
+<th style="text-align:right">V</th>
+<th style="text-align:right">G</th>
+<th style="text-align:right">M</th>
+<th style="text-align:right">P</th>
+<th style="text-align:right">E</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>洗手</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="判断进步"><a class="anchor" href="#判断进步" aria-hidden="true">#</a>判断进步</h3>
+<p>真正的进步不只是正确率高，而是提示减少。</p>
+<p>例如：</p>
+<ul>
+<li>第1周：身体提示8次；</li>
+<li>第2周：手势提示6次；</li>
+<li>第3周：独立5次。</li>
+</ul>
+<p>这说明孩子在变独立。</p>
+<hr>
+<h2 id="九、生活技能任务分析记录"><a class="anchor" href="#九、生活技能任务分析记录" aria-hidden="true">#</a>九、生活技能任务分析记录</h2>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>内容</th>
+<th>I独立</th>
+<th>V语言</th>
+<th>G手势</th>
+<th>P身体</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>打开水</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td>冲湿手</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td>挤洗手液</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td>搓手</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>5</td>
+<td>冲干净</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>6</td>
+<td>关水</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td>擦手</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>记录后才能知道孩子卡在哪一步。</p>
+<hr>
+<h2 id="十、情绪行为数据记录"><a class="anchor" href="#十、情绪行为数据记录" aria-hidden="true">#</a>十、情绪行为数据记录</h2>
+<h3 id="1.-频率"><a class="anchor" href="#1.-频率" aria-hidden="true">#</a>1. 频率</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>行为</th>
+<th style="text-align:right">次数</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>尖叫</td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="2.-持续时间"><a class="anchor" href="#2.-持续时间" aria-hidden="true">#</a>2. 持续时间</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>开始</th>
+<th>结束</th>
+<th>持续时间</th>
+<th>处理方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="3.-强度"><a class="anchor" href="#3.-强度" aria-hidden="true">#</a>3. 强度</h3>
+<table>
+<thead>
+<tr>
+<th>分数</th>
+<th>定义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>轻微拒绝、皱眉</td>
+</tr>
+<tr>
+<td>2</td>
+<td>哭、声音变大</td>
+</tr>
+<tr>
+<td>3</td>
+<td>躺地、推材料</td>
+</tr>
+<tr>
+<td>4</td>
+<td>摔物、攻击倾向</td>
+</tr>
+<tr>
+<td>5</td>
+<td>自伤、攻击、逃跑等危险行为</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="十一、如何判断目标是否掌握"><a class="anchor" href="#十一、如何判断目标是否掌握" aria-hidden="true">#</a>十一、如何判断目标是否掌握</h2>
+<p>推荐标准：</p>
+<pre><code class="language-text">连续3节课，独立正确率达到80%以上，并能在至少2种材料或2个场景中完成。
+</code></pre>
+<p>但不同目标要灵活调整。</p>
+<h3 id="不能只看一次成功"><a class="anchor" href="#不能只看一次成功" aria-hidden="true">#</a>不能只看一次成功</h3>
+<p>孩子今天做对，不代表掌握。</p>
+<p>要看：</p>
+<ul>
+<li>是否连续稳定；</li>
+<li>是否需要提示；</li>
+<li>是否换人也会；</li>
+<li>是否换场景也会；</li>
+<li>是否能在生活中用。</li>
+</ul>
+<hr>
+<h2 id="十二、数据怎么看趋势"><a class="anchor" href="#十二、数据怎么看趋势" aria-hidden="true">#</a>十二、数据怎么看趋势</h2>
+<h3 id="1.-上升趋势"><a class="anchor" href="#1.-上升趋势" aria-hidden="true">#</a>1. 上升趋势</h3>
+<p>独立反应越来越多，说明有效。</p>
+<h3 id="2.-下降趋势"><a class="anchor" href="#2.-下降趋势" aria-hidden="true">#</a>2. 下降趋势</h3>
+<p>问题行为越来越少，说明行为支持可能有效。</p>
+<h3 id="3.-平稳不变"><a class="anchor" href="#3.-平稳不变" aria-hidden="true">#</a>3. 平稳不变</h3>
+<p>可能目标太难、强化不足、提示不对、动机不够。</p>
+<h3 id="4.-忽高忽低"><a class="anchor" href="#4.-忽高忽低" aria-hidden="true">#</a>4. 忽高忽低</h3>
+<p>可能受睡眠、身体、环境、家校不一致影响。</p>
+<h3 id="5.-退步"><a class="anchor" href="#5.-退步" aria-hidden="true">#</a>5. 退步</h3>
+<p>要关注：</p>
+<ul>
+<li>身体不适；</li>
+<li>睡眠；</li>
+<li>生活变化；</li>
+<li>学校压力；</li>
+<li>目标过难；</li>
+<li>情绪问题。</li>
+</ul>
+<hr>
+<h2 id="十三、什么时候调整目标"><a class="anchor" href="#十三、什么时候调整目标" aria-hidden="true">#</a>十三、什么时候调整目标</h2>
+<h3 id="需要提高难度"><a class="anchor" href="#需要提高难度" aria-hidden="true">#</a>需要提高难度</h3>
+<ul>
+<li>连续3节课独立正确率高；</li>
+<li>提示少；</li>
+<li>孩子动机好；</li>
+<li>换材料也会。</li>
+</ul>
+<h3 id="需要降低难度"><a class="anchor" href="#需要降低难度" aria-hidden="true">#</a>需要降低难度</h3>
+<ul>
+<li>正确率长期低于50%；</li>
+<li>问题行为增加；</li>
+<li>孩子明显逃避；</li>
+<li>提示很重仍困难。</li>
+</ul>
+<h3 id="需要换教学方法"><a class="anchor" href="#需要换教学方法" aria-hidden="true">#</a>需要换教学方法</h3>
+<ul>
+<li>数据停滞；</li>
+<li>强化无效；</li>
+<li>孩子只在一个场景会；</li>
+<li>家长反馈无法泛化。</li>
+</ul>
+<hr>
+<h2 id="十四、课后反馈怎么用数据说话"><a class="anchor" href="#十四、课后反馈怎么用数据说话" aria-hidden="true">#</a>十四、课后反馈怎么用数据说话</h2>
+<h3 id="不专业反馈"><a class="anchor" href="#不专业反馈" aria-hidden="true">#</a>不专业反馈</h3>
+<pre><code class="language-text">今天表现不错，就是有点闹。
+</code></pre>
+<h3 id="专业反馈"><a class="anchor" href="#专业反馈" aria-hidden="true">#</a>专业反馈</h3>
+<pre><code class="language-text">今天练习“还要”共8次，孩子独立表达3次，语言提示后表达4次，无反应1次。相比上周独立表达从1次增加到3次，说明主动性在提高。家庭这周继续用泡泡和水果练“还要”。
+</code></pre>
+<hr>
+<h2 id="十五、周报告模板"><a class="anchor" href="#十五、周报告模板" aria-hidden="true">#</a>十五、周报告模板</h2>
+<pre><code class="language-text">儿童姓名：
+报告周期：
+训练师：
+
+一、本周训练目标
+1.
+2.
+3.
+
+二、数据表现
+目标1：
+目标2：
+目标3：
+
+三、主要进步
+
+四、主要困难
+
+五、行为情况
+
+六、有效策略
+
+七、家庭练习完成情况
+
+八、下周计划
+</code></pre>
+<hr>
+<h2 id="十六、阶段报告模板"><a class="anchor" href="#十六、阶段报告模板" aria-hidden="true">#</a>十六、阶段报告模板</h2>
+<pre><code class="language-text">儿童姓名：
+阶段时间：
+训练频率：
+
+一、总体概况
+
+二、语言沟通
+当前表现：
+数据变化：
+下一步：
+
+三、社交游戏
+当前表现：
+数据变化：
+下一步：
+
+四、认知学习
+当前表现：
+数据变化：
+下一步：
+
+五、生活自理
+当前表现：
+数据变化：
+下一步：
+
+六、情绪行为
+当前表现：
+数据变化：
+支持策略：
+
+七、家庭泛化
+
+八、建议
+</code></pre>
+<hr>
+<h2 id="十七、图表化表达"><a class="anchor" href="#十七、图表化表达" aria-hidden="true">#</a>十七、图表化表达</h2>
+<p>如果可以，把数据画成简单趋势：</p>
+<ul>
+<li>横轴：日期；</li>
+<li>纵轴：正确率/次数/持续时间；</li>
+<li>一条线表示变化。</li>
+</ul>
+<p>家长更容易理解：</p>
+<ul>
+<li>尖叫次数下降；</li>
+<li>主动请求上升；</li>
+<li>提示等级降低；</li>
+<li>等待时间增加。</li>
+</ul>
+<hr>
+<h2 id="十八、数据伦理"><a class="anchor" href="#十八、数据伦理" aria-hidden="true">#</a>十八、数据伦理</h2>
+<p>数据涉及孩子隐私。</p>
+<p>必须注意：</p>
+<ul>
+<li>不随意外传；</li>
+<li>不在公开群发孩子姓名和细节；</li>
+<li>拍照录像需授权；</li>
+<li>报告中用专业、尊重语言；</li>
+<li>不用数据羞辱孩子或家长。</li>
+</ul>
+<hr>
+<h2 id="十九、新人常见错误"><a class="anchor" href="#十九、新人常见错误" aria-hidden="true">#</a>十九、新人常见错误</h2>
+<h3 id="错误1只凭感觉"><a class="anchor" href="#错误1只凭感觉" aria-hidden="true">#</a>错误1：只凭感觉</h3>
+<p>改法：<br>
+每个目标至少记录机会和结果。</p>
+<h3 id="错误2只记对错不记提示"><a class="anchor" href="#错误2只记对错不记提示" aria-hidden="true">#</a>错误2：只记对错，不记提示</h3>
+<p>改法：<br>
+提示等级也要记。</p>
+<h3 id="错误3记录太复杂坚持不了"><a class="anchor" href="#错误3记录太复杂坚持不了" aria-hidden="true">#</a>错误3：记录太复杂坚持不了</h3>
+<p>改法：<br>
+先用最简单表格。</p>
+<h3 id="错误4数据写得不客观"><a class="anchor" href="#错误4数据写得不客观" aria-hidden="true">#</a>错误4：数据写得不客观</h3>
+<p>改法：<br>
+写可观察行为。</p>
+<h3 id="错误5有数据不分析"><a class="anchor" href="#错误5有数据不分析" aria-hidden="true">#</a>错误5：有数据不分析</h3>
+<p>改法：<br>
+每周看趋势并调整。</p>
+<h3 id="错误6把提示正确算独立正确"><a class="anchor" href="#错误6把提示正确算独立正确" aria-hidden="true">#</a>错误6：把提示正确算独立正确</h3>
+<p>改法：<br>
+独立和提示分开算。</p>
+<h3 id="错误7只报好消息"><a class="anchor" href="#错误7只报好消息" aria-hidden="true">#</a>错误7：只报好消息</h3>
+<p>改法：<br>
+如实记录困难，但给方案。</p>
+<h3 id="错误8不做泛化记录"><a class="anchor" href="#错误8不做泛化记录" aria-hidden="true">#</a>错误8：不做泛化记录</h3>
+<p>改法：<br>
+机构、家、学校分别看。</p>
+<hr>
+<h2 id="二十、数据记录计划模板"><a class="anchor" href="#二十、数据记录计划模板" aria-hidden="true">#</a>二十、数据记录计划模板</h2>
+<pre><code class="language-text">儿童姓名：
+日期：
+
+目标1：
+记录类型：正确率 / 频率 / 持续时间 / 提示等级 / ABC
+记录人：
+记录场景：
+达标标准：
+
+目标2：
+记录类型：
+记录人：
+记录场景：
+达标标准：
+
+目标3：
+记录类型：
+记录人：
+记录场景：
+达标标准：
+</code></pre>
+<hr>
+<h2 id="二十一、课堂自查表"><a class="anchor" href="#二十一、课堂自查表" aria-hidden="true">#</a>二十一、课堂自查表</h2>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>是/否</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>我今天是否记录了核心目标？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否区分独立和提示？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否记录了问题行为前后？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否写了具体事实？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否能用数据给家长反馈？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否知道下节课要调整什么？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否保护了孩子隐私？</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="二十二、空白打印模板"><a class="anchor" href="#二十二、空白打印模板" aria-hidden="true">#</a>二十二、空白打印模板</h2>
+<h3 id="1.-通用目标记录表"><a class="anchor" href="#1.-通用目标记录表" aria-hidden="true">#</a>1. 通用目标记录表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>目标</th>
+<th style="text-align:right">机会</th>
+<th style="text-align:right">独立</th>
+<th style="text-align:right">提示</th>
+<th style="text-align:right">错误</th>
+<th style="text-align:right">无反应</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="2.-行为频率表"><a class="anchor" href="#2.-行为频率表" aria-hidden="true">#</a>2. 行为频率表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>行为</th>
+<th style="text-align:right">次数</th>
+<th>最常见前因</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right"></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="3.-阶段总结数据表"><a class="anchor" href="#3.-阶段总结数据表" aria-hidden="true">#</a>3. 阶段总结数据表</h3>
+<table>
+<thead>
+<tr>
+<th>目标</th>
+<th>初始水平</th>
+<th>当前水平</th>
+<th>是否达标</th>
+<th>下一步</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="二十三、新人必须记住的10句话"><a class="anchor" href="#二十三、新人必须记住的10句话" aria-hidden="true">#</a>二十三、新人必须记住的10句话</h2>
+<ol>
+<li>数据不是打分，是导航。</li>
+<li>记录事实，不写评价。</li>
+<li>独立正确和提示正确要分开。</li>
+<li>没有ABC，就难判断行为功能。</li>
+<li>正确率高不等于泛化成功。</li>
+<li>提示减少才是真正独立。</li>
+<li>数据停滞说明方法要调整。</li>
+<li>家长反馈要用具体数据。</li>
+<li>数据也要保护隐私。</li>
+<li>好训练师用数据反思，而不是凭感觉坚持。</li>
+</ol>
+<hr>
+<h2 id="二十四、最后给新人训练师的话"><a class="anchor" href="#二十四、最后给新人训练师的话" aria-hidden="true">#</a>二十四、最后给新人训练师的话</h2>
+<p>数据记录看起来枯燥，但它是专业训练师的眼睛。</p>
+<p>它能告诉你：</p>
+<ul>
+<li>孩子真的会了吗；</li>
+<li>需要多少帮助；</li>
+<li>哪个方法有效；</li>
+<li>哪个目标太难；</li>
+<li>问题行为是否下降；</li>
+<li>家庭泛化是否成功。</li>
+</ul>
+<p>当你能用数据看见孩子一点点进步，<br>
+你也能更坚定、更清楚地带着家长往前走。</p>
+
+  <div class="footer">由 asd-data-recording-and-progress-reporting.md 转换生成。保留原文清单、表格、模板和代码块；流程型文本已增强为图例展示，并保留原始文本。</div>
+</main>
+</div>
+</body>
+</html>

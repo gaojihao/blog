@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>新人到专家级完整文档路线图</title>
+<style>
+:root{--bg:#f7f7fb;--paper:#fff;--ink:#1f2937;--muted:#6b7280;--brand:#2563eb;--brand2:#7c3aed;--line:#e5e7eb;--soft:#eff6ff;--warn:#fff7ed;--code:#111827;--codebg:#f3f4f6;--shadow:0 20px 60px rgba(15,23,42,.10)}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#f8fafc,#eef2ff 45%,#fdf2f8);color:var(--ink);font:16px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif}.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:26px;max-width:1440px;margin:0 auto;padding:28px}.sidebar{position:sticky;top:20px;align-self:start;max-height:calc(100vh - 40px);overflow:auto;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}.sidebar h2{font-size:16px;margin:0 0 10px}.sidebar a{display:block;color:#334155;text-decoration:none;border-radius:10px;padding:7px 9px;margin:2px 0;font-size:13px;line-height:1.35}.sidebar a:hover{background:var(--soft);color:var(--brand)}.sidebar .toc-l2{padding-left:18px}.sidebar .toc-l3{padding-left:32px;color:#64748b}.content{min-width:0;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:44px 52px}.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:28px}.badge{display:inline-flex;gap:8px;align-items:center;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;border-radius:999px;padding:8px 14px;font-size:13px}.navlink{color:var(--brand);text-decoration:none;font-weight:600}h1{font-size:34px;line-height:1.25;margin:0 0 22px;color:#0f172a}h2{font-size:26px;margin:44px 0 14px;padding-top:14px;border-top:1px solid var(--line)}h3{font-size:21px;margin:30px 0 10px}h4{font-size:18px;margin:24px 0 8px}p{margin:12px 0}blockquote{margin:18px 0;padding:14px 18px;border-left:5px solid var(--brand);background:var(--soft);border-radius:12px;color:#1e3a8a}table{width:100%;border-collapse:collapse;margin:18px 0;overflow:hidden;border-radius:14px;display:table}th,td{border:1px solid var(--line);padding:10px 12px;vertical-align:top}th{background:#f1f5f9;text-align:left}tr:nth-child(even) td{background:#fafafa}pre{background:#0b1020;color:#e5e7eb;border-radius:16px;padding:18px;overflow:auto;line-height:1.55}code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace}p code,li code,td code{background:var(--codebg);color:#be123c;padding:2px 6px;border-radius:6px}ul,ol{padding-left:1.5em}.anchor{opacity:.25;text-decoration:none;margin-right:8px;color:var(--brand)}h1:hover .anchor,h2:hover .anchor,h3:hover .anchor{opacity:1}.flowchart{margin:22px 0;padding:18px;border:1px solid #bfdbfe;background:linear-gradient(180deg,#eff6ff,#fff);border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:8px}.flow-step{width:min(640px,100%);display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid #dbeafe;border-radius:14px;padding:12px 14px;box-shadow:0 8px 22px rgba(37,99,235,.08)}.flow-num{flex:0 0 auto;width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;background:var(--brand);color:white;font-weight:700;font-size:13px}.flow-arrow{color:var(--brand);font-size:22px;font-weight:800;line-height:1}.raw-flow{margin:8px 0 20px;color:var(--muted)}.raw-flow summary{cursor:pointer}.footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}.callout{background:var(--warn);border:1px solid #fed7aa;border-radius:16px;padding:14px 16px;margin:18px 0}.page-list{columns:2;column-gap:28px}.page-list a{display:block;break-inside:avoid;text-decoration:none;color:#1d4ed8;padding:8px 0;border-bottom:1px dashed #dbeafe}.meta{color:var(--muted);font-size:14px}@media(max-width:960px){.layout{display:block;padding:14px}.sidebar{position:relative;max-height:none;margin-bottom:16px}.content{padding:26px 20px}.page-list{columns:1}h1{font-size:28px}h2{font-size:23px}table{display:block;overflow-x:auto;white-space:normal}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <h2>目录</h2>
+  <a class="navlink" href="index.html">← HTML总索引</a>
+  <a class="toc-l1" href="#新人到专家级完整文档路线图">新人到专家级完整文档路线图</a>
+<a class="toc-l2" href="#一、总体结论">一、总体结论</a>
+<a class="toc-l2" href="#二、你已知道但未明说的部分">二、你已知道但未明说的部分</a>
+<a class="toc-l3" href="#1.-新人需要结构化路线">1. 新人需要结构化路线</a>
+<a class="toc-l3" href="#2.-训练不能只靠经验">2. 训练不能只靠经验</a>
+<a class="toc-l3" href="#3.-家长和学校是核心场景">3. 家长和学校是核心场景</a>
+<a class="toc-l3" href="#4.-成年和女性安全不能忽略">4. 成年和女性安全不能忽略</a>
+<a class="toc-l3" href="#5.-机构需要体系">5. 机构需要体系</a>
+<a class="toc-l2" href="#三、你不知道但应该知道的部分">三、你不知道但应该知道的部分</a>
+<a class="toc-l3" href="#1.-循证实践">1. 循证实践</a>
+<a class="toc-l3" href="#2.-标准化评估">2. 标准化评估</a>
+<a class="toc-l3" href="#3.-个案概念化">3. 个案概念化</a>
+<a class="toc-l3" href="#4.-共患和红旗">4. 共患和红旗</a>
+<a class="toc-l3" href="#5.-危机管理">5. 危机管理</a>
+<a class="toc-l3" href="#6.-督导带教">6. 督导带教</a>
+<a class="toc-l3" href="#7.-研究阅读">7. 研究阅读</a>
+<a class="toc-l3" href="#8.-机构体系">8. 机构体系</a>
+<a class="toc-l2" href="#四、完整学习分层">四、完整学习分层</a>
+<a class="toc-l3" href="#l1入门观察层">L1：入门观察层</a>
+<a class="toc-l3" href="#l2基础教学层">L2：基础教学层</a>
+<a class="toc-l3" href="#l3沟通行为层">L3：沟通行为层</a>
+<a class="toc-l3" href="#l4生活生态层">L4：生活生态层</a>
+<a class="toc-l3" href="#l5个案管理层">L5：个案管理层</a>
+<a class="toc-l3" href="#l6专家进阶层">L6：专家进阶层</a>
+<a class="toc-l3" href="#l7督导体系层">L7：督导体系层</a>
+<a class="toc-l2" href="#五、完整文档分类">五、完整文档分类</a>
+<a class="toc-l3" href="#01基础认知">01基础认知</a>
+<a class="toc-l3" href="#02评估与目标">02评估与目标</a>
+<a class="toc-l3" href="#03教学技术">03教学技术</a>
+<a class="toc-l3" href="#04沟通社交">04沟通社交</a>
+<a class="toc-l3" href="#05行为与情绪">05行为与情绪</a>
+<a class="toc-l3" href="#06生活与生态">06生活与生态</a>
+<a class="toc-l3" href="#07青春期与成年">07青春期与成年</a>
+<a class="toc-l3" href="#08督导与机构">08督导与机构</a>
+<a class="toc-l3" href="#09研究与案例">09研究与案例</a>
+<a class="toc-l2" href="#六、如何使用这套资料">六、如何使用这套资料</a>
+<a class="toc-l3" href="#新人">新人</a>
+<a class="toc-l3" href="#独立训练师">独立训练师</a>
+<a class="toc-l3" href="#个案负责人">个案负责人</a>
+<a class="toc-l3" href="#督导-机构负责人">督导/机构负责人</a>
+<a class="toc-l2" href="#七、还需要什么才能真正成为专家">七、还需要什么才能真正成为专家</a>
+<a class="toc-l2" href="#八、最终专家级成长公式">八、最终专家级成长公式</a>
+<a class="toc-l2" href="#九、最后提醒">九、最后提醒</a>
+</aside>
+<main class="content">
+  <div class="topbar"><span class="badge">ASD训练师资料库 · 第 29 篇</span><a class="navlink" href="../asd-expert-documentation-roadmap.md">查看Markdown源文档</a></div>
+  <h1 id="新人到专家级完整文档路线图"><a class="anchor" href="#新人到专家级完整文档路线图" aria-hidden="true">#</a>新人到专家级完整文档路线图</h1>
+<blockquote>
+<p>这份文档用于总览：从新手自闭症康复训练师成长到专家级，完整文档体系应该如何学习、如何分层、如何补齐能力。<br>
+它回答两个问题：</p>
+<ol>
+<li>你已知道但未明说的能力有哪些？</li>
+<li>你不知道但应该知道的能力有哪些？</li>
+</ol>
+</blockquote>
+<hr>
+<h2 id="一、总体结论"><a class="anchor" href="#一、总体结论" aria-hidden="true">#</a>一、总体结论</h2>
+<p>目前资料库已经从“新人入门”扩展到“专家级能力体系”。</p>
+<p>它包含：</p>
+<ol>
+<li>新人基础；</li>
+<li>教学技术；</li>
+<li>沟通社交；</li>
+<li>行为支持；</li>
+<li>生活自理；</li>
+<li>感觉调节；</li>
+<li>学校融合；</li>
+<li>家长培训；</li>
+<li>数据和报告；</li>
+<li>青春期和职业转衔；</li>
+<li>伦理安全；</li>
+<li>循证实践；</li>
+<li>标准化评估；</li>
+<li>个案概念化；</li>
+<li>共患识别；</li>
+<li>危机管理；</li>
+<li>督导带教；</li>
+<li>多方协作；</li>
+<li>研究阅读；</li>
+<li>机构体系；</li>
+<li>高级案例；</li>
+<li>能力考核。</li>
+</ol>
+<p>一句话：</p>
+<blockquote>
+<p>这已经不是单纯“学习资料”，而是一套训练师培养体系雏形。</p>
+</blockquote>
+<hr>
+<h2 id="二、你已知道但未明说的部分"><a class="anchor" href="#二、你已知道但未明说的部分" aria-hidden="true">#</a>二、你已知道但未明说的部分</h2>
+<p>你已经隐含知道：</p>
+<h3 id="1.-新人需要结构化路线"><a class="anchor" href="#1.-新人需要结构化路线" aria-hidden="true">#</a>1. 新人需要结构化路线</h3>
+<p>所以需要：</p>
+<ul>
+<li>30-90-180天成长路径；</li>
+<li>新人手册；</li>
+<li>基础教学SOP。</li>
+</ul>
+<h3 id="2.-训练不能只靠经验"><a class="anchor" href="#2.-训练不能只靠经验" aria-hidden="true">#</a>2. 训练不能只靠经验</h3>
+<p>所以需要：</p>
+<ul>
+<li>数据记录；</li>
+<li>ABC；</li>
+<li>IEP；</li>
+<li>阶段报告。</li>
+</ul>
+<h3 id="3.-家长和学校是核心场景"><a class="anchor" href="#3.-家长和学校是核心场景" aria-hidden="true">#</a>3. 家长和学校是核心场景</h3>
+<p>所以需要：</p>
+<ul>
+<li>家长培训；</li>
+<li>家庭泛化；</li>
+<li>学校融合。</li>
+</ul>
+<h3 id="4.-成年和女性安全不能忽略"><a class="anchor" href="#4.-成年和女性安全不能忽略" aria-hidden="true">#</a>4. 成年和女性安全不能忽略</h3>
+<p>所以需要：</p>
+<ul>
+<li>青春期支持；</li>
+<li>月经管理；</li>
+<li>性安全；</li>
+<li>职业转衔。</li>
+</ul>
+<h3 id="5.-机构需要体系"><a class="anchor" href="#5.-机构需要体系" aria-hidden="true">#</a>5. 机构需要体系</h3>
+<p>所以需要：</p>
+<ul>
+<li>督导；</li>
+<li>质控；</li>
+<li>能力考核；</li>
+<li>课程体系。</li>
+</ul>
+<hr>
+<h2 id="三、你不知道但应该知道的部分"><a class="anchor" href="#三、你不知道但应该知道的部分" aria-hidden="true">#</a>三、你不知道但应该知道的部分</h2>
+<h3 id="1.-循证实践"><a class="anchor" href="#1.-循证实践" aria-hidden="true">#</a>1. 循证实践</h3>
+<p>不是所有热门方法都可靠。<br>
+专家需要知道证据、风险和适用边界。</p>
+<h3 id="2.-标准化评估"><a class="anchor" href="#2.-标准化评估" aria-hidden="true">#</a>2. 标准化评估</h3>
+<p>不能只靠主观观察定目标。<br>
+要知道VB-MAPP、ABLLS-R、AFLS、Vineland等工具的用途。</p>
+<h3 id="3.-个案概念化"><a class="anchor" href="#3.-个案概念化" aria-hidden="true">#</a>3. 个案概念化</h3>
+<p>复杂个案不是单一技术能解决。<br>
+要整合发展、行为、沟通、感觉、家庭、学校和医学因素。</p>
+<h3 id="4.-共患和红旗"><a class="anchor" href="#4.-共患和红旗" aria-hidden="true">#</a>4. 共患和红旗</h3>
+<p>ASD孩子也可能有焦虑、ADHD、睡眠、便秘、癫痫、抑郁等问题。<br>
+训练师必须知道什么时候转介。</p>
+<h3 id="5.-危机管理"><a class="anchor" href="#5.-危机管理" aria-hidden="true">#</a>5. 危机管理</h3>
+<p>高风险行为需要安全计划和团队分工，不能靠新人硬扛。</p>
+<h3 id="6.-督导带教"><a class="anchor" href="#6.-督导带教" aria-hidden="true">#</a>6. 督导带教</h3>
+<p>专家不仅自己会做，还要能培养别人。</p>
+<h3 id="7.-研究阅读"><a class="anchor" href="#7.-研究阅读" aria-hidden="true">#</a>7. 研究阅读</h3>
+<p>专家要能判断新疗法和研究质量。</p>
+<h3 id="8.-机构体系"><a class="anchor" href="#8.-机构体系" aria-hidden="true">#</a>8. 机构体系</h3>
+<p>真正专家级能力包括建立流程、质控和伦理规范。</p>
+<hr>
+<h2 id="四、完整学习分层"><a class="anchor" href="#四、完整学习分层" aria-hidden="true">#</a>四、完整学习分层</h2>
+<h3 id="l1入门观察层"><a class="anchor" href="#l1入门观察层" aria-hidden="true">#</a>L1：入门观察层</h3>
+<p>学习：</p>
+<ul>
+<li>新人入门；</li>
+<li>儿童发展；</li>
+<li>接案观察；</li>
+<li>伦理安全。</li>
+</ul>
+<p>目标：能看懂孩子、写具体行为。</p>
+<h3 id="l2基础教学层"><a class="anchor" href="#l2基础教学层" aria-hidden="true">#</a>L2：基础教学层</h3>
+<p>学习：</p>
+<ul>
+<li>强化；</li>
+<li>提示撤销；</li>
+<li>DTT；</li>
+<li>NET。</li>
+</ul>
+<p>目标：能上基础课。</p>
+<h3 id="l3沟通行为层"><a class="anchor" href="#l3沟通行为层" aria-hidden="true">#</a>L3：沟通行为层</h3>
+<p>学习：</p>
+<ul>
+<li>FCT；</li>
+<li>AAC；</li>
+<li>社交游戏；</li>
+<li>ABC；</li>
+<li>情绪行为。</li>
+</ul>
+<p>目标：能处理常见沟通和行为目标。</p>
+<h3 id="l4生活生态层"><a class="anchor" href="#l4生活生态层" aria-hidden="true">#</a>L4：生活生态层</h3>
+<p>学习：</p>
+<ul>
+<li>生活自理；</li>
+<li>感觉调节；</li>
+<li>学校融合；</li>
+<li>家长培训。</li>
+</ul>
+<p>目标：能把技能带到真实生活。</p>
+<h3 id="l5个案管理层"><a class="anchor" href="#l5个案管理层" aria-hidden="true">#</a>L5：个案管理层</h3>
+<p>学习：</p>
+<ul>
+<li>数据报告；</li>
+<li>IEP；</li>
+<li>青春期转衔；</li>
+<li>案例库。</li>
+</ul>
+<p>目标：能参与完整个案管理。</p>
+<h3 id="l6专家进阶层"><a class="anchor" href="#l6专家进阶层" aria-hidden="true">#</a>L6：专家进阶层</h3>
+<p>学习：</p>
+<ul>
+<li>循证实践；</li>
+<li>标准化评估；</li>
+<li>个案概念化；</li>
+<li>共患转介；</li>
+<li>危机管理；</li>
+<li>多方协作。</li>
+</ul>
+<p>目标：能处理复杂个案。</p>
+<h3 id="l7督导体系层"><a class="anchor" href="#l7督导体系层" aria-hidden="true">#</a>L7：督导体系层</h3>
+<p>学习：</p>
+<ul>
+<li>督导带教；</li>
+<li>能力考核；</li>
+<li>机构体系；</li>
+<li>研究阅读；</li>
+<li>高级案例督导。</li>
+</ul>
+<p>目标：能培养团队和建立体系。</p>
+<hr>
+<h2 id="五、完整文档分类"><a class="anchor" href="#五、完整文档分类" aria-hidden="true">#</a>五、完整文档分类</h2>
+<h3 id="01基础认知"><a class="anchor" href="#01基础认知" aria-hidden="true">#</a>01_基础认知</h3>
+<ul>
+<li>新人入门；</li>
+<li>儿童发展；</li>
+<li>伦理安全；</li>
+<li>专家能力地图。</li>
+</ul>
+<h3 id="02评估与目标"><a class="anchor" href="#02评估与目标" aria-hidden="true">#</a>02_评估与目标</h3>
+<ul>
+<li>接案访谈；</li>
+<li>标准化评估；</li>
+<li>个案概念化；</li>
+<li>IEP报告。</li>
+</ul>
+<h3 id="03教学技术"><a class="anchor" href="#03教学技术" aria-hidden="true">#</a>03_教学技术</h3>
+<ul>
+<li>强化；</li>
+<li>提示；</li>
+<li>DTT；</li>
+<li>NET；</li>
+<li>数据记录。</li>
+</ul>
+<h3 id="04沟通社交"><a class="anchor" href="#04沟通社交" aria-hidden="true">#</a>04_沟通社交</h3>
+<ul>
+<li>FCT；</li>
+<li>AAC；</li>
+<li>社交游戏；</li>
+<li>共同注意。</li>
+</ul>
+<h3 id="05行为与情绪"><a class="anchor" href="#05行为与情绪" aria-hidden="true">#</a>05_行为与情绪</h3>
+<ul>
+<li>ABC；</li>
+<li>情绪行为；</li>
+<li>复杂危机；</li>
+<li>共患红旗。</li>
+</ul>
+<h3 id="06生活与生态"><a class="anchor" href="#06生活与生态" aria-hidden="true">#</a>06_生活与生态</h3>
+<ul>
+<li>生活自理；</li>
+<li>感觉调节；</li>
+<li>学校融合；</li>
+<li>家长培训。</li>
+</ul>
+<h3 id="07青春期与成年"><a class="anchor" href="#07青春期与成年" aria-hidden="true">#</a>07_青春期与成年</h3>
+<ul>
+<li>青春期转衔；</li>
+<li>职业支持；</li>
+<li>女性安全。</li>
+</ul>
+<h3 id="08督导与机构"><a class="anchor" href="#08督导与机构" aria-hidden="true">#</a>08_督导与机构</h3>
+<ul>
+<li>督导带教；</li>
+<li>能力考核；</li>
+<li>机构体系；</li>
+<li>多方协作。</li>
+</ul>
+<h3 id="09研究与案例"><a class="anchor" href="#09研究与案例" aria-hidden="true">#</a>09_研究与案例</h3>
+<ul>
+<li>循证实践；</li>
+<li>研究阅读；</li>
+<li>新人案例；</li>
+<li>高级案例。</li>
+</ul>
+<hr>
+<h2 id="六、如何使用这套资料"><a class="anchor" href="#六、如何使用这套资料" aria-hidden="true">#</a>六、如何使用这套资料</h2>
+<h3 id="新人"><a class="anchor" href="#新人" aria-hidden="true">#</a>新人</h3>
+<p>不要一次读完全部。<br>
+先读基础和教学技术。</p>
+<h3 id="独立训练师"><a class="anchor" href="#独立训练师" aria-hidden="true">#</a>独立训练师</h3>
+<p>重点读沟通、行为、家长和数据。</p>
+<h3 id="个案负责人"><a class="anchor" href="#个案负责人" aria-hidden="true">#</a>个案负责人</h3>
+<p>重点读评估、IEP、个案概念化、学校和共患。</p>
+<h3 id="督导-机构负责人"><a class="anchor" href="#督导-机构负责人" aria-hidden="true">#</a>督导/机构负责人</h3>
+<p>重点读督导、考核、机构体系、研究阅读和危机管理。</p>
+<hr>
+<h2 id="七、还需要什么才能真正成为专家"><a class="anchor" href="#七、还需要什么才能真正成为专家" aria-hidden="true">#</a>七、还需要什么才能真正成为专家</h2>
+<p>即使文档齐了，还必须有：</p>
+<ol>
+<li>真实个案经验；</li>
+<li>高质量督导；</li>
+<li>视频复盘；</li>
+<li>数据追踪；</li>
+<li>家长沟通实践；</li>
+<li>学校协作实践；</li>
+<li>高风险个案处理经验；</li>
+<li>持续阅读和培训；</li>
+<li>伦理监督；</li>
+<li>长期反思。</li>
+</ol>
+<p>文档是地图。<br>
+实践和督导才是路。</p>
+<hr>
+<h2 id="八、最终专家级成长公式"><a class="anchor" href="#八、最终专家级成长公式" aria-hidden="true">#</a>八、最终专家级成长公式</h2>
+<pre><code class="language-text">专家级训练师
+= 文档体系
++ 真实个案
++ 督导反馈
++ 数据复盘
++ 循证阅读
++ 多方协作
++ 伦理边界
++ 长期实践
+</code></pre>
+<hr>
+<h2 id="九、最后提醒"><a class="anchor" href="#九、最后提醒" aria-hidden="true">#</a>九、最后提醒</h2>
+<p>如果目标是“会上一节课”，资料读到中级就够。<br>
+如果目标是“成为专家”，你必须把训练师能力看成一个系统工程。</p>
+<p>这套资料已经把系统工程的地图搭起来。<br>
+下一步，就是用它培训、实践、复盘、迭代。</p>
+
+  <div class="footer">由 asd-expert-documentation-roadmap.md 转换生成。保留原文清单、表格、模板和代码块；流程型文本已增强为图例展示，并保留原始文本。</div>
+</main>
+</div>
+</body>
+</html>

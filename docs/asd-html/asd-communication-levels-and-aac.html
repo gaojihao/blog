@@ -1,0 +1,1132 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>沟通层级与AAC辅助沟通实操手册</title>
+<style>
+:root{--bg:#f7f7fb;--paper:#fff;--ink:#1f2937;--muted:#6b7280;--brand:#2563eb;--brand2:#7c3aed;--line:#e5e7eb;--soft:#eff6ff;--warn:#fff7ed;--code:#111827;--codebg:#f3f4f6;--shadow:0 20px 60px rgba(15,23,42,.10)}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#f8fafc,#eef2ff 45%,#fdf2f8);color:var(--ink);font:16px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif}.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:26px;max-width:1440px;margin:0 auto;padding:28px}.sidebar{position:sticky;top:20px;align-self:start;max-height:calc(100vh - 40px);overflow:auto;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}.sidebar h2{font-size:16px;margin:0 0 10px}.sidebar a{display:block;color:#334155;text-decoration:none;border-radius:10px;padding:7px 9px;margin:2px 0;font-size:13px;line-height:1.35}.sidebar a:hover{background:var(--soft);color:var(--brand)}.sidebar .toc-l2{padding-left:18px}.sidebar .toc-l3{padding-left:32px;color:#64748b}.content{min-width:0;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:44px 52px}.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:28px}.badge{display:inline-flex;gap:8px;align-items:center;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;border-radius:999px;padding:8px 14px;font-size:13px}.navlink{color:var(--brand);text-decoration:none;font-weight:600}h1{font-size:34px;line-height:1.25;margin:0 0 22px;color:#0f172a}h2{font-size:26px;margin:44px 0 14px;padding-top:14px;border-top:1px solid var(--line)}h3{font-size:21px;margin:30px 0 10px}h4{font-size:18px;margin:24px 0 8px}p{margin:12px 0}blockquote{margin:18px 0;padding:14px 18px;border-left:5px solid var(--brand);background:var(--soft);border-radius:12px;color:#1e3a8a}table{width:100%;border-collapse:collapse;margin:18px 0;overflow:hidden;border-radius:14px;display:table}th,td{border:1px solid var(--line);padding:10px 12px;vertical-align:top}th{background:#f1f5f9;text-align:left}tr:nth-child(even) td{background:#fafafa}pre{background:#0b1020;color:#e5e7eb;border-radius:16px;padding:18px;overflow:auto;line-height:1.55}code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace}p code,li code,td code{background:var(--codebg);color:#be123c;padding:2px 6px;border-radius:6px}ul,ol{padding-left:1.5em}.anchor{opacity:.25;text-decoration:none;margin-right:8px;color:var(--brand)}h1:hover .anchor,h2:hover .anchor,h3:hover .anchor{opacity:1}.flowchart{margin:22px 0;padding:18px;border:1px solid #bfdbfe;background:linear-gradient(180deg,#eff6ff,#fff);border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:8px}.flow-step{width:min(640px,100%);display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid #dbeafe;border-radius:14px;padding:12px 14px;box-shadow:0 8px 22px rgba(37,99,235,.08)}.flow-num{flex:0 0 auto;width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;background:var(--brand);color:white;font-weight:700;font-size:13px}.flow-arrow{color:var(--brand);font-size:22px;font-weight:800;line-height:1}.raw-flow{margin:8px 0 20px;color:var(--muted)}.raw-flow summary{cursor:pointer}.footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}.callout{background:var(--warn);border:1px solid #fed7aa;border-radius:16px;padding:14px 16px;margin:18px 0}.page-list{columns:2;column-gap:28px}.page-list a{display:block;break-inside:avoid;text-decoration:none;color:#1d4ed8;padding:8px 0;border-bottom:1px dashed #dbeafe}.meta{color:var(--muted);font-size:14px}@media(max-width:960px){.layout{display:block;padding:14px}.sidebar{position:relative;max-height:none;margin-bottom:16px}.content{padding:26px 20px}.page-list{columns:1}h1{font-size:28px}h2{font-size:23px}table{display:block;overflow-x:auto;white-space:normal}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <h2>目录</h2>
+  <a class="navlink" href="index.html">← HTML总索引</a>
+  <a class="toc-l1" href="#沟通层级与aac辅助沟通实操手册">沟通层级与AAC辅助沟通实操手册</a>
+<a class="toc-l2" href="#一、先用一句话讲清楚aac">一、先用一句话讲清楚AAC</a>
+<a class="toc-l2" href="#二、为什么要看“沟通层级”">二、为什么要看“沟通层级”？</a>
+<a class="toc-l2" href="#三、沟通发展的八个层级">三、沟通发展的八个层级</a>
+<a class="toc-l3" href="#第1层无意图表达">第1层：无意图表达</a>
+<a class="toc-l3" href="#第2层动作-行为表达">第2层：动作/行为表达</a>
+<a class="toc-l3" href="#第3层声音-单音节">第3层：声音/单音节</a>
+<a class="toc-l3" href="#第4层单词表达">第4层：单词表达</a>
+<a class="toc-l3" href="#第5层短句表达">第5层：短句表达</a>
+<a class="toc-l3" href="#第6层简单对话">第6层：简单对话</a>
+<a class="toc-l3" href="#第7层复杂对话">第7层：复杂对话</a>
+<a class="toc-l3" href="#第8层情境化沟通">第8层：情境化沟通</a>
+<a class="toc-l2" href="#四、沟通评估看什么">四、沟通评估看什么</a>
+<a class="toc-l3" href="#1.-理解">1. 理解</a>
+<a class="toc-l3" href="#2.-表达">2. 表达</a>
+<a class="toc-l3" href="#3.-沟通功能">3. 沟通功能</a>
+<a class="toc-l3" href="#4.-场景">4. 场景</a>
+<a class="toc-l2" href="#五、无语言孩子怎么开始">五、无语言孩子怎么开始</a>
+<a class="toc-l3" href="#1.-先别急着教“说话”">1. 先别急着教“说话”</a>
+<a class="toc-l3" href="#2.-用动机最高的东西">2. 用动机最高的东西</a>
+<a class="toc-l3" href="#3.-创造表达机会">3. 创造表达机会</a>
+<a class="toc-l3" href="#4.-先强化任何合适表达">4. 先强化任何合适表达</a>
+<a class="toc-l2" href="#六、手势沟通怎么教">六、手势沟通怎么教</a>
+<a class="toc-l3" href="#常见手势">常见手势</a>
+<a class="toc-l3" href="#教学sop">教学SOP</a>
+<a class="toc-l3" href="#目标">目标</a>
+<a class="toc-l2" href="#七、图片沟通怎么教">七、图片沟通怎么教</a>
+<a class="toc-l3" href="#1.-图片沟通适合谁">1. 图片沟通适合谁</a>
+<a class="toc-l3" href="#2.-图片选择原则">2. 图片选择原则</a>
+<a class="toc-l3" href="#3.-初级图片">3. 初级图片</a>
+<a class="toc-l3" href="#4.-教法">4. 教法</a>
+<a class="toc-l3" href="#5.-图片不是考试">5. 图片不是考试</a>
+<a class="toc-l2" href="#八、沟通板怎么设计">八、沟通板怎么设计</a>
+<a class="toc-l3" href="#初级沟通板">初级沟通板</a>
+<a class="toc-l3" href="#家庭沟通板">家庭沟通板</a>
+<a class="toc-l3" href="#学校沟通板">学校沟通板</a>
+<a class="toc-l3" href="#沟通板使用原则">沟通板使用原则</a>
+<a class="toc-l2" href="#九、电子aac怎么用">九、电子AAC怎么用</a>
+<a class="toc-l3" href="#适合对象">适合对象</a>
+<a class="toc-l3" href="#教学原则">教学原则</a>
+<a class="toc-l3" href="#适用词汇">适用词汇</a>
+<a class="toc-l2" href="#十、fct和aac怎么结合">十、FCT和AAC怎么结合</a>
+<a class="toc-l2" href="#十一、仿说怎么处理">十一、仿说怎么处理</a>
+<a class="toc-l3" href="#处理方法">处理方法</a>
+<a class="toc-l3" href="#例子">例子</a>
+<a class="toc-l2" href="#十二、如何从单词到短句">十二、如何从单词到短句</a>
+<a class="toc-l3" href="#单词阶段">单词阶段</a>
+<a class="toc-l3" href="#扩展方法">扩展方法</a>
+<a class="toc-l3" href="#教学sop-2">教学SOP</a>
+<a class="toc-l2" href="#十三、如何从短句到对话">十三、如何从短句到对话</a>
+<a class="toc-l3" href="#目标-2">目标</a>
+<a class="toc-l3" href="#训练内容">训练内容</a>
+<a class="toc-l3" href="#例子-2">例子</a>
+<a class="toc-l2" href="#十四、情绪状态下的沟通">十四、情绪状态下的沟通</a>
+<a class="toc-l3" href="#要教的情绪表达">要教的情绪表达</a>
+<a class="toc-l3" href="#情绪卡">情绪卡</a>
+<a class="toc-l3" href="#训练原则">训练原则</a>
+<a class="toc-l2" href="#十五、沟通层级怎么测">十五、沟通层级怎么测</a>
+<a class="toc-l3" href="#观察表">观察表</a>
+<a class="toc-l3" href="#判定原则">判定原则</a>
+<a class="toc-l2" href="#十六、沟通目标怎么写">十六、沟通目标怎么写？</a>
+<a class="toc-l3" href="#错误写法">错误写法</a>
+<a class="toc-l3" href="#正确模板">正确模板</a>
+<a class="toc-l3" href="#示例">示例</a>
+<a class="toc-l2" href="#十七、aac数据怎么记">十七、AAC数据怎么记？</a>
+<a class="toc-l3" href="#1.-使用频率表">1. 使用频率表</a>
+<a class="toc-l3" href="#2.-表达功能表">2. 表达功能表</a>
+<a class="toc-l3" href="#3.-进步记录表">3. 进步记录表</a>
+<a class="toc-l2" href="#十八、家长版解释话术">十八、家长版解释话术</a>
+<a class="toc-l3" href="#1.-解释aac不是放弃说话">1. 解释AAC不是放弃说话</a>
+<a class="toc-l3" href="#2.-解释为什么孩子需要图片">2. 解释为什么孩子需要图片</a>
+<a class="toc-l3" href="#3.-解释为什么大人要一致">3. 解释为什么大人要一致</a>
+<a class="toc-l3" href="#4.-家庭练习建议">4. 家庭练习建议</a>
+<a class="toc-l2" href="#十九、新人常见错误">十九、新人常见错误</a>
+<a class="toc-l3" href="#错误1一上来给太多词">错误1：一上来给太多词</a>
+<a class="toc-l3" href="#错误2只在课上用">错误2：只在课上用</a>
+<a class="toc-l3" href="#错误3用了aac但不回应">错误3：用了AAC但不回应</a>
+<a class="toc-l3" href="#错误4总逼孩子说完整句">错误4：总逼孩子说完整句</a>
+<a class="toc-l3" href="#错误5把aac当考试">错误5：把AAC当考试</a>
+<a class="toc-l3" href="#错误6工具放太远">错误6：工具放太远</a>
+<a class="toc-l3" href="#错误7家长不会用">错误7：家长不会用</a>
+<a class="toc-l3" href="#错误8不做泛化">错误8：不做泛化</a>
+<a class="toc-l2" href="#二十、aac教案模板">二十、AAC教案模板</a>
+<a class="toc-l2" href="#二十一、课堂自查表">二十一、课堂自查表</a>
+<a class="toc-l2" href="#二十二、空白打印模板">二十二、空白打印模板</a>
+<a class="toc-l3" href="#1.-沟通层级观察表">1. 沟通层级观察表</a>
+<a class="toc-l3" href="#2.-aac词汇表">2. AAC词汇表</a>
+<a class="toc-l3" href="#3.-aac使用记录表">3. AAC使用记录表</a>
+<a class="toc-l2" href="#二十三、新人必须记住的10句话">二十三、新人必须记住的10句话</a>
+<a class="toc-l2" href="#二十四、最后给新人训练师的话">二十四、最后给新人训练师的话</a>
+</aside>
+<main class="content">
+  <div class="topbar"><span class="badge">ASD训练师资料库 · 第 12 篇</span><a class="navlink" href="../asd-communication-levels-and-aac.md">查看Markdown源文档</a></div>
+  <h1 id="沟通层级与aac辅助沟通实操手册"><a class="anchor" href="#沟通层级与aac辅助沟通实操手册" aria-hidden="true">#</a>沟通层级与AAC辅助沟通实操手册</h1>
+<blockquote>
+<p>适用对象：自闭症康复训练师、语言老师、家长指导老师、影子老师、融合教育老师。<br>
+使用场景：孩子无语言、语言少、表达不清、仿说多、情绪一来就不会说、需要图片沟通板或电子AAC支持。<br>
+核心目的：帮助新人理解沟通发展的层级，学会评估孩子当前沟通水平，并把手势、图片、沟通板、字词、电子设备等工具用到真正有效。<br>
+重要提醒：AAC不是放弃说话，而是先保证孩子有一个能表达的办法。</p>
+</blockquote>
+<hr>
+<h2 id="一、先用一句话讲清楚aac"><a class="anchor" href="#一、先用一句话讲清楚aac" aria-hidden="true">#</a>一、先用一句话讲清楚AAC</h2>
+<p>AAC全称 Augmentative and Alternative Communication，常译为“辅助与替代沟通”。</p>
+<p>一句大白话：</p>
+<blockquote>
+<p>AAC就是当孩子暂时不会说、说不出来、说不清时，给他一个别的办法来表达。</p>
+</blockquote>
+<p>AAC可以是：</p>
+<ul>
+<li>手势；</li>
+<li>眼神；</li>
+<li>指物；</li>
+<li>图片卡；</li>
+<li>沟通板；</li>
+<li>文字；</li>
+<li>平板语音按钮；</li>
+<li>手机沟通APP；</li>
+<li>写字；</li>
+<li>打字。</li>
+</ul>
+<p>AAC的目标不是“替代孩子一辈子说话”，而是：</p>
+<blockquote>
+<p>先让孩子能表达，再慢慢提高表达质量和语言水平。</p>
+</blockquote>
+<hr>
+<h2 id="二、为什么要看“沟通层级”"><a class="anchor" href="#二、为什么要看“沟通层级”" aria-hidden="true">#</a>二、为什么要看“沟通层级”？</h2>
+<p>不是所有孩子都需要从说完整句开始。</p>
+<p>很多ASD孩子的沟通能力是分层的：</p>
+<ul>
+<li>有的还不会用动作表达；</li>
+<li>有的会拉大人；</li>
+<li>有的会指物；</li>
+<li>有的会递卡；</li>
+<li>有的会说单词；</li>
+<li>有的能说短句；</li>
+<li>有的会聊天，但情绪一来就表达不出来。</li>
+</ul>
+<p>训练师如果直接要求所有孩子都说完整句，常常会失败。</p>
+<p>所以我们要先看：</p>
+<blockquote>
+<p>这个孩子现在在哪一层？下一层应该怎么上？</p>
+</blockquote>
+<hr>
+<h2 id="三、沟通发展的八个层级"><a class="anchor" href="#三、沟通发展的八个层级" aria-hidden="true">#</a>三、沟通发展的八个层级</h2>
+<h3 id="第1层无意图表达"><a class="anchor" href="#第1层无意图表达" aria-hidden="true">#</a>第1层：无意图表达</h3>
+<p>表现：</p>
+<ul>
+<li>哭；</li>
+<li>叫；</li>
+<li>拉大人；</li>
+<li>推开；</li>
+<li>抢；</li>
+<li>跑。</li>
+</ul>
+<p>说明：</p>
+<blockquote>
+<p>孩子有需求，但还没有稳定的可理解表达。</p>
+</blockquote>
+<h3 id="第2层动作-行为表达"><a class="anchor" href="#第2层动作-行为表达" aria-hidden="true">#</a>第2层：动作/行为表达</h3>
+<p>表现：</p>
+<ul>
+<li>指物；</li>
+<li>递物；</li>
+<li>拉手；</li>
+<li>摇头点头；</li>
+<li>推开不要；</li>
+<li>拿东西给大人。</li>
+</ul>
+<p>说明：</p>
+<blockquote>
+<p>孩子开始用动作“说话”。</p>
+</blockquote>
+<h3 id="第3层声音-单音节"><a class="anchor" href="#第3层声音-单音节" aria-hidden="true">#</a>第3层：声音/单音节</h3>
+<p>表现：</p>
+<ul>
+<li>啊、啊呀、妈、要、开、走；</li>
+<li>仿说一两个字；</li>
+<li>会重复口头提示。</li>
+</ul>
+<p>说明：</p>
+<blockquote>
+<p>孩子开始把声音和意义连起来。</p>
+</blockquote>
+<h3 id="第4层单词表达"><a class="anchor" href="#第4层单词表达" aria-hidden="true">#</a>第4层：单词表达</h3>
+<p>表现：</p>
+<ul>
+<li>要；</li>
+<li>水；</li>
+<li>车；</li>
+<li>不要；</li>
+<li>帮；</li>
+<li>走；</li>
+<li>休息。</li>
+</ul>
+<p>说明：</p>
+<blockquote>
+<p>孩子能用一个词表达需求或拒绝。</p>
+</blockquote>
+<h3 id="第5层短句表达"><a class="anchor" href="#第5层短句表达" aria-hidden="true">#</a>第5层：短句表达</h3>
+<p>表现：</p>
+<ul>
+<li>我要水；</li>
+<li>帮我打开；</li>
+<li>我不要这个；</li>
+<li>还要泡泡；</li>
+<li>我想休息。</li>
+</ul>
+<p>说明：</p>
+<blockquote>
+<p>孩子开始把词组合起来。</p>
+</blockquote>
+<h3 id="第6层简单对话"><a class="anchor" href="#第6层简单对话" aria-hidden="true">#</a>第6层：简单对话</h3>
+<p>表现：</p>
+<ul>
+<li>回答问题；</li>
+<li>简单问答；</li>
+<li>讲经历；</li>
+<li>提问；</li>
+<li>评论。</li>
+</ul>
+<p>说明：</p>
+<blockquote>
+<p>孩子开始进行来回沟通。</p>
+</blockquote>
+<h3 id="第7层复杂对话"><a class="anchor" href="#第7层复杂对话" aria-hidden="true">#</a>第7层：复杂对话</h3>
+<p>表现：</p>
+<ul>
+<li>讲原因；</li>
+<li>讲计划；</li>
+<li>解释想法；</li>
+<li>讨论；</li>
+<li>自我修正。</li>
+</ul>
+<p>说明：</p>
+<blockquote>
+<p>孩子可以更灵活地表达和理解。</p>
+</blockquote>
+<h3 id="第8层情境化沟通"><a class="anchor" href="#第8层情境化沟通" aria-hidden="true">#</a>第8层：情境化沟通</h3>
+<p>表现：</p>
+<ul>
+<li>公众场合沟通；</li>
+<li>与陌生人问路；</li>
+<li>网络交流；</li>
+<li>校园和职场沟通；</li>
+<li>安全求助。</li>
+</ul>
+<p>说明：</p>
+<blockquote>
+<p>孩子能把沟通用到真实生活里。</p>
+</blockquote>
+<hr>
+<h2 id="四、沟通评估看什么"><a class="anchor" href="#四、沟通评估看什么" aria-hidden="true">#</a>四、沟通评估看什么</h2>
+<h3 id="1.-理解"><a class="anchor" href="#1.-理解" aria-hidden="true">#</a>1. 理解</h3>
+<p>孩子听得懂多少？</p>
+<ul>
+<li>叫名是否回应？</li>
+<li>是否理解常见指令？</li>
+<li>是否理解图片？</li>
+<li>是否理解“先……后……”？</li>
+</ul>
+<h3 id="2.-表达"><a class="anchor" href="#2.-表达" aria-hidden="true">#</a>2. 表达</h3>
+<p>孩子能怎么说？</p>
+<ul>
+<li>哭；</li>
+<li>拉；</li>
+<li>指；</li>
+<li>递卡；</li>
+<li>发声；</li>
+<li>单词；</li>
+<li>短句；</li>
+<li>手写；</li>
+<li>打字。</li>
+</ul>
+<h3 id="3.-沟通功能"><a class="anchor" href="#3.-沟通功能" aria-hidden="true">#</a>3. 沟通功能</h3>
+<p>孩子在表达什么？</p>
+<ul>
+<li>要东西；</li>
+<li>拒绝；</li>
+<li>请求帮助；</li>
+<li>请求休息；</li>
+<li>分享兴趣；</li>
+<li>求关注；</li>
+<li>表达不适；</li>
+<li>求安全。</li>
+</ul>
+<h3 id="4.-场景"><a class="anchor" href="#4.-场景" aria-hidden="true">#</a>4. 场景</h3>
+<p>孩子在哪些场景沟通最好？</p>
+<ul>
+<li>泡泡；</li>
+<li>零食；</li>
+<li>玩具；</li>
+<li>家里；</li>
+<li>学校；</li>
+<li>出门；</li>
+<li>情绪平稳/爆发时。</li>
+</ul>
+<hr>
+<h2 id="五、无语言孩子怎么开始"><a class="anchor" href="#五、无语言孩子怎么开始" aria-hidden="true">#</a>五、无语言孩子怎么开始</h2>
+<h3 id="1.-先别急着教“说话”"><a class="anchor" href="#1.-先别急着教“说话”" aria-hidden="true">#</a>1. 先别急着教“说话”</h3>
+<p>先看孩子现在会不会：</p>
+<ul>
+<li>看你；</li>
+<li>伸手；</li>
+<li>指；</li>
+<li>拉你；</li>
+<li>递东西；</li>
+<li>模仿；</li>
+<li>发声。</li>
+</ul>
+<h3 id="2.-用动机最高的东西"><a class="anchor" href="#2.-用动机最高的东西" aria-hidden="true">#</a>2. 用动机最高的东西</h3>
+<p>比如：</p>
+<ul>
+<li>泡泡；</li>
+<li>零食；</li>
+<li>小车；</li>
+<li>秋千；</li>
+<li>音乐；</li>
+<li>玩水；</li>
+<li>手机屏幕；</li>
+<li>喜欢的玩具。</li>
+</ul>
+<h3 id="3.-创造表达机会"><a class="anchor" href="#3.-创造表达机会" aria-hidden="true">#</a>3. 创造表达机会</h3>
+<ul>
+<li>东西放高一点；</li>
+<li>先关上；</li>
+<li>少给一点；</li>
+<li>停一下；</li>
+<li>等孩子来找。</li>
+</ul>
+<h3 id="4.-先强化任何合适表达"><a class="anchor" href="#4.-先强化任何合适表达" aria-hidden="true">#</a>4. 先强化任何合适表达</h3>
+<p>孩子只要有：</p>
+<ul>
+<li>看人；</li>
+<li>拉你；</li>
+<li>递卡；</li>
+<li>发声；</li>
+<li>指物；</li>
+</ul>
+<p>都可以立刻回应。</p>
+<p>目标是：</p>
+<blockquote>
+<p>让孩子知道“表达有用”。</p>
+</blockquote>
+<hr>
+<h2 id="六、手势沟通怎么教"><a class="anchor" href="#六、手势沟通怎么教" aria-hidden="true">#</a>六、手势沟通怎么教</h2>
+<h3 id="常见手势"><a class="anchor" href="#常见手势" aria-hidden="true">#</a>常见手势</h3>
+<ul>
+<li>指；</li>
+<li>点头；</li>
+<li>摇头；</li>
+<li>举手；</li>
+<li>招手；</li>
+<li>拉人；</li>
+<li>递物；</li>
+<li>双手合十；</li>
+<li>比“停”；</li>
+<li>比“来”。</li>
+</ul>
+<h3 id="教学sop"><a class="anchor" href="#教学sop" aria-hidden="true">#</a>教学SOP</h3>
+<ol>
+<li>先选一个功能明确的动作，比如“指泡泡”；</li>
+<li>老师示范给孩子看；</li>
+<li>把强化物停一下；</li>
+<li>等孩子做手势；</li>
+<li>立刻给结果；</li>
+<li>反复练。</li>
+</ol>
+<h3 id="目标"><a class="anchor" href="#目标" aria-hidden="true">#</a>目标</h3>
+<p>从：</p>
+<ul>
+<li>拉大人；</li>
+</ul>
+<p>过渡到：</p>
+<ul>
+<li>指；</li>
+<li>递卡；</li>
+<li>手势；</li>
+<li>语言。</li>
+</ul>
+<hr>
+<h2 id="七、图片沟通怎么教"><a class="anchor" href="#七、图片沟通怎么教" aria-hidden="true">#</a>七、图片沟通怎么教</h2>
+<h3 id="1.-图片沟通适合谁"><a class="anchor" href="#1.-图片沟通适合谁" aria-hidden="true">#</a>1. 图片沟通适合谁</h3>
+<p>适合：</p>
+<ul>
+<li>无语言；</li>
+<li>语言少；</li>
+<li>说不清；</li>
+<li>情绪一来不会说；</li>
+<li>需要稳定表达工具的孩子。</li>
+</ul>
+<h3 id="2.-图片选择原则"><a class="anchor" href="#2.-图片选择原则" aria-hidden="true">#</a>2. 图片选择原则</h3>
+<ul>
+<li>清楚；</li>
+<li>一张代表一个意思；</li>
+<li>大小合适；</li>
+<li>常用优先；</li>
+<li>容易拿；</li>
+<li>贴在孩子能看到的地方。</li>
+</ul>
+<h3 id="3.-初级图片"><a class="anchor" href="#3.-初级图片" aria-hidden="true">#</a>3. 初级图片</h3>
+<p>先准备：</p>
+<ul>
+<li>我要；</li>
+<li>还要；</li>
+<li>不要；</li>
+<li>帮我；</li>
+<li>休息；</li>
+<li>打开；</li>
+<li>太吵；</li>
+<li>厕所；</li>
+<li>喝水；</li>
+<li>妈妈；</li>
+<li>老师。</li>
+</ul>
+<h3 id="4.-教法"><a class="anchor" href="#4.-教法" aria-hidden="true">#</a>4. 教法</h3>
+<ol>
+<li>孩子想要东西；</li>
+<li>老师把对应图片递给他；</li>
+<li>轻提示他拿卡递给老师；</li>
+<li>老师接卡，马上给结果；</li>
+<li>慢慢减少帮助。</li>
+</ol>
+<h3 id="5.-图片不是考试"><a class="anchor" href="#5.-图片不是考试" aria-hidden="true">#</a>5. 图片不是考试</h3>
+<p>图片的重点是：</p>
+<blockquote>
+<p>孩子拿来就能得到结果。</p>
+</blockquote>
+<p>不要拿图片反复问答却不给实际反馈。</p>
+<hr>
+<h2 id="八、沟通板怎么设计"><a class="anchor" href="#八、沟通板怎么设计" aria-hidden="true">#</a>八、沟通板怎么设计</h2>
+<h3 id="初级沟通板"><a class="anchor" href="#初级沟通板" aria-hidden="true">#</a>初级沟通板</h3>
+<pre><code class="language-text">[我要] [不要] [帮我]
+[休息] [打开] [还要]
+[厕所] [喝水] [太吵]
+</code></pre>
+<h3 id="家庭沟通板"><a class="anchor" href="#家庭沟通板" aria-hidden="true">#</a>家庭沟通板</h3>
+<pre><code class="language-text">[吃] [喝] [玩]
+[妈妈] [爸爸] [老师]
+[出去] [睡觉] [洗澡]
+[手机] [车] [泡泡]
+</code></pre>
+<h3 id="学校沟通板"><a class="anchor" href="#学校沟通板" aria-hidden="true">#</a>学校沟通板</h3>
+<pre><code class="language-text">[休息] [帮我] [厕所]
+[铅笔] [书] [水]
+[我不会] [等一下] [完成]
+</code></pre>
+<h3 id="沟通板使用原则"><a class="anchor" href="#沟通板使用原则" aria-hidden="true">#</a>沟通板使用原则</h3>
+<ul>
+<li>放在孩子随手能拿的位置；</li>
+<li>大人必须示范；</li>
+<li>每次使用后都要有反应；</li>
+<li>一次不要太多；</li>
+<li>定期更新。</li>
+</ul>
+<hr>
+<h2 id="九、电子aac怎么用"><a class="anchor" href="#九、电子aac怎么用" aria-hidden="true">#</a>九、电子AAC怎么用</h2>
+<p>电子AAC可以是：</p>
+<ul>
+<li>平板语音按钮；</li>
+<li>手机应用；</li>
+<li>录音按钮；</li>
+<li>文字转语音设备。</li>
+</ul>
+<h3 id="适合对象"><a class="anchor" href="#适合对象" aria-hidden="true">#</a>适合对象</h3>
+<ul>
+<li>图片沟通已经稳定；</li>
+<li>能理解选择；</li>
+<li>喜欢按按钮；</li>
+<li>需要更丰富表达；</li>
+<li>书写或打字能力较好。</li>
+</ul>
+<h3 id="教学原则"><a class="anchor" href="#教学原则" aria-hidden="true">#</a>教学原则</h3>
+<ol>
+<li>从最常用的词开始；</li>
+<li>不要一次塞太多按钮；</li>
+<li>常用词放前面；</li>
+<li>每次按按钮后马上获得结果；</li>
+<li>家校统一设备或词汇。</li>
+</ol>
+<h3 id="适用词汇"><a class="anchor" href="#适用词汇" aria-hidden="true">#</a>适用词汇</h3>
+<ul>
+<li>我要；</li>
+<li>还要；</li>
+<li>帮我；</li>
+<li>休息；</li>
+<li>不要；</li>
+<li>打开；</li>
+<li>太吵；</li>
+<li>回家；</li>
+<li>妈妈；</li>
+<li>老师。</li>
+</ul>
+<hr>
+<h2 id="十、fct和aac怎么结合"><a class="anchor" href="#十、fct和aac怎么结合" aria-hidden="true">#</a>十、FCT和AAC怎么结合</h2>
+<p>FCT是功能沟通训练，AAC是辅助工具。两者可以一起用。</p>
+<p>例如：</p>
+<ul>
+<li>孩子想要饼干；</li>
+<li>用图片卡递给老师；</li>
+<li>老师说“饼干”；</li>
+<li>给一小块饼干；</li>
+<li>逐渐过渡到说词或短句。</li>
+</ul>
+<p>或者：</p>
+<ul>
+<li>孩子觉得太吵；</li>
+<li>递“太吵”卡；</li>
+<li>老师立刻带去安静区；</li>
+<li>后续再教说“太吵了”。</li>
+</ul>
+<hr>
+<h2 id="十一、仿说怎么处理"><a class="anchor" href="#十一、仿说怎么处理" aria-hidden="true">#</a>十一、仿说怎么处理</h2>
+<p>仿说大白话：</p>
+<blockquote>
+<p>孩子重复大人刚说的话。</p>
+</blockquote>
+<p>仿说不一定是坏事，它可以是语言发展的中间台阶。</p>
+<h3 id="处理方法"><a class="anchor" href="#处理方法" aria-hidden="true">#</a>处理方法</h3>
+<ol>
+<li>不急着打断；</li>
+<li>把仿说变成有意义表达；</li>
+<li>用模型句教他怎么用；</li>
+<li>在真实场景中练。</li>
+</ol>
+<h3 id="例子"><a class="anchor" href="#例子" aria-hidden="true">#</a>例子</h3>
+<p>孩子说：</p>
+<blockquote>
+<p>“要水，要水。”</p>
+</blockquote>
+<p>老师：</p>
+<blockquote>
+<p>“对，水。”</p>
+</blockquote>
+<p>然后马上给水。</p>
+<p>如果孩子总是重复问题句，可以给更短、更实用的表达模板。</p>
+<hr>
+<h2 id="十二、如何从单词到短句"><a class="anchor" href="#十二、如何从单词到短句" aria-hidden="true">#</a>十二、如何从单词到短句</h2>
+<h3 id="单词阶段"><a class="anchor" href="#单词阶段" aria-hidden="true">#</a>单词阶段</h3>
+<p>孩子说：</p>
+<ul>
+<li>要；</li>
+<li>水；</li>
+<li>车；</li>
+<li>走；</li>
+<li>不要；</li>
+<li>帮。</li>
+</ul>
+<h3 id="扩展方法"><a class="anchor" href="#扩展方法" aria-hidden="true">#</a>扩展方法</h3>
+<p>老师把词扩成句：</p>
+<ul>
+<li>“要” → “我要水”；</li>
+<li>“车” → “我要车”；</li>
+<li>“帮” → “帮我打开”；</li>
+<li>“不要” → “我不要这个”。</li>
+</ul>
+<h3 id="教学sop-2"><a class="anchor" href="#教学sop-2" aria-hidden="true">#</a>教学SOP</h3>
+<ol>
+<li>先接受单词；</li>
+<li>给正确句式模型；</li>
+<li>不要求一次说完整句；</li>
+<li>逐步让孩子模仿；</li>
+<li>最后在真实场景独立用。</li>
+</ol>
+<hr>
+<h2 id="十三、如何从短句到对话"><a class="anchor" href="#十三、如何从短句到对话" aria-hidden="true">#</a>十三、如何从短句到对话</h2>
+<h3 id="目标-2"><a class="anchor" href="#目标-2" aria-hidden="true">#</a>目标</h3>
+<p>让孩子不只是要东西，而是能交流。</p>
+<h3 id="训练内容"><a class="anchor" href="#训练内容" aria-hidden="true">#</a>训练内容</h3>
+<ul>
+<li>回答问题；</li>
+<li>提问；</li>
+<li>评论；</li>
+<li>讲经历；</li>
+<li>轮流对话；</li>
+<li>解释想法。</li>
+</ul>
+<h3 id="例子-2"><a class="anchor" href="#例子-2" aria-hidden="true">#</a>例子</h3>
+<h4>评论</h4>
+<p>孩子看到飞机：</p>
+<blockquote>
+<p>“飞机！”</p>
+</blockquote>
+<p>老师：</p>
+<blockquote>
+<p>“对，飞机飞高高。”</p>
+</blockquote>
+<h4>提问</h4>
+<p>孩子学会问：</p>
+<blockquote>
+<p>“这是什么？”<br>
+“谁来了？”<br>
+“为什么？”</p>
+</blockquote>
+<h4>讲经历</h4>
+<blockquote>
+<p>“今天去公园。”<br>
+“我玩泡泡。”<br>
+“我回家了。”</p>
+</blockquote>
+<hr>
+<h2 id="十四、情绪状态下的沟通"><a class="anchor" href="#十四、情绪状态下的沟通" aria-hidden="true">#</a>十四、情绪状态下的沟通</h2>
+<p>很多孩子平时能说，一生气就不会说。</p>
+<h3 id="要教的情绪表达"><a class="anchor" href="#要教的情绪表达" aria-hidden="true">#</a>要教的情绪表达</h3>
+<ul>
+<li>我生气了；</li>
+<li>我不要；</li>
+<li>太吵了；</li>
+<li>我想休息；</li>
+<li>我需要帮忙；</li>
+<li>我想离开；</li>
+<li>我不舒服。</li>
+</ul>
+<h3 id="情绪卡"><a class="anchor" href="#情绪卡" aria-hidden="true">#</a>情绪卡</h3>
+<p>把表情图和文字放一起：</p>
+<ul>
+<li>开心；</li>
+<li>生气；</li>
+<li>害怕；</li>
+<li>累了；</li>
+<li>太吵；</li>
+<li>休息。</li>
+</ul>
+<h3 id="训练原则"><a class="anchor" href="#训练原则" aria-hidden="true">#</a>训练原则</h3>
+<ul>
+<li>平静时练；</li>
+<li>不在爆发时要求完整表达；</li>
+<li>先让孩子能用卡，再逐步加语言。</li>
+</ul>
+<hr>
+<h2 id="十五、沟通层级怎么测"><a class="anchor" href="#十五、沟通层级怎么测" aria-hidden="true">#</a>十五、沟通层级怎么测</h2>
+<h3 id="观察表"><a class="anchor" href="#观察表" aria-hidden="true">#</a>观察表</h3>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>表现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>无意图</td>
+<td>哭、叫、拉、抢</td>
+</tr>
+<tr>
+<td>动作</td>
+<td>指、递、拉人、点头摇头</td>
+</tr>
+<tr>
+<td>声音</td>
+<td>发声、模仿单音</td>
+</tr>
+<tr>
+<td>单词</td>
+<td>要、水、车、帮</td>
+</tr>
+<tr>
+<td>短句</td>
+<td>我要水、帮我打开</td>
+</tr>
+<tr>
+<td>对话</td>
+<td>回答、提问、评论</td>
+</tr>
+<tr>
+<td>场景化</td>
+<td>在学校、商场、家里都能用</td>
+</tr>
+</tbody>
+</table>
+<h3 id="判定原则"><a class="anchor" href="#判定原则" aria-hidden="true">#</a>判定原则</h3>
+<p>不要只看“会不会说”。<br>
+要看：</p>
+<ul>
+<li>会不会主动；</li>
+<li>会不会在多场景用；</li>
+<li>会不会在情绪变化时用；</li>
+<li>会不会被陌生人理解。</li>
+</ul>
+<hr>
+<h2 id="十六、沟通目标怎么写"><a class="anchor" href="#十六、沟通目标怎么写" aria-hidden="true">#</a>十六、沟通目标怎么写？</h2>
+<h3 id="错误写法"><a class="anchor" href="#错误写法" aria-hidden="true">#</a>错误写法</h3>
+<pre><code class="language-text">提高语言能力。
+学会说话。
+改善表达。
+</code></pre>
+<h3 id="正确模板"><a class="anchor" href="#正确模板" aria-hidden="true">#</a>正确模板</h3>
+<pre><code class="language-text">在________场景中，当________发生时，儿童能通过________方式表达________，在____次机会中独立完成____次，连续____天/节课达到。
+</code></pre>
+<h3 id="示例"><a class="anchor" href="#示例" aria-hidden="true">#</a>示例</h3>
+<h4>请求目标</h4>
+<pre><code class="language-text">在泡泡活动中，当老师停止吹泡泡时，儿童能通过递泡泡卡或说“还要”请求继续，5次机会中独立完成4次，连续3节课达到。
+</code></pre>
+<h4>休息目标</h4>
+<pre><code class="language-text">在桌面任务中，当儿童感到烦躁时，能递休息卡或说“休息”，在5次机会中完成4次，连续3节课达到。
+</code></pre>
+<h4>安全求助目标</h4>
+<pre><code class="language-text">在外出场景中，当儿童感到不适或迷路时，能说“我要找妈妈”或递求助卡，连续2周每周至少成功3次。
+</code></pre>
+<hr>
+<h2 id="十七、aac数据怎么记"><a class="anchor" href="#十七、aac数据怎么记" aria-hidden="true">#</a>十七、AAC数据怎么记？</h2>
+<h3 id="1.-使用频率表"><a class="anchor" href="#1.-使用频率表" aria-hidden="true">#</a>1. 使用频率表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>工具</th>
+<th>场景</th>
+<th style="text-align:right">独立使用</th>
+<th style="text-align:right">提示使用</th>
+<th style="text-align:right">无反应</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>图片卡</td>
+<td></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>沟通板</td>
+<td></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>语音按钮</td>
+<td></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="2.-表达功能表"><a class="anchor" href="#2.-表达功能表" aria-hidden="true">#</a>2. 表达功能表</h3>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th style="text-align:right">使用次数</th>
+<th style="text-align:right">成功率</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>请求</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td>休息</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td>拒绝</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td>帮助</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td>关注</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td>安全求助</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="3.-进步记录表"><a class="anchor" href="#3.-进步记录表" aria-hidden="true">#</a>3. 进步记录表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>当前层级</th>
+<th>下一步</th>
+<th>家长是否会用</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="十八、家长版解释话术"><a class="anchor" href="#十八、家长版解释话术" aria-hidden="true">#</a>十八、家长版解释话术</h2>
+<h3 id="1.-解释aac不是放弃说话"><a class="anchor" href="#1.-解释aac不是放弃说话" aria-hidden="true">#</a>1. 解释AAC不是放弃说话</h3>
+<pre><code class="language-text">AAC不是不让孩子说话，而是先给他一个能表达的办法。
+很多孩子有需求但说不出来，图片或按钮能先让他体验“表达有用”。
+当表达动机起来后，再逐步推动语言发展。
+</code></pre>
+<h3 id="2.-解释为什么孩子需要图片"><a class="anchor" href="#2.-解释为什么孩子需要图片" aria-hidden="true">#</a>2. 解释为什么孩子需要图片</h3>
+<pre><code class="language-text">图片比语言更稳定，尤其是在孩子情绪高、环境乱、压力大的时候。
+先用图片让他能沟通，后面再加声音和句子。
+</code></pre>
+<h3 id="3.-解释为什么大人要一致"><a class="anchor" href="#3.-解释为什么大人要一致" aria-hidden="true">#</a>3. 解释为什么大人要一致</h3>
+<pre><code class="language-text">如果今天说了“休息”有效，明天又不认卡片，孩子就会失去信任。
+全家和学校尽量统一相同的词和图。
+</code></pre>
+<h3 id="4.-家庭练习建议"><a class="anchor" href="#4.-家庭练习建议" aria-hidden="true">#</a>4. 家庭练习建议</h3>
+<pre><code class="language-text">家里先只做3–5个最常用的词，比如：我要、不要、帮我、休息、打开。
+每次孩子用卡或说词，大人马上给结果。
+不要把AAC拿来反复考他。
+</code></pre>
+<hr>
+<h2 id="十九、新人常见错误"><a class="anchor" href="#十九、新人常见错误" aria-hidden="true">#</a>十九、新人常见错误</h2>
+<h3 id="错误1一上来给太多词"><a class="anchor" href="#错误1一上来给太多词" aria-hidden="true">#</a>错误1：一上来给太多词</h3>
+<p>改法：<br>
+先从最常用、最有动机的词开始。</p>
+<h3 id="错误2只在课上用"><a class="anchor" href="#错误2只在课上用" aria-hidden="true">#</a>错误2：只在课上用</h3>
+<p>改法：<br>
+家里、学校、外出都要用。</p>
+<h3 id="错误3用了aac但不回应"><a class="anchor" href="#错误3用了aac但不回应" aria-hidden="true">#</a>错误3：用了AAC但不回应</h3>
+<p>改法：<br>
+孩子一表达，大人要马上反应。</p>
+<h3 id="错误4总逼孩子说完整句"><a class="anchor" href="#错误4总逼孩子说完整句" aria-hidden="true">#</a>错误4：总逼孩子说完整句</h3>
+<p>改法：<br>
+先接受卡片、手势、单词，再逐步扩展。</p>
+<h3 id="错误5把aac当考试"><a class="anchor" href="#错误5把aac当考试" aria-hidden="true">#</a>错误5：把AAC当考试</h3>
+<p>改法：<br>
+AAC是沟通工具，不是测验卷。</p>
+<h3 id="错误6工具放太远"><a class="anchor" href="#错误6工具放太远" aria-hidden="true">#</a>错误6：工具放太远</h3>
+<p>改法：<br>
+孩子随时能拿到。</p>
+<h3 id="错误7家长不会用"><a class="anchor" href="#错误7家长不会用" aria-hidden="true">#</a>错误7：家长不会用</h3>
+<p>改法：<br>
+先教家长3个最常用词。</p>
+<h3 id="错误8不做泛化"><a class="anchor" href="#错误8不做泛化" aria-hidden="true">#</a>错误8：不做泛化</h3>
+<p>改法：<br>
+同一个词在多场景重复练。</p>
+<hr>
+<h2 id="二十、aac教案模板"><a class="anchor" href="#二十、aac教案模板" aria-hidden="true">#</a>二十、AAC教案模板</h2>
+<pre><code class="language-text">儿童姓名：
+日期：
+训练师：
+
+一、当前沟通层级
+
+二、最主要的沟通功能
+□ 请求
+□ 拒绝
+□ 休息
+□ 帮助
+□ 关注
+□ 安全求助
+
+三、目标AAC形式
+□ 手势
+□ 图片卡
+□ 沟通板
+□ 语音按钮
+□ 文字/打字
+
+四、目标词汇
+1.
+2.
+3.
+
+五、教学场景
+
+六、提示方式
+
+七、强化方式
+
+八、数据记录
+
+九、家庭/学校泛化
+</code></pre>
+<hr>
+<h2 id="二十一、课堂自查表"><a class="anchor" href="#二十一、课堂自查表" aria-hidden="true">#</a>二十一、课堂自查表</h2>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>是/否</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>我是否知道孩子当前的沟通层级？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否选了最有动机的词？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否在真实场景里教？</td>
+<td></td>
+</tr>
+<tr>
+<td>孩子使用AAC后我是否马上回应？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否把AAC和口语一起示范？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否避免把AAC当考试？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否让工具随手可得？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否记录了使用频率和成功率？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否和家长/学校统一词汇？</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="二十二、空白打印模板"><a class="anchor" href="#二十二、空白打印模板" aria-hidden="true">#</a>二十二、空白打印模板</h2>
+<h3 id="1.-沟通层级观察表"><a class="anchor" href="#1.-沟通层级观察表" aria-hidden="true">#</a>1. 沟通层级观察表</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>当前表现</th>
+<th>下一步</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>理解</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>表达方式</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>沟通功能</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>情绪表达</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>安全求助</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>场景泛化</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="2.-aac词汇表"><a class="anchor" href="#2.-aac词汇表" aria-hidden="true">#</a>2. AAC词汇表</h3>
+<table>
+<thead>
+<tr>
+<th>词汇</th>
+<th>图标是否做好</th>
+<th>常用场景</th>
+<th>是否会独立使用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>我要</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>还要</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>不要</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>帮我</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>休息</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>打开</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>太吵</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>厕所</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="3.-aac使用记录表"><a class="anchor" href="#3.-aac使用记录表" aria-hidden="true">#</a>3. AAC使用记录表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>工具</th>
+<th>目标词</th>
+<th style="text-align:right">独立</th>
+<th style="text-align:right">提示</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="二十三、新人必须记住的10句话"><a class="anchor" href="#二十三、新人必须记住的10句话" aria-hidden="true">#</a>二十三、新人必须记住的10句话</h2>
+<ol>
+<li>AAC不是放弃说话，而是先保证能表达。</li>
+<li>沟通要看层级，不能一上来就要求完整句。</li>
+<li>最先教最有动机的词。</li>
+<li>图片、手势、语音按钮都可以是沟通工具。</li>
+<li>孩子表达后，大人要马上响应。</li>
+<li>情绪高时先用简单AAC，不要硬逼口语。</li>
+<li>家校要统一工具和词汇。</li>
+<li>AAC要放在真实生活里用，不是只在训练室。</li>
+<li>仿说可以是桥梁，不必一棍子打死。</li>
+<li>好的沟通工具会增加表达动机，而不是削弱语言发展。</li>
+</ol>
+<hr>
+<h2 id="二十四、最后给新人训练师的话"><a class="anchor" href="#二十四、最后给新人训练师的话" aria-hidden="true">#</a>二十四、最后给新人训练师的话</h2>
+<p>很多孩子不是不想说，而是“说”这条路太难走。<br>
+AAC的意义，就是先给他一条更容易走的路。</p>
+<p>当孩子第一次把“我要”卡递给你，<br>
+第一次按下按钮说“帮我”，<br>
+第一次在情绪里用“休息”代替尖叫，<br>
+你会看到：</p>
+<blockquote>
+<p>沟通不是等待某个神奇时刻才出现，<br>
+沟通是我们一步一步搭出来的桥。</p>
+</blockquote>
+<p>先让孩子被理解，<br>
+再慢慢让他表达得更完整、更多样、更自然。<br>
+这就是AAC最重要的价值。</p>
+
+  <div class="footer">由 asd-communication-levels-and-aac.md 转换生成。保留原文清单、表格、模板和代码块；流程型文本已增强为图例展示，并保留原始文本。</div>
+</main>
+</div>
+</body>
+</html>

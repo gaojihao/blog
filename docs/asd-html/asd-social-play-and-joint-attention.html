@@ -1,0 +1,1192 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>社交游戏与共同注意训练实操手册</title>
+<style>
+:root{--bg:#f7f7fb;--paper:#fff;--ink:#1f2937;--muted:#6b7280;--brand:#2563eb;--brand2:#7c3aed;--line:#e5e7eb;--soft:#eff6ff;--warn:#fff7ed;--code:#111827;--codebg:#f3f4f6;--shadow:0 20px 60px rgba(15,23,42,.10)}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#f8fafc,#eef2ff 45%,#fdf2f8);color:var(--ink);font:16px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif}.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:26px;max-width:1440px;margin:0 auto;padding:28px}.sidebar{position:sticky;top:20px;align-self:start;max-height:calc(100vh - 40px);overflow:auto;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}.sidebar h2{font-size:16px;margin:0 0 10px}.sidebar a{display:block;color:#334155;text-decoration:none;border-radius:10px;padding:7px 9px;margin:2px 0;font-size:13px;line-height:1.35}.sidebar a:hover{background:var(--soft);color:var(--brand)}.sidebar .toc-l2{padding-left:18px}.sidebar .toc-l3{padding-left:32px;color:#64748b}.content{min-width:0;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:44px 52px}.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:28px}.badge{display:inline-flex;gap:8px;align-items:center;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;border-radius:999px;padding:8px 14px;font-size:13px}.navlink{color:var(--brand);text-decoration:none;font-weight:600}h1{font-size:34px;line-height:1.25;margin:0 0 22px;color:#0f172a}h2{font-size:26px;margin:44px 0 14px;padding-top:14px;border-top:1px solid var(--line)}h3{font-size:21px;margin:30px 0 10px}h4{font-size:18px;margin:24px 0 8px}p{margin:12px 0}blockquote{margin:18px 0;padding:14px 18px;border-left:5px solid var(--brand);background:var(--soft);border-radius:12px;color:#1e3a8a}table{width:100%;border-collapse:collapse;margin:18px 0;overflow:hidden;border-radius:14px;display:table}th,td{border:1px solid var(--line);padding:10px 12px;vertical-align:top}th{background:#f1f5f9;text-align:left}tr:nth-child(even) td{background:#fafafa}pre{background:#0b1020;color:#e5e7eb;border-radius:16px;padding:18px;overflow:auto;line-height:1.55}code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace}p code,li code,td code{background:var(--codebg);color:#be123c;padding:2px 6px;border-radius:6px}ul,ol{padding-left:1.5em}.anchor{opacity:.25;text-decoration:none;margin-right:8px;color:var(--brand)}h1:hover .anchor,h2:hover .anchor,h3:hover .anchor{opacity:1}.flowchart{margin:22px 0;padding:18px;border:1px solid #bfdbfe;background:linear-gradient(180deg,#eff6ff,#fff);border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:8px}.flow-step{width:min(640px,100%);display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid #dbeafe;border-radius:14px;padding:12px 14px;box-shadow:0 8px 22px rgba(37,99,235,.08)}.flow-num{flex:0 0 auto;width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;background:var(--brand);color:white;font-weight:700;font-size:13px}.flow-arrow{color:var(--brand);font-size:22px;font-weight:800;line-height:1}.raw-flow{margin:8px 0 20px;color:var(--muted)}.raw-flow summary{cursor:pointer}.footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}.callout{background:var(--warn);border:1px solid #fed7aa;border-radius:16px;padding:14px 16px;margin:18px 0}.page-list{columns:2;column-gap:28px}.page-list a{display:block;break-inside:avoid;text-decoration:none;color:#1d4ed8;padding:8px 0;border-bottom:1px dashed #dbeafe}.meta{color:var(--muted);font-size:14px}@media(max-width:960px){.layout{display:block;padding:14px}.sidebar{position:relative;max-height:none;margin-bottom:16px}.content{padding:26px 20px}.page-list{columns:1}h1{font-size:28px}h2{font-size:23px}table{display:block;overflow-x:auto;white-space:normal}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <h2>目录</h2>
+  <a class="navlink" href="index.html">← HTML总索引</a>
+  <a class="toc-l1" href="#社交游戏与共同注意训练实操手册">社交游戏与共同注意训练实操手册</a>
+<a class="toc-l2" href="#一、先用一句话讲清楚社交训练">一、先用一句话讲清楚社交训练</a>
+<a class="toc-l2" href="#二、共同注意是什么">二、共同注意是什么？</a>
+<a class="toc-l3" href="#请求和共同注意的区别">请求和共同注意的区别</a>
+<a class="toc-l2" href="#三、社交游戏训练的底层逻辑">三、社交游戏训练的底层逻辑</a>
+<a class="toc-l2" href="#四、社交训练的能力阶梯">四、社交训练的能力阶梯</a>
+<a class="toc-l3" href="#阶段1允许他人在旁边">阶段1：允许他人在旁边</a>
+<a class="toc-l3" href="#阶段2回应他人">阶段2：回应他人</a>
+<a class="toc-l3" href="#阶段3主动找人">阶段3：主动找人</a>
+<a class="toc-l3" href="#阶段4来回互动">阶段4：来回互动</a>
+<a class="toc-l3" href="#阶段5同伴互动">阶段5：同伴互动</a>
+<a class="toc-l2" href="#五、社交训练黄金原则">五、社交训练黄金原则</a>
+<a class="toc-l3" href="#原则1先让人变得有趣">原则1：先让人变得有趣</a>
+<a class="toc-l3" href="#原则2少问问题多制造互动">原则2：少问问题，多制造互动</a>
+<a class="toc-l3" href="#原则3跟随孩子兴趣">原则3：跟随孩子兴趣</a>
+<a class="toc-l3" href="#原则4互动要短、快、成功">原则4：互动要短、快、成功</a>
+<a class="toc-l3" href="#原则5不要强行掰脸看眼睛">原则5：不要强行掰脸看眼睛</a>
+<a class="toc-l3" href="#原则6用夸张但不过载的表情">原则6：用夸张但不过载的表情</a>
+<a class="toc-l3" href="#原则7把社交和自然强化绑在一起">原则7：把社交和自然强化绑在一起</a>
+<a class="toc-l2" href="#六、叫名反应训练">六、叫名反应训练</a>
+<a class="toc-l3" href="#1.-目标">1. 目标</a>
+<a class="toc-l3" href="#2.-sop">2. SOP</a>
+<a class="toc-l3" href="#3.-老师语言">3. 老师语言</a>
+<a class="toc-l3" href="#4.-避坑">4. 避坑</a>
+<a class="toc-l3" href="#5.-进阶">5. 进阶</a>
+<a class="toc-l2" href="#七、眼神互动训练">七、眼神互动训练</a>
+<a class="toc-l3" href="#1.-目标-2">1. 目标</a>
+<a class="toc-l3" href="#2.-不推荐">2. 不推荐</a>
+<a class="toc-l3" href="#3.-推荐方法物品靠近脸">3. 推荐方法：物品靠近脸</a>
+<a class="toc-l3" href="#4.-推荐方法暂停等待">4. 推荐方法：暂停等待</a>
+<a class="toc-l3" href="#5.-推荐方法惊喜事件">5. 推荐方法：惊喜事件</a>
+<a class="toc-l2" href="#八、共同注意训练">八、共同注意训练</a>
+<a class="toc-l3" href="#1.-共同注意的三种基础形式">1. 共同注意的三种基础形式</a>
+<a class="toc-l3" href="#2.-sop用惊喜事件训练">2. SOP：用惊喜事件训练</a>
+<a class="toc-l3" href="#3.-sop户外分享">3. SOP：户外分享</a>
+<a class="toc-l3" href="#4.-sop作品分享">4. SOP：作品分享</a>
+<a class="toc-l2" href="#九、轮流游戏训练">九、轮流游戏训练</a>
+<a class="toc-l3" href="#1.-目标-3">1. 目标</a>
+<a class="toc-l3" href="#2.-适合活动">2. 适合活动</a>
+<a class="toc-l3" href="#3.-sop">3. SOP</a>
+<a class="toc-l3" href="#4.-老师语言">4. 老师语言</a>
+<a class="toc-l3" href="#5.-避坑">5. 避坑</a>
+<a class="toc-l2" href="#十、模仿游戏训练">十、模仿游戏训练</a>
+<a class="toc-l3" href="#1.-为什么模仿重要">1. 为什么模仿重要？</a>
+<a class="toc-l3" href="#2.-模仿阶梯">2. 模仿阶梯</a>
+<a class="toc-l3" href="#3.-sop-2">3. SOP</a>
+<a class="toc-l3" href="#4.-示例敲鼓">4. 示例：敲鼓</a>
+<a class="toc-l2" href="#十一、假装游戏训练">十一、假装游戏训练</a>
+<a class="toc-l3" href="#1.-假装游戏是什么">1. 假装游戏是什么？</a>
+<a class="toc-l3" href="#2.-为什么重要">2. 为什么重要？</a>
+<a class="toc-l3" href="#3.-假装游戏阶梯">3. 假装游戏阶梯</a>
+<a class="toc-l3" href="#4.-sop喂娃娃">4. SOP：喂娃娃</a>
+<a class="toc-l3" href="#5.-sop医生游戏">5. SOP：医生游戏</a>
+<a class="toc-l2" href="#十二、同伴互动训练">十二、同伴互动训练</a>
+<a class="toc-l3" href="#1.-不要一开始就把孩子丢进大群体">1. 不要一开始就把孩子丢进大群体</a>
+<a class="toc-l3" href="#2.-同伴互动阶梯">2. 同伴互动阶梯</a>
+<a class="toc-l3" href="#3.-选择合适同伴">3. 选择合适同伴</a>
+<a class="toc-l3" href="#4.-两人滚球sop">4. 两人滚球SOP</a>
+<a class="toc-l3" href="#5.-合作搭积木sop">5. 合作搭积木SOP</a>
+<a class="toc-l2" href="#十三、社交故事和规则卡">十三、社交故事和规则卡</a>
+<a class="toc-l3" href="#示例轮流社交故事">示例：轮流社交故事</a>
+<a class="toc-l3" href="#规则卡示例">规则卡示例</a>
+<a class="toc-l2" href="#十四、不同年龄社交训练重点">十四、不同年龄社交训练重点</a>
+<a class="toc-l3" href="#0–3岁">0–3岁</a>
+<a class="toc-l3" href="#3–6岁">3–6岁</a>
+<a class="toc-l3" href="#6–12岁">6–12岁</a>
+<a class="toc-l3" href="#12岁以上">12岁以上</a>
+<a class="toc-l2" href="#十五、社交目标怎么写">十五、社交目标怎么写？</a>
+<a class="toc-l3" href="#错误写法">错误写法</a>
+<a class="toc-l3" href="#正确模板">正确模板</a>
+<a class="toc-l3" href="#示例1共同注意">示例1：共同注意</a>
+<a class="toc-l3" href="#示例2轮流">示例2：轮流</a>
+<a class="toc-l3" href="#示例3同伴互动">示例3：同伴互动</a>
+<a class="toc-l3" href="#示例4假装游戏">示例4：假装游戏</a>
+<a class="toc-l2" href="#十六、社交游戏数据怎么记">十六、社交游戏数据怎么记？</a>
+<a class="toc-l3" href="#1.-共同注意记录表">1. 共同注意记录表</a>
+<a class="toc-l3" href="#2.-轮流记录表">2. 轮流记录表</a>
+<a class="toc-l3" href="#3.-模仿游戏记录表">3. 模仿游戏记录表</a>
+<a class="toc-l3" href="#4.-同伴互动记录表">4. 同伴互动记录表</a>
+<a class="toc-l2" href="#十七、家长版解释话术">十七、家长版解释话术</a>
+<a class="toc-l3" href="#1.-解释共同注意">1. 解释共同注意</a>
+<a class="toc-l3" href="#2.-解释不要强迫眼神">2. 解释不要强迫眼神</a>
+<a class="toc-l3" href="#3.-解释同伴训练不能太急">3. 解释同伴训练不能太急</a>
+<a class="toc-l3" href="#4.-家庭练习建议">4. 家庭练习建议</a>
+<a class="toc-l2" href="#十八、常见错误">十八、常见错误</a>
+<a class="toc-l3" href="#错误1把社交训练变成眼神训练">错误1：把社交训练变成眼神训练</a>
+<a class="toc-l3" href="#错误2问题太多">错误2：问题太多</a>
+<a class="toc-l3" href="#错误3一开始就要求和同伴玩">错误3：一开始就要求和同伴玩</a>
+<a class="toc-l3" href="#错误4老师主导太强">错误4：老师主导太强</a>
+<a class="toc-l3" href="#错误5只练请求不练分享">错误5：只练请求，不练分享</a>
+<a class="toc-l3" href="#错误6忽略孩子感觉负荷">错误6：忽略孩子感觉负荷</a>
+<a class="toc-l3" href="#错误7同伴选择不合适">错误7：同伴选择不合适</a>
+<a class="toc-l2" href="#十九、社交游戏教案模板">十九、社交游戏教案模板</a>
+<a class="toc-l2" href="#二十、课堂自查表">二十、课堂自查表</a>
+<a class="toc-l2" href="#二十一、空白打印模板">二十一、空白打印模板</a>
+<a class="toc-l3" href="#1.-社交能力观察表">1. 社交能力观察表</a>
+<a class="toc-l3" href="#2.-社交游戏机会记录表">2. 社交游戏机会记录表</a>
+<a class="toc-l3" href="#3.-家庭社交游戏练习表">3. 家庭社交游戏练习表</a>
+<a class="toc-l2" href="#二十二、新人必须记住的10句话">二十二、新人必须记住的10句话</a>
+<a class="toc-l2" href="#二十三、最后给新人训练师的话">二十三、最后给新人训练师的话</a>
+</aside>
+<main class="content">
+  <div class="topbar"><span class="badge">ASD训练师资料库 · 第 13 篇</span><a class="navlink" href="../asd-social-play-and-joint-attention.md">查看Markdown源文档</a></div>
+  <h1 id="社交游戏与共同注意训练实操手册"><a class="anchor" href="#社交游戏与共同注意训练实操手册" aria-hidden="true">#</a>社交游戏与共同注意训练实操手册</h1>
+<blockquote>
+<p>适用对象：自闭症康复训练师、早期干预老师、家长指导老师、融合教育老师、影子老师。<br>
+使用场景：孩子不看人、叫名不应、只自己玩、不分享兴趣、不轮流、不模仿、不会假装游戏、不和同伴玩。<br>
+核心目的：帮助新人训练师用游戏和生活互动训练儿童的社交动机、共同注意、轮流、模仿、假装游戏和同伴互动。<br>
+重要提醒：社交训练不是逼孩子“看人”和“表演礼貌”，而是让孩子逐渐体验到：人是有趣的、互动是有用的、分享是快乐的。</p>
+</blockquote>
+<hr>
+<h2 id="一、先用一句话讲清楚社交训练"><a class="anchor" href="#一、先用一句话讲清楚社交训练" aria-hidden="true">#</a>一、先用一句话讲清楚社交训练</h2>
+<p>一句大白话：</p>
+<blockquote>
+<p>社交训练不是让孩子机械看人，而是让孩子发现“和人在一起也很好玩”。</p>
+</blockquote>
+<p>很多新人会把社交训练理解为：</p>
+<ul>
+<li>看老师眼睛；</li>
+<li>叫人；</li>
+<li>说你好；</li>
+<li>回答问题；</li>
+<li>和小朋友坐一起。</li>
+</ul>
+<p>这些只是表面。真正的社交核心是：</p>
+<ul>
+<li>我愿意注意你；</li>
+<li>我想让你知道我的想法；</li>
+<li>我会回应你；</li>
+<li>我会和你轮流；</li>
+<li>我会分享快乐；</li>
+<li>我知道你和我可能想得不一样。</li>
+</ul>
+<hr>
+<h2 id="二、共同注意是什么"><a class="anchor" href="#二、共同注意是什么" aria-hidden="true">#</a>二、共同注意是什么？</h2>
+<p>共同注意是ASD干预里非常核心的能力。</p>
+<p>一句大白话：</p>
+<blockquote>
+<p>共同注意就是孩子看到一个有趣的东西，不只是自己看，还会拉你一起看。</p>
+</blockquote>
+<p>比如：</p>
+<ul>
+<li>孩子看到飞机，指给妈妈看；</li>
+<li>孩子搭好积木，拿给老师看；</li>
+<li>孩子看到泡泡飞起来，先看泡泡，再看老师笑；</li>
+<li>孩子听到小狗叫，转头看小狗，再看妈妈。</li>
+</ul>
+<p>共同注意不是单纯要东西。</p>
+<h3 id="请求和共同注意的区别"><a class="anchor" href="#请求和共同注意的区别" aria-hidden="true">#</a>请求和共同注意的区别</h3>
+<table>
+<thead>
+<tr>
+<th>行为</th>
+<th>孩子的意思</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>指饼干，看妈妈</td>
+<td>我要饼干</td>
+</tr>
+<tr>
+<td>指飞机，看妈妈</td>
+<td>妈妈你看飞机</td>
+</tr>
+<tr>
+<td>递打不开的盒子</td>
+<td>帮我打开</td>
+</tr>
+<tr>
+<td>拿画给妈妈看</td>
+<td>看我画的东西</td>
+</tr>
+</tbody>
+</table>
+<p>请求是为了得到东西。<br>
+共同注意是为了分享兴趣。</p>
+<p>ASD孩子常常会请求，但不会分享。<br>
+所以训练师要特别练“分享型互动”。</p>
+<hr>
+<h2 id="三、社交游戏训练的底层逻辑"><a class="anchor" href="#三、社交游戏训练的底层逻辑" aria-hidden="true">#</a>三、社交游戏训练的底层逻辑</h2>
+<p>孩子为什么不理人？常见原因有：</p>
+<ol>
+<li>人的表情、声音、动作太复杂；</li>
+<li>玩具比人更稳定、更可控；</li>
+<li>他不知道别人能帮他；</li>
+<li>他不知道互动有什么乐趣；</li>
+<li>他听不懂社交规则；</li>
+<li>他曾经在人际互动中反复失败；</li>
+<li>感觉过载或焦虑。</li>
+</ol>
+<p>所以训练师不是强迫孩子社交，而是设计体验：</p>
+<blockquote>
+<p>人能带来好玩的事；人能帮我；人会回应我；我和人可以来回玩。</p>
+</blockquote>
+<hr>
+<h2 id="四、社交训练的能力阶梯"><a class="anchor" href="#四、社交训练的能力阶梯" aria-hidden="true">#</a>四、社交训练的能力阶梯</h2>
+<h3 id="阶段1允许他人在旁边"><a class="anchor" href="#阶段1允许他人在旁边" aria-hidden="true">#</a>阶段1：允许他人在旁边</h3>
+<p>目标：孩子不排斥老师靠近、旁观、拿同类玩具。</p>
+<h3 id="阶段2回应他人"><a class="anchor" href="#阶段2回应他人" aria-hidden="true">#</a>阶段2：回应他人</h3>
+<p>目标：孩子能回应叫名、接物、看人、跟随简单动作。</p>
+<h3 id="阶段3主动找人"><a class="anchor" href="#阶段3主动找人" aria-hidden="true">#</a>阶段3：主动找人</h3>
+<p>目标：孩子能主动拉人、递物、看人、请求、分享。</p>
+<h3 id="阶段4来回互动"><a class="anchor" href="#阶段4来回互动" aria-hidden="true">#</a>阶段4：来回互动</h3>
+<p>目标：孩子能轮流、等待、模仿、简单对话、共同完成游戏。</p>
+<h3 id="阶段5同伴互动"><a class="anchor" href="#阶段5同伴互动" aria-hidden="true">#</a>阶段5：同伴互动</h3>
+<p>目标：孩子能加入同伴、邀请同伴、遵守规则、处理冲突。</p>
+<p>新人不要一上来要求阶段5。<br>
+如果孩子还在阶段1，你先要让他接受你，而不是逼他和小朋友玩桌游。</p>
+<hr>
+<h2 id="五、社交训练黄金原则"><a class="anchor" href="#五、社交训练黄金原则" aria-hidden="true">#</a>五、社交训练黄金原则</h2>
+<h3 id="原则1先让人变得有趣"><a class="anchor" href="#原则1先让人变得有趣" aria-hidden="true">#</a>原则1：先让人变得有趣</h3>
+<p>老师要成为“好事发生器”。</p>
+<p>孩子喜欢泡泡，泡泡在老师手里；<br>
+孩子喜欢车，老师让车飞出去；<br>
+孩子喜欢挠痒，老师会玩挠痒游戏；<br>
+孩子喜欢荡秋千，老师推他。</p>
+<p>目的：</p>
+<blockquote>
+<p>孩子开始觉得：找人有用，和人互动有意思。</p>
+</blockquote>
+<h3 id="原则2少问问题多制造互动"><a class="anchor" href="#原则2少问问题多制造互动" aria-hidden="true">#</a>原则2：少问问题，多制造互动</h3>
+<p>错误：</p>
+<blockquote>
+<p>“这是什么？这是什么颜色？你看我，你说呀。”</p>
+</blockquote>
+<p>正确：</p>
+<blockquote>
+<p>“车来了，嘟嘟！”<br>
+“停！”<br>
+“哇，倒了！”<br>
+“轮到你。”</p>
+</blockquote>
+<p>问题太多会让孩子觉得社交像考试。</p>
+<h3 id="原则3跟随孩子兴趣"><a class="anchor" href="#原则3跟随孩子兴趣" aria-hidden="true">#</a>原则3：跟随孩子兴趣</h3>
+<p>先进入孩子的玩法，再轻轻扩展。</p>
+<p>如果孩子转轮子，不要马上抢走。<br>
+可以先说：</p>
+<blockquote>
+<p>“轮子转转。”</p>
+</blockquote>
+<p>然后加入：</p>
+<blockquote>
+<p>“我的轮子也转。”<br>
+“停！”<br>
+“车开了。”</p>
+</blockquote>
+<h3 id="原则4互动要短、快、成功"><a class="anchor" href="#原则4互动要短、快、成功" aria-hidden="true">#</a>原则4：互动要短、快、成功</h3>
+<p>初期互动不要太长。</p>
+<ul>
+<li>看你1秒就强化；</li>
+<li>轮流1轮就成功；</li>
+<li>模仿1个动作就玩；</li>
+<li>分享1次就回应。</li>
+</ul>
+<h3 id="原则5不要强行掰脸看眼睛"><a class="anchor" href="#原则5不要强行掰脸看眼睛" aria-hidden="true">#</a>原则5：不要强行掰脸看眼睛</h3>
+<p>眼神接触应该来自兴趣和需要，不应靠控制头部。</p>
+<p>可以把有趣的东西放在自己眼睛附近，但不要强迫。</p>
+<h3 id="原则6用夸张但不过载的表情"><a class="anchor" href="#原则6用夸张但不过载的表情" aria-hidden="true">#</a>原则6：用夸张但不过载的表情</h3>
+<p>有些孩子喜欢夸张表情，有些孩子会被吓到。<br>
+训练师要观察孩子反应。</p>
+<h3 id="原则7把社交和自然强化绑在一起"><a class="anchor" href="#原则7把社交和自然强化绑在一起" aria-hidden="true">#</a>原则7：把社交和自然强化绑在一起</h3>
+<p>孩子看人 → 游戏继续。<br>
+孩子递物 → 老师打开。<br>
+孩子轮流 → 小车开出去。<br>
+孩子分享 → 大人惊喜回应。</p>
+<hr>
+<h2 id="六、叫名反应训练"><a class="anchor" href="#六、叫名反应训练" aria-hidden="true">#</a>六、叫名反应训练</h2>
+<h3 id="1.-目标"><a class="anchor" href="#1.-目标" aria-hidden="true">#</a>1. 目标</h3>
+<p>孩子听到名字后，能转头、看人或用声音回应。</p>
+<p>注意：<br>
+叫名反应不是为了让孩子“服从”，而是为了建立安全和沟通入口。</p>
+<h3 id="2.-sop"><a class="anchor" href="#2.-sop" aria-hidden="true">#</a>2. SOP</h3>
+<ol>
+<li>站在孩子侧前方，不要离太远；</li>
+<li>手里准备强强化物；</li>
+<li>叫名字一次；</li>
+<li>等1–2秒；</li>
+<li>孩子转头或看你，马上强化；</li>
+<li>没反应，用声音玩具或动作吸引，不要重复叫很多遍；</li>
+<li>成功后逐渐增加距离、换人、换环境。</li>
+</ol>
+<h3 id="3.-老师语言"><a class="anchor" href="#3.-老师语言" aria-hidden="true">#</a>3. 老师语言</h3>
+<blockquote>
+<p>“小明。”<br>
+孩子看。<br>
+“你看老师了，泡泡！”</p>
+</blockquote>
+<h3 id="4.-避坑"><a class="anchor" href="#4.-避坑" aria-hidden="true">#</a>4. 避坑</h3>
+<ul>
+<li>不要连续叫十几遍；</li>
+<li>不要每次叫名后都是批评或任务；</li>
+<li>不要掰脸；</li>
+<li>不要在孩子专注高强度兴趣时硬叫很多次。</li>
+</ul>
+<h3 id="5.-进阶"><a class="anchor" href="#5.-进阶" aria-hidden="true">#</a>5. 进阶</h3>
+<ul>
+<li>安静环境叫名；</li>
+<li>玩具中叫名；</li>
+<li>远距离叫名；</li>
+<li>户外叫名；</li>
+<li>同伴叫名；</li>
+<li>危险场景停下回应。</li>
+</ul>
+<hr>
+<h2 id="七、眼神互动训练"><a class="anchor" href="#七、眼神互动训练" aria-hidden="true">#</a>七、眼神互动训练</h2>
+<h3 id="1.-目标-2"><a class="anchor" href="#1.-目标-2" aria-hidden="true">#</a>1. 目标</h3>
+<p>孩子愿意自然地看人，尤其是在请求、分享、等待、轮流时看人。</p>
+<h3 id="2.-不推荐"><a class="anchor" href="#2.-不推荐" aria-hidden="true">#</a>2. 不推荐</h3>
+<ul>
+<li>“看我看我看我”；</li>
+<li>用手掰下巴；</li>
+<li>不看就不给任何回应；</li>
+<li>长时间要求盯眼睛。</li>
+</ul>
+<h3 id="3.-推荐方法物品靠近脸"><a class="anchor" href="#3.-推荐方法物品靠近脸" aria-hidden="true">#</a>3. 推荐方法：物品靠近脸</h3>
+<p>SOP：</p>
+<ol>
+<li>拿孩子喜欢的泡泡；</li>
+<li>放在自己眼睛旁边；</li>
+<li>等孩子看过来；</li>
+<li>孩子看你或看物品靠近脸的方向，马上吹泡泡；</li>
+<li>逐渐减少物品靠脸。</li>
+</ol>
+<h3 id="4.-推荐方法暂停等待"><a class="anchor" href="#4.-推荐方法暂停等待" aria-hidden="true">#</a>4. 推荐方法：暂停等待</h3>
+<p>孩子正在玩喜欢的游戏时，老师突然停下。<br>
+等待孩子看老师。<br>
+一看，游戏继续。</p>
+<p>例如：</p>
+<blockquote>
+<p>推车——停——孩子看老师——老师说“开！”车继续。</p>
+</blockquote>
+<h3 id="5.-推荐方法惊喜事件"><a class="anchor" href="#5.-推荐方法惊喜事件" aria-hidden="true">#</a>5. 推荐方法：惊喜事件</h3>
+<p>制造有趣事件：</p>
+<ul>
+<li>积木倒；</li>
+<li>玩偶摔倒；</li>
+<li>小车飞出去；</li>
+<li>老师夸张打喷嚏；</li>
+<li>泡泡飞到头上。</li>
+</ul>
+<p>孩子看老师时，老师立刻回应：</p>
+<blockquote>
+<p>“哈哈，倒了！”</p>
+</blockquote>
+<hr>
+<h2 id="八、共同注意训练"><a class="anchor" href="#八、共同注意训练" aria-hidden="true">#</a>八、共同注意训练</h2>
+<h3 id="1.-共同注意的三种基础形式"><a class="anchor" href="#1.-共同注意的三种基础形式" aria-hidden="true">#</a>1. 共同注意的三种基础形式</h3>
+<h4>看物再看人</h4>
+<p>孩子看泡泡，再看老师。</p>
+<h4>指物给人看</h4>
+<p>孩子指飞机给妈妈看。</p>
+<h4>拿物给人看</h4>
+<p>孩子拿作品给老师看。</p>
+<h3 id="2.-sop用惊喜事件训练"><a class="anchor" href="#2.-sop用惊喜事件训练" aria-hidden="true">#</a>2. SOP：用惊喜事件训练</h3>
+<ol>
+<li>准备孩子感兴趣的活动，如泡泡或小车；</li>
+<li>制造惊喜：泡泡突然很多、小车撞倒积木；</li>
+<li>老师夸张说：“哇！”</li>
+<li>等孩子看老师；</li>
+<li>孩子一看，马上共享：“你也看到了！车撞倒了！”</li>
+<li>再重复。</li>
+</ol>
+<h3 id="3.-sop户外分享"><a class="anchor" href="#3.-sop户外分享" aria-hidden="true">#</a>3. SOP：户外分享</h3>
+<ol>
+<li>看到小狗、飞机、灯、车等；</li>
+<li>老师先指：“看，小狗！”</li>
+<li>等孩子顺着看；</li>
+<li>再等孩子看回老师；</li>
+<li>孩子看回时，老师回应：“对，小狗跑！”</li>
+</ol>
+<h3 id="4.-sop作品分享"><a class="anchor" href="#4.-sop作品分享" aria-hidden="true">#</a>4. SOP：作品分享</h3>
+<ol>
+<li>孩子搭好积木；</li>
+<li>老师不要只问“这是什么”；</li>
+<li>可以说：“哇，你搭好了，给妈妈看。”</li>
+<li>帮孩子把作品拿给家长；</li>
+<li>家长夸张回应：“我看到了，好高！”</li>
+</ol>
+<hr>
+<h2 id="九、轮流游戏训练"><a class="anchor" href="#九、轮流游戏训练" aria-hidden="true">#</a>九、轮流游戏训练</h2>
+<h3 id="1.-目标-3"><a class="anchor" href="#1.-目标-3" aria-hidden="true">#</a>1. 目标</h3>
+<p>孩子能理解“你一次，我一次”。</p>
+<h3 id="2.-适合活动"><a class="anchor" href="#2.-适合活动" aria-hidden="true">#</a>2. 适合活动</h3>
+<ul>
+<li>滚球；</li>
+<li>推车；</li>
+<li>敲鼓；</li>
+<li>搭积木；</li>
+<li>投篮；</li>
+<li>插玩具；</li>
+<li>吹泡泡；</li>
+<li>按按钮。</li>
+</ul>
+<h3 id="3.-sop"><a class="anchor" href="#3.-sop" aria-hidden="true">#</a>3. SOP</h3>
+<ol>
+<li>选孩子喜欢但可以共享的活动；</li>
+<li>孩子先玩一次；</li>
+<li>老师说：“我一次。”快速玩一下；</li>
+<li>马上说：“你一次。”还给孩子；</li>
+<li>初期老师回合要非常短；</li>
+<li>成功2–3轮后强化；</li>
+<li>逐渐加入同伴。</li>
+</ol>
+<h3 id="4.-老师语言"><a class="anchor" href="#4.-老师语言" aria-hidden="true">#</a>4. 老师语言</h3>
+<blockquote>
+<p>“你一次。”<br>
+“我一次。”<br>
+“轮到你。”<br>
+“轮到我。”</p>
+</blockquote>
+<h3 id="5.-避坑"><a class="anchor" href="#5.-避坑" aria-hidden="true">#</a>5. 避坑</h3>
+<ul>
+<li>不要拿孩子最不能分享的物品开始；</li>
+<li>不要老师拿到后玩太久；</li>
+<li>不要孩子一抢就完全放弃规则；</li>
+<li>不要一开始就要求多人轮流。</li>
+</ul>
+<hr>
+<h2 id="十、模仿游戏训练"><a class="anchor" href="#十、模仿游戏训练" aria-hidden="true">#</a>十、模仿游戏训练</h2>
+<h3 id="1.-为什么模仿重要"><a class="anchor" href="#1.-为什么模仿重要" aria-hidden="true">#</a>1. 为什么模仿重要？</h3>
+<p>大白话：</p>
+<blockquote>
+<p>模仿是孩子学习别人的入口。</p>
+</blockquote>
+<p>孩子会模仿，才能更容易学：</p>
+<ul>
+<li>说话；</li>
+<li>游戏；</li>
+<li>生活动作；</li>
+<li>同伴行为；</li>
+<li>课堂规则。</li>
+</ul>
+<h3 id="2.-模仿阶梯"><a class="anchor" href="#2.-模仿阶梯" aria-hidden="true">#</a>2. 模仿阶梯</h3>
+<ol>
+<li>模仿有物动作：推车、敲鼓、喂娃娃；</li>
+<li>模仿大动作：拍手、举手、跺脚；</li>
+<li>模仿精细动作：指、捏、摸头；</li>
+<li>模仿口部动作：张嘴、吹、伸舌；</li>
+<li>模仿声音；</li>
+<li>模仿同伴游戏。</li>
+</ol>
+<h3 id="3.-sop-2"><a class="anchor" href="#3.-sop-2" aria-hidden="true">#</a>3. SOP</h3>
+<ol>
+<li>先模仿孩子，让孩子发现“老师在跟我一样”；</li>
+<li>孩子注意到后，老师做一个小变化；</li>
+<li>说：“这样做”；</li>
+<li>等孩子模仿；</li>
+<li>成功后立刻让游戏更好玩；</li>
+<li>不会就身体或示范提示；</li>
+<li>逐渐撤提示。</li>
+</ol>
+<h3 id="4.-示例敲鼓"><a class="anchor" href="#4.-示例敲鼓" aria-hidden="true">#</a>4. 示例：敲鼓</h3>
+<ul>
+<li>孩子敲鼓，老师也敲；</li>
+<li>老师敲两下停；</li>
+<li>孩子看老师；</li>
+<li>老师说：“你敲”；</li>
+<li>孩子敲，老师夸张回应。</li>
+</ul>
+<hr>
+<h2 id="十一、假装游戏训练"><a class="anchor" href="#十一、假装游戏训练" aria-hidden="true">#</a>十一、假装游戏训练</h2>
+<h3 id="1.-假装游戏是什么"><a class="anchor" href="#1.-假装游戏是什么" aria-hidden="true">#</a>1. 假装游戏是什么？</h3>
+<p>大白话：</p>
+<blockquote>
+<p>假装游戏就是把一个东西当成另一个东西，或者扮演生活里的角色。</p>
+</blockquote>
+<p>例子：</p>
+<ul>
+<li>假装喂娃娃；</li>
+<li>假装打电话；</li>
+<li>假装医生看病；</li>
+<li>假装做饭；</li>
+<li>积木当蛋糕；</li>
+<li>盒子当车库。</li>
+</ul>
+<h3 id="2.-为什么重要"><a class="anchor" href="#2.-为什么重要" aria-hidden="true">#</a>2. 为什么重要？</h3>
+<p>假装游戏帮助孩子发展：</p>
+<ul>
+<li>想象力；</li>
+<li>语言；</li>
+<li>社交角色；</li>
+<li>情绪理解；</li>
+<li>生活经验；</li>
+<li>同伴游戏能力。</li>
+</ul>
+<h3 id="3.-假装游戏阶梯"><a class="anchor" href="#3.-假装游戏阶梯" aria-hidden="true">#</a>3. 假装游戏阶梯</h3>
+<ol>
+<li>功能性动作：杯子喝水、勺子吃饭；</li>
+<li>对娃娃动作：喂娃娃、给娃娃盖被子；</li>
+<li>多步骤脚本：做饭→喂娃娃→擦嘴；</li>
+<li>角色扮演：医生、老师、司机；</li>
+<li>合作故事：你当医生，我当病人。</li>
+</ol>
+<h3 id="4.-sop喂娃娃"><a class="anchor" href="#4.-sop喂娃娃" aria-hidden="true">#</a>4. SOP：喂娃娃</h3>
+<ol>
+<li>准备娃娃、碗、勺子；</li>
+<li>老师示范：“娃娃饿了，吃饭。”</li>
+<li>老师喂一口；</li>
+<li>递勺子给孩子：“你喂。”</li>
+<li>孩子喂后，老师让娃娃说：“好吃！”</li>
+<li>加入擦嘴、喝水、睡觉。</li>
+</ol>
+<h3 id="5.-sop医生游戏"><a class="anchor" href="#5.-sop医生游戏" aria-hidden="true">#</a>5. SOP：医生游戏</h3>
+<ol>
+<li>准备听诊器、娃娃、创可贴；</li>
+<li>老师说：“娃娃生病了。”</li>
+<li>示范听一听；</li>
+<li>孩子模仿；</li>
+<li>贴创可贴；</li>
+<li>说“好了”；</li>
+<li>换角色：孩子当医生，老师当病人。</li>
+</ol>
+<hr>
+<h2 id="十二、同伴互动训练"><a class="anchor" href="#十二、同伴互动训练" aria-hidden="true">#</a>十二、同伴互动训练</h2>
+<h3 id="1.-不要一开始就把孩子丢进大群体"><a class="anchor" href="#1.-不要一开始就把孩子丢进大群体" aria-hidden="true">#</a>1. 不要一开始就把孩子丢进大群体</h3>
+<p>很多ASD孩子在大群体中会：</p>
+<ul>
+<li>躲开；</li>
+<li>抢东西；</li>
+<li>跑走；</li>
+<li>不知道规则；</li>
+<li>被忽视；</li>
+<li>崩溃。</li>
+</ul>
+<p>同伴训练要从小开始。</p>
+<h3 id="2.-同伴互动阶梯"><a class="anchor" href="#2.-同伴互动阶梯" aria-hidden="true">#</a>2. 同伴互动阶梯</h3>
+<ol>
+<li>同处一个空间；</li>
+<li>平行玩；</li>
+<li>观察同伴；</li>
+<li>模仿同伴；</li>
+<li>和同伴轮流；</li>
+<li>简单合作；</li>
+<li>规则游戏；</li>
+<li>处理冲突。</li>
+</ol>
+<h3 id="3.-选择合适同伴"><a class="anchor" href="#3.-选择合适同伴" aria-hidden="true">#</a>3. 选择合适同伴</h3>
+<p>适合同伴：</p>
+<ul>
+<li>温和；</li>
+<li>愿意等待；</li>
+<li>不抢；</li>
+<li>能听老师引导；</li>
+<li>对孩子友好。</li>
+</ul>
+<p>不适合初期同伴：</p>
+<ul>
+<li>攻击性强；</li>
+<li>规则意识差；</li>
+<li>爱嘲笑；</li>
+<li>过度强势；</li>
+<li>人数太多。</li>
+</ul>
+<h3 id="4.-两人滚球sop"><a class="anchor" href="#4.-两人滚球sop" aria-hidden="true">#</a>4. 两人滚球SOP</h3>
+<ol>
+<li>两个孩子面对面坐；</li>
+<li>老师在旁边辅助；</li>
+<li>A滚给B；</li>
+<li>B滚给A；</li>
+<li>老师说：“给小明”；</li>
+<li>成功后夸双方；</li>
+<li>逐渐减少老师提示。</li>
+</ol>
+<h3 id="5.-合作搭积木sop"><a class="anchor" href="#5.-合作搭积木sop" aria-hidden="true">#</a>5. 合作搭积木SOP</h3>
+<ol>
+<li>设定共同目标：“一起搭高塔”；</li>
+<li>A放一块；</li>
+<li>B放一块；</li>
+<li>老师提示“轮到谁”；</li>
+<li>塔倒时一起笑；</li>
+<li>完成后一起给家长看。</li>
+</ol>
+<hr>
+<h2 id="十三、社交故事和规则卡"><a class="anchor" href="#十三、社交故事和规则卡" aria-hidden="true">#</a>十三、社交故事和规则卡</h2>
+<p>社交故事大白话：</p>
+<blockquote>
+<p>用简单图文告诉孩子一个社交场景里会发生什么、别人怎么想、我可以怎么做。</p>
+</blockquote>
+<p>适合：</p>
+<ul>
+<li>排队；</li>
+<li>轮流；</li>
+<li>分享；</li>
+<li>输赢；</li>
+<li>生日会；</li>
+<li>上学；</li>
+<li>看医生；</li>
+<li>同伴拒绝。</li>
+</ul>
+<h3 id="示例轮流社交故事"><a class="anchor" href="#示例轮流社交故事" aria-hidden="true">#</a>示例：轮流社交故事</h3>
+<pre><code class="language-text">我和小朋友一起玩球。
+有时候轮到我。
+有时候轮到小朋友。
+轮到别人时，我可以等一等。
+等到我时，我再玩。
+我会说：轮到我了吗？
+</code></pre>
+<h3 id="规则卡示例"><a class="anchor" href="#规则卡示例" aria-hidden="true">#</a>规则卡示例</h3>
+<pre><code class="language-text">玩游戏规则：
+1. 轮流
+2. 等待
+3. 手不抢
+4. 说“轮到我”
+</code></pre>
+<hr>
+<h2 id="十四、不同年龄社交训练重点"><a class="anchor" href="#十四、不同年龄社交训练重点" aria-hidden="true">#</a>十四、不同年龄社交训练重点</h2>
+<h3 id="0–3岁"><a class="anchor" href="#0–3岁" aria-hidden="true">#</a>0–3岁</h3>
+<p>重点：</p>
+<ul>
+<li>亲子互动；</li>
+<li>看人；</li>
+<li>回应名字；</li>
+<li>轮流声音；</li>
+<li>模仿动作；</li>
+<li>简单游戏。</li>
+</ul>
+<p>活动：</p>
+<ul>
+<li>躲猫猫；</li>
+<li>挠痒痒；</li>
+<li>泡泡；</li>
+<li>滚球；</li>
+<li>唱儿歌。</li>
+</ul>
+<h3 id="3–6岁"><a class="anchor" href="#3–6岁" aria-hidden="true">#</a>3–6岁</h3>
+<p>重点：</p>
+<ul>
+<li>功能性游戏；</li>
+<li>假装游戏；</li>
+<li>轮流；</li>
+<li>共同注意；</li>
+<li>同伴平行玩到合作玩。</li>
+</ul>
+<p>活动：</p>
+<ul>
+<li>娃娃家；</li>
+<li>医生游戏；</li>
+<li>小车轨道；</li>
+<li>积木合作；</li>
+<li>简单桌游。</li>
+</ul>
+<h3 id="6–12岁"><a class="anchor" href="#6–12岁" aria-hidden="true">#</a>6–12岁</h3>
+<p>重点：</p>
+<ul>
+<li>规则游戏；</li>
+<li>话题轮替；</li>
+<li>处理输赢；</li>
+<li>加入同伴；</li>
+<li>理解别人想法；</li>
+<li>识别欺负。</li>
+</ul>
+<p>活动：</p>
+<ul>
+<li>桌游；</li>
+<li>运动；</li>
+<li>小组任务；</li>
+<li>角色扮演；</li>
+<li>社交情景剧。</li>
+</ul>
+<h3 id="12岁以上"><a class="anchor" href="#12岁以上" aria-hidden="true">#</a>12岁以上</h3>
+<p>重点：</p>
+<ul>
+<li>友谊边界；</li>
+<li>青春期社交；</li>
+<li>网络安全；</li>
+<li>拒绝与求助；</li>
+<li>同伴压力；</li>
+<li>职业社交。</li>
+</ul>
+<p>活动：</p>
+<ul>
+<li>情景讨论；</li>
+<li>安全社交脚本；</li>
+<li>购物问路；</li>
+<li>面试练习；</li>
+<li>团体合作任务。</li>
+</ul>
+<hr>
+<h2 id="十五、社交目标怎么写"><a class="anchor" href="#十五、社交目标怎么写" aria-hidden="true">#</a>十五、社交目标怎么写？</h2>
+<h3 id="错误写法"><a class="anchor" href="#错误写法" aria-hidden="true">#</a>错误写法</h3>
+<pre><code class="language-text">提高社交能力。
+多看人。
+会和小朋友玩。
+</code></pre>
+<h3 id="正确模板"><a class="anchor" href="#正确模板" aria-hidden="true">#</a>正确模板</h3>
+<pre><code class="language-text">在________活动中，当________发生时，儿童能________，在____次机会中完成____次，连续____节课达到。
+</code></pre>
+<h3 id="示例1共同注意"><a class="anchor" href="#示例1共同注意" aria-hidden="true">#</a>示例1：共同注意</h3>
+<pre><code class="language-text">在泡泡游戏中，当老师吹出泡泡并停顿时，儿童能在5次机会中至少3次看向老师或指向泡泡进行分享，连续3节课达到。
+</code></pre>
+<h3 id="示例2轮流"><a class="anchor" href="#示例2轮流" aria-hidden="true">#</a>示例2：轮流</h3>
+<pre><code class="language-text">在滚球游戏中，儿童能与成人完成至少3轮“你一次我一次”，手势提示不超过2次，连续3节课达到。
+</code></pre>
+<h3 id="示例3同伴互动"><a class="anchor" href="#示例3同伴互动" aria-hidden="true">#</a>示例3：同伴互动</h3>
+<pre><code class="language-text">在双人积木活动中，儿童能在成人提示下与同伴轮流放积木，每轮等待不抢，完成5轮中的4轮，连续3次小组课达到。
+</code></pre>
+<h3 id="示例4假装游戏"><a class="anchor" href="#示例4假装游戏" aria-hidden="true">#</a>示例4：假装游戏</h3>
+<pre><code class="language-text">在娃娃家游戏中，儿童能模仿并独立完成喂娃娃、喝水、盖被子3个假装动作中的2个，连续3节课达到。
+</code></pre>
+<hr>
+<h2 id="十六、社交游戏数据怎么记"><a class="anchor" href="#十六、社交游戏数据怎么记" aria-hidden="true">#</a>十六、社交游戏数据怎么记？</h2>
+<h3 id="1.-共同注意记录表"><a class="anchor" href="#1.-共同注意记录表" aria-hidden="true">#</a>1. 共同注意记录表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>活动</th>
+<th style="text-align:right">分享机会</th>
+<th style="text-align:right">看人</th>
+<th style="text-align:right">指物</th>
+<th style="text-align:right">拿给人看</th>
+<th style="text-align:right">无反应</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="2.-轮流记录表"><a class="anchor" href="#2.-轮流记录表" aria-hidden="true">#</a>2. 轮流记录表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>活动</th>
+<th style="text-align:right">目标轮数</th>
+<th style="text-align:right">完成轮数</th>
+<th style="text-align:right">提示次数</th>
+<th>是否抢夺</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="3.-模仿游戏记录表"><a class="anchor" href="#3.-模仿游戏记录表" aria-hidden="true">#</a>3. 模仿游戏记录表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>动作</th>
+<th style="text-align:right">独立模仿</th>
+<th style="text-align:right">提示模仿</th>
+<th style="text-align:right">不能完成</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>拍手</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>推车</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>喂娃娃</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="4.-同伴互动记录表"><a class="anchor" href="#4.-同伴互动记录表" aria-hidden="true">#</a>4. 同伴互动记录表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>同伴活动</th>
+<th>接近同伴</th>
+<th>回应同伴</th>
+<th>轮流</th>
+<th>合作</th>
+<th>冲突</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="十七、家长版解释话术"><a class="anchor" href="#十七、家长版解释话术" aria-hidden="true">#</a>十七、家长版解释话术</h2>
+<h3 id="1.-解释共同注意"><a class="anchor" href="#1.-解释共同注意" aria-hidden="true">#</a>1. 解释共同注意</h3>
+<pre><code class="language-text">共同注意就是孩子看到有趣的东西，会想让你也看到。
+比如看到飞机，他不只是自己看，而是指给你看、看你一眼。
+这说明他开始把快乐和别人分享，这是社交很重要的基础。
+</code></pre>
+<h3 id="2.-解释不要强迫眼神"><a class="anchor" href="#2.-解释不要强迫眼神" aria-hidden="true">#</a>2. 解释不要强迫眼神</h3>
+<pre><code class="language-text">我们不是用手掰孩子看人。
+我们会让互动变有趣，让孩子因为想继续玩、想分享，而自然地看向大人。
+这样的眼神才有意义。
+</code></pre>
+<h3 id="3.-解释同伴训练不能太急"><a class="anchor" href="#3.-解释同伴训练不能太急" aria-hidden="true">#</a>3. 解释同伴训练不能太急</h3>
+<pre><code class="language-text">孩子如果还不会轮流、等待、模仿，直接放进一群小朋友里，可能只会更挫败。
+我们会先从一对一、短时间、简单游戏开始，再慢慢过渡到小组。
+</code></pre>
+<h3 id="4.-家庭练习建议"><a class="anchor" href="#4.-家庭练习建议" aria-hidden="true">#</a>4. 家庭练习建议</h3>
+<pre><code class="language-text">家里每天不用练很久。
+您可以抓3个小游戏：泡泡停下来等他看你；滚球时你一次我一次；看到小狗或车时指给他看，再等他看你。
+重点是让他体验到：和人一起玩很有意思。
+</code></pre>
+<hr>
+<h2 id="十八、常见错误"><a class="anchor" href="#十八、常见错误" aria-hidden="true">#</a>十八、常见错误</h2>
+<h3 id="错误1把社交训练变成眼神训练"><a class="anchor" href="#错误1把社交训练变成眼神训练" aria-hidden="true">#</a>错误1：把社交训练变成眼神训练</h3>
+<p>只盯着看眼睛，忽略互动意义。</p>
+<p>改法：<br>
+在请求、分享、轮流中自然诱发看人。</p>
+<h3 id="错误2问题太多"><a class="anchor" href="#错误2问题太多" aria-hidden="true">#</a>错误2：问题太多</h3>
+<p>一直问“这是什么”，孩子像被考试。</p>
+<p>改法：<br>
+多描述、多等待、多制造惊喜。</p>
+<h3 id="错误3一开始就要求和同伴玩"><a class="anchor" href="#错误3一开始就要求和同伴玩" aria-hidden="true">#</a>错误3：一开始就要求和同伴玩</h3>
+<p>孩子基础不够，容易失败。</p>
+<p>改法：<br>
+先成人互动，再一个同伴，再小组。</p>
+<h3 id="错误4老师主导太强"><a class="anchor" href="#错误4老师主导太强" aria-hidden="true">#</a>错误4：老师主导太强</h3>
+<p>完全按老师想法玩，孩子没兴趣。</p>
+<p>改法：<br>
+先跟随孩子，再扩展。</p>
+<h3 id="错误5只练请求不练分享"><a class="anchor" href="#错误5只练请求不练分享" aria-hidden="true">#</a>错误5：只练请求，不练分享</h3>
+<p>孩子会要东西，但不会给你看。</p>
+<p>改法：<br>
+加入共同注意目标。</p>
+<h3 id="错误6忽略孩子感觉负荷"><a class="anchor" href="#错误6忽略孩子感觉负荷" aria-hidden="true">#</a>错误6：忽略孩子感觉负荷</h3>
+<p>环境太吵、人太多，孩子无法社交。</p>
+<p>改法：<br>
+先调环境，再训练互动。</p>
+<h3 id="错误7同伴选择不合适"><a class="anchor" href="#错误7同伴选择不合适" aria-hidden="true">#</a>错误7：同伴选择不合适</h3>
+<p>同伴抢、催、笑，孩子更抗拒社交。</p>
+<p>改法：<br>
+选择温和、可引导同伴。</p>
+<hr>
+<h2 id="十九、社交游戏教案模板"><a class="anchor" href="#十九、社交游戏教案模板" aria-hidden="true">#</a>十九、社交游戏教案模板</h2>
+<pre><code class="language-text">儿童姓名：
+日期：
+训练师：
+
+一、活动名称
+□ 泡泡
+□ 滚球
+□ 小车
+□ 积木
+□ 娃娃家
+□ 医生游戏
+□ 桌游
+□ 户外活动
+□ 其他：
+
+二、社交目标
+目标1：
+目标2：
+
+三、孩子兴趣/强化物
+
+四、互动设计
+如何开始：
+如何制造轮流：
+如何制造共同注意：
+如何扩展游戏：
+
+五、提示方式
+□ 示范
+□ 手势
+□ 语言
+□ 视觉卡
+□ 同伴示范
+□ 身体提示
+
+六、数据记录
+共同注意次数：
+轮流次数：
+模仿次数：
+同伴互动次数：
+
+七、家庭泛化建议
+</code></pre>
+<hr>
+<h2 id="二十、课堂自查表"><a class="anchor" href="#二十、课堂自查表" aria-hidden="true">#</a>二十、课堂自查表</h2>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>是/否</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>我是否先找到了孩子的兴趣？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否让人变得有趣，而不是只下指令？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否减少了考试式提问？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否设计了共同注意机会？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否设计了轮流机会？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否给孩子足够等待时间？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否避免强迫眼神？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否根据孩子阶段选择社交目标？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否记录了社交数据？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否安排家庭或同伴泛化？</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="二十一、空白打印模板"><a class="anchor" href="#二十一、空白打印模板" aria-hidden="true">#</a>二十一、空白打印模板</h2>
+<h3 id="1.-社交能力观察表"><a class="anchor" href="#1.-社交能力观察表" aria-hidden="true">#</a>1. 社交能力观察表</h3>
+<table>
+<thead>
+<tr>
+<th>领域</th>
+<th>当前表现</th>
+<th>下一步目标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>叫名反应</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>看人</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>请求</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>分享兴趣</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>轮流</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>模仿</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>功能性游戏</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>假装游戏</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>同伴互动</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>情绪适应</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="2.-社交游戏机会记录表"><a class="anchor" href="#2.-社交游戏机会记录表" aria-hidden="true">#</a>2. 社交游戏机会记录表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>活动</th>
+<th style="text-align:right">机会</th>
+<th>看人</th>
+<th>分享</th>
+<th>轮流</th>
+<th>模仿</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">2</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">3</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">4</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">5</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="3.-家庭社交游戏练习表"><a class="anchor" href="#3.-家庭社交游戏练习表" aria-hidden="true">#</a>3. 家庭社交游戏练习表</h3>
+<table>
+<thead>
+<tr>
+<th>游戏</th>
+<th>家长做什么</th>
+<th>孩子目标</th>
+<th>是否完成</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>泡泡</td>
+<td>吹一下停下来</td>
+<td>看人/还要</td>
+<td></td>
+</tr>
+<tr>
+<td>滚球</td>
+<td>你一次我一次</td>
+<td>轮流</td>
+<td></td>
+</tr>
+<tr>
+<td>积木</td>
+<td>家长放一块孩子放一块</td>
+<td>合作</td>
+<td></td>
+</tr>
+<tr>
+<td>绘本</td>
+<td>指有趣图片</td>
+<td>分享</td>
+<td></td>
+</tr>
+<tr>
+<td>户外</td>
+<td>指小狗/车/飞机</td>
+<td>看物再看人</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="二十二、新人必须记住的10句话"><a class="anchor" href="#二十二、新人必须记住的10句话" aria-hidden="true">#</a>二十二、新人必须记住的10句话</h2>
+<ol>
+<li>社交训练不是逼孩子看人。</li>
+<li>先让人变得有趣，孩子才愿意靠近人。</li>
+<li>共同注意是分享，不是要东西。</li>
+<li>少问考试题，多创造互动。</li>
+<li>先跟随孩子兴趣，再轻轻扩展。</li>
+<li>轮流从一对一、短回合开始。</li>
+<li>模仿是学习别人行为的入口。</li>
+<li>假装游戏是语言和社交的重要桥梁。</li>
+<li>同伴互动不能操之过急，要搭台阶。</li>
+<li>真正的社交目标是让孩子体验到“和人一起也很好”。</li>
+</ol>
+<hr>
+<h2 id="二十三、最后给新人训练师的话"><a class="anchor" href="#二十三、最后给新人训练师的话" aria-hidden="true">#</a>二十三、最后给新人训练师的话</h2>
+<p>对很多ASD孩子来说，人是复杂的，玩具是简单的；<br>
+人会变化，玩具更可控；<br>
+人会提要求，玩具不会让他紧张。</p>
+<p>所以我们不能一上来就要求孩子“会社交”。<br>
+我们要先成为一个让孩子觉得安全、有趣、可预测的人。</p>
+<p>当孩子第一次在泡泡飞起时回头看你，<br>
+第一次把积木塔拿给你看，<br>
+第一次愿意把球滚回来，<br>
+第一次和同伴一起笑，<br>
+那不是一个小动作，<br>
+那是孩子开始把你带进他的世界。</p>
+<p>这就是社交训练最珍贵的起点。</p>
+
+  <div class="footer">由 asd-social-play-and-joint-attention.md 转换生成。保留原文清单、表格、模板和代码块；流程型文本已增强为图例展示，并保留原始文本。</div>
+</main>
+</div>
+</body>
+</html>

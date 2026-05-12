@@ -1,0 +1,867 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>感觉处理与感觉调节支持手册</title>
+<style>
+:root{--bg:#f7f7fb;--paper:#fff;--ink:#1f2937;--muted:#6b7280;--brand:#2563eb;--brand2:#7c3aed;--line:#e5e7eb;--soft:#eff6ff;--warn:#fff7ed;--code:#111827;--codebg:#f3f4f6;--shadow:0 20px 60px rgba(15,23,42,.10)}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#f8fafc,#eef2ff 45%,#fdf2f8);color:var(--ink);font:16px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif}.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:26px;max-width:1440px;margin:0 auto;padding:28px}.sidebar{position:sticky;top:20px;align-self:start;max-height:calc(100vh - 40px);overflow:auto;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}.sidebar h2{font-size:16px;margin:0 0 10px}.sidebar a{display:block;color:#334155;text-decoration:none;border-radius:10px;padding:7px 9px;margin:2px 0;font-size:13px;line-height:1.35}.sidebar a:hover{background:var(--soft);color:var(--brand)}.sidebar .toc-l2{padding-left:18px}.sidebar .toc-l3{padding-left:32px;color:#64748b}.content{min-width:0;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:44px 52px}.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:28px}.badge{display:inline-flex;gap:8px;align-items:center;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;border-radius:999px;padding:8px 14px;font-size:13px}.navlink{color:var(--brand);text-decoration:none;font-weight:600}h1{font-size:34px;line-height:1.25;margin:0 0 22px;color:#0f172a}h2{font-size:26px;margin:44px 0 14px;padding-top:14px;border-top:1px solid var(--line)}h3{font-size:21px;margin:30px 0 10px}h4{font-size:18px;margin:24px 0 8px}p{margin:12px 0}blockquote{margin:18px 0;padding:14px 18px;border-left:5px solid var(--brand);background:var(--soft);border-radius:12px;color:#1e3a8a}table{width:100%;border-collapse:collapse;margin:18px 0;overflow:hidden;border-radius:14px;display:table}th,td{border:1px solid var(--line);padding:10px 12px;vertical-align:top}th{background:#f1f5f9;text-align:left}tr:nth-child(even) td{background:#fafafa}pre{background:#0b1020;color:#e5e7eb;border-radius:16px;padding:18px;overflow:auto;line-height:1.55}code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace}p code,li code,td code{background:var(--codebg);color:#be123c;padding:2px 6px;border-radius:6px}ul,ol{padding-left:1.5em}.anchor{opacity:.25;text-decoration:none;margin-right:8px;color:var(--brand)}h1:hover .anchor,h2:hover .anchor,h3:hover .anchor{opacity:1}.flowchart{margin:22px 0;padding:18px;border:1px solid #bfdbfe;background:linear-gradient(180deg,#eff6ff,#fff);border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:8px}.flow-step{width:min(640px,100%);display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid #dbeafe;border-radius:14px;padding:12px 14px;box-shadow:0 8px 22px rgba(37,99,235,.08)}.flow-num{flex:0 0 auto;width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;background:var(--brand);color:white;font-weight:700;font-size:13px}.flow-arrow{color:var(--brand);font-size:22px;font-weight:800;line-height:1}.raw-flow{margin:8px 0 20px;color:var(--muted)}.raw-flow summary{cursor:pointer}.footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}.callout{background:var(--warn);border:1px solid #fed7aa;border-radius:16px;padding:14px 16px;margin:18px 0}.page-list{columns:2;column-gap:28px}.page-list a{display:block;break-inside:avoid;text-decoration:none;color:#1d4ed8;padding:8px 0;border-bottom:1px dashed #dbeafe}.meta{color:var(--muted);font-size:14px}@media(max-width:960px){.layout{display:block;padding:14px}.sidebar{position:relative;max-height:none;margin-bottom:16px}.content{padding:26px 20px}.page-list{columns:1}h1{font-size:28px}h2{font-size:23px}table{display:block;overflow-x:auto;white-space:normal}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <h2>目录</h2>
+  <a class="navlink" href="index.html">← HTML总索引</a>
+  <a class="toc-l1" href="#感觉处理与感觉调节支持手册">感觉处理与感觉调节支持手册</a>
+<a class="toc-l2" href="#一、先用一句话讲清楚感觉处理">一、先用一句话讲清楚感觉处理</a>
+<a class="toc-l2" href="#二、感觉系统的几个常见维度">二、感觉系统的几个常见维度</a>
+<a class="toc-l3" href="#1.-听觉">1. 听觉</a>
+<a class="toc-l3" href="#2.-触觉">2. 触觉</a>
+<a class="toc-l3" href="#3.-视觉">3. 视觉</a>
+<a class="toc-l3" href="#4.-味觉-嗅觉">4. 味觉/嗅觉</a>
+<a class="toc-l3" href="#5.-前庭觉">5. 前庭觉</a>
+<a class="toc-l3" href="#6.-本体觉">6. 本体觉</a>
+<a class="toc-l2" href="#三、感觉差异如何影响行为">三、感觉差异如何影响行为</a>
+<a class="toc-l2" href="#四、感觉调节的底层逻辑">四、感觉调节的底层逻辑</a>
+<a class="toc-l3" href="#1.-减少过载">1. 减少过载</a>
+<a class="toc-l3" href="#2.-提供需要的感觉">2. 提供需要的感觉</a>
+<a class="toc-l2" href="#五、感觉支持三步法">五、感觉支持三步法</a>
+<a class="toc-l3" href="#第一步观察">第一步：观察</a>
+<a class="toc-l3" href="#第二步判断功能">第二步：判断功能</a>
+<a class="toc-l3" href="#第三步做支持">第三步：做支持</a>
+<a class="toc-l2" href="#六、常见感觉支持工具">六、常见感觉支持工具</a>
+<a class="toc-l3" href="#1.-降噪耳机">1. 降噪耳机</a>
+<a class="toc-l3" href="#2.-视觉提示">2. 视觉提示</a>
+<a class="toc-l3" href="#3.-触觉支持">3. 触觉支持</a>
+<a class="toc-l3" href="#4.-本体觉支持">4. 本体觉支持</a>
+<a class="toc-l3" href="#5.-感觉角">5. 感觉角</a>
+<a class="toc-l2" href="#七、感觉寻求型孩子怎么支持">七、感觉寻求型孩子怎么支持</a>
+<a class="toc-l3" href="#支持策略">支持策略</a>
+<a class="toc-l3" href="#例子">例子</a>
+<a class="toc-l2" href="#八、感觉逃避型孩子怎么支持">八、感觉逃避型孩子怎么支持</a>
+<a class="toc-l3" href="#支持策略-2">支持策略</a>
+<a class="toc-l3" href="#例子洗头">例子：洗头</a>
+<a class="toc-l2" href="#九、出门前的感觉预告">九、出门前的感觉预告</a>
+<a class="toc-l3" href="#出门前可以说">出门前可以说：</a>
+<a class="toc-l3" href="#配合视觉卡">配合视觉卡：</a>
+<a class="toc-l3" href="#配合小目标">配合小目标：</a>
+<a class="toc-l2" href="#十、感觉过载时怎么做">十、感觉过载时怎么做</a>
+<a class="toc-l3" href="#现场sop">现场SOP</a>
+<a class="toc-l3" href="#不要做">不要做</a>
+<a class="toc-l2" href="#十一、感觉饮食和进食支持">十一、感觉饮食和进食支持</a>
+<a class="toc-l3" href="#常见感觉问题表现">常见感觉问题表现</a>
+<a class="toc-l3" href="#支持原则">支持原则</a>
+<a class="toc-l3" href="#进阶策略">进阶策略</a>
+<a class="toc-l3" href="#注意">注意</a>
+<a class="toc-l2" href="#十二、感觉支持与行为支持如何配合">十二、感觉支持与行为支持如何配合</a>
+<a class="toc-l2" href="#十三、感觉目标怎么写">十三、感觉目标怎么写？</a>
+<a class="toc-l3" href="#错误写法">错误写法</a>
+<a class="toc-l3" href="#正确写法">正确写法</a>
+<a class="toc-l2" href="#十四、数据记录模板">十四、数据记录模板</a>
+<a class="toc-l3" href="#1.-感觉触发记录表">1. 感觉触发记录表</a>
+<a class="toc-l3" href="#2.-感觉工具使用表">2. 感觉工具使用表</a>
+<a class="toc-l3" href="#3.-感觉调节行为表">3. 感觉调节行为表</a>
+<a class="toc-l2" href="#十五、家长版解释话术">十五、家长版解释话术</a>
+<a class="toc-l3" href="#1.-解释感觉差异">1. 解释感觉差异</a>
+<a class="toc-l3" href="#2.-解释为什么要用耳机或安静角">2. 解释为什么要用耳机或安静角</a>
+<a class="toc-l3" href="#3.-解释为什么不能硬逼洗头穿衣">3. 解释为什么不能硬逼洗头穿衣</a>
+<a class="toc-l3" href="#4.-家庭练习建议">4. 家庭练习建议</a>
+<a class="toc-l2" href="#十六、新人常见错误">十六、新人常见错误</a>
+<a class="toc-l3" href="#错误1把所有行为都当成不听话">错误1：把所有行为都当成不听话</a>
+<a class="toc-l3" href="#错误2直接强迫适应">错误2：直接强迫适应</a>
+<a class="toc-l3" href="#错误3只压制不替代">错误3：只压制，不替代</a>
+<a class="toc-l3" href="#错误4忽略环境">错误4：忽略环境</a>
+<a class="toc-l3" href="#错误5感觉工具不给孩子随时可用">错误5：感觉工具不给孩子随时可用</a>
+<a class="toc-l3" href="#错误6爆发后还继续训练">错误6：爆发后还继续训练</a>
+<a class="toc-l3" href="#错误7挑食时只靠哄骗">错误7：挑食时只靠哄骗</a>
+<a class="toc-l3" href="#错误8没记录触发因素">错误8：没记录触发因素</a>
+<a class="toc-l2" href="#十七、感觉支持计划模板">十七、感觉支持计划模板</a>
+<a class="toc-l2" href="#十八、课堂自查表">十八、课堂自查表</a>
+<a class="toc-l2" href="#十九、空白打印模板">十九、空白打印模板</a>
+<a class="toc-l3" href="#1.-感觉观察表">1. 感觉观察表</a>
+<a class="toc-l3" href="#2.-感觉工具计划表">2. 感觉工具计划表</a>
+<a class="toc-l3" href="#3.-感觉适应练习表">3. 感觉适应练习表</a>
+<a class="toc-l2" href="#二十、新人必须记住的10句话">二十、新人必须记住的10句话</a>
+<a class="toc-l2" href="#二十一、最后给新人训练师的话">二十一、最后给新人训练师的话</a>
+</aside>
+<main class="content">
+  <div class="topbar"><span class="badge">ASD训练师资料库 · 第 17 篇</span><a class="navlink" href="../asd-sensory-processing-and-regulation.md">查看Markdown源文档</a></div>
+  <h1 id="感觉处理与感觉调节支持手册"><a class="anchor" href="#感觉处理与感觉调节支持手册" aria-hidden="true">#</a>感觉处理与感觉调节支持手册</h1>
+<blockquote>
+<p>适用对象：自闭症康复训练师、家长指导老师、影子老师、融合教育老师、家长。<br>
+使用场景：孩子怕声音、怕触觉、怕洗头、怕理发、怕穿衣、爱跳爱撞、爱转圈、挑食、咬物、拍手、捂耳、出门崩溃、在商场或学校明显过载。<br>
+核心目的：帮助新人理解“感觉差异”如何影响孩子的情绪、行为、学习和生活，并学会做环境支持、感觉调节和安全替代。<br>
+重要提醒：感觉支持不是把孩子“训练成不敏感”，而是让他更舒适、更安全、更能参与生活。</p>
+</blockquote>
+<hr>
+<h2 id="一、先用一句话讲清楚感觉处理"><a class="anchor" href="#一、先用一句话讲清楚感觉处理" aria-hidden="true">#</a>一、先用一句话讲清楚感觉处理</h2>
+<p>一句大白话：</p>
+<blockquote>
+<p>感觉处理就是大脑怎么接收和理解声音、光线、触觉、味道、动作和身体位置。</p>
+</blockquote>
+<p>有些孩子不是故意“矫情”，而是：</p>
+<ul>
+<li>声音对他太大；</li>
+<li>衣服对他太扎；</li>
+<li>洗头对他太刺激；</li>
+<li>人多对他太乱；</li>
+<li>身体需要更多压、跳、转、撞的感觉；</li>
+<li>饥饿、疲劳、疼痛也会放大感觉问题。</li>
+</ul>
+<p>训练师要理解：</p>
+<blockquote>
+<p>很多所谓“脾气大”的背后，其实是感觉系统在报警。</p>
+</blockquote>
+<hr>
+<h2 id="二、感觉系统的几个常见维度"><a class="anchor" href="#二、感觉系统的几个常见维度" aria-hidden="true">#</a>二、感觉系统的几个常见维度</h2>
+<h3 id="1.-听觉"><a class="anchor" href="#1.-听觉" aria-hidden="true">#</a>1. 听觉</h3>
+<p>对声音的敏感程度。</p>
+<p>表现：</p>
+<ul>
+<li>捂耳；</li>
+<li>怕吹风机、吸尘器、马路、广播；</li>
+<li>在吵环境崩溃；</li>
+<li>需要重复听同一声音；</li>
+<li>喜欢制造声音。</li>
+</ul>
+<h3 id="2.-触觉"><a class="anchor" href="#2.-触觉" aria-hidden="true">#</a>2. 触觉</h3>
+<p>对皮肤接触、衣服材质、洗澡、剪指甲、理发的反应。</p>
+<p>表现：</p>
+<ul>
+<li>不喜欢某些衣服、袜子、标签；</li>
+<li>不喜欢别人碰；</li>
+<li>怕头发被碰；</li>
+<li>洗头、刷牙困难；</li>
+<li>也可能喜欢挤压、包裹、深压。</li>
+</ul>
+<h3 id="3.-视觉"><a class="anchor" href="#3.-视觉" aria-hidden="true">#</a>3. 视觉</h3>
+<p>对光线、闪烁、颜色、场景变化的处理。</p>
+<p>表现：</p>
+<ul>
+<li>怕强光；</li>
+<li>喜欢盯旋转物、灯、风扇；</li>
+<li>在视觉杂乱环境里容易乱；</li>
+<li>喜欢看细节、排队、摆放。</li>
+</ul>
+<h3 id="4.-味觉-嗅觉"><a class="anchor" href="#4.-味觉-嗅觉" aria-hidden="true">#</a>4. 味觉/嗅觉</h3>
+<p>表现：</p>
+<ul>
+<li>严重挑食；</li>
+<li>对气味敏感；</li>
+<li>不愿意尝试新食物；</li>
+<li>喜欢闻物品、闻人、闻手。</li>
+</ul>
+<h3 id="5.-前庭觉"><a class="anchor" href="#5.-前庭觉" aria-hidden="true">#</a>5. 前庭觉</h3>
+<p>和运动、平衡、旋转、晃动有关。</p>
+<p>表现：</p>
+<ul>
+<li>喜欢跳、转、荡；</li>
+<li>怕坐电梯或荡秋千；</li>
+<li>走路不稳或特别爱跑；</li>
+<li>对姿势变化反应大。</li>
+</ul>
+<h3 id="6.-本体觉"><a class="anchor" href="#6.-本体觉" aria-hidden="true">#</a>6. 本体觉</h3>
+<p>和身体用力、关节压、深压、撞、推、搬有关。</p>
+<p>表现：</p>
+<ul>
+<li>喜欢撞墙、跳、压、背重包；</li>
+<li>喜欢推东西；</li>
+<li>身体边界感弱；</li>
+<li>需要更多“用力感”来稳住自己。</li>
+</ul>
+<hr>
+<h2 id="三、感觉差异如何影响行为"><a class="anchor" href="#三、感觉差异如何影响行为" aria-hidden="true">#</a>三、感觉差异如何影响行为</h2>
+<p>感觉问题常常表现为：</p>
+<ul>
+<li>发脾气；</li>
+<li>逃跑；</li>
+<li>拒绝；</li>
+<li>打人；</li>
+<li>躺地；</li>
+<li>拍手跳跃；</li>
+<li>自言自语；</li>
+<li>拒绝穿衣洗头；</li>
+<li>吞食异物；</li>
+<li>咬物；</li>
+<li>摇晃身体。</li>
+</ul>
+<p>这些行为可能不是“坏”，而是在做三件事：</p>
+<ol>
+<li><strong>避开不舒服</strong>；</li>
+<li><strong>找回身体平衡</strong>；</li>
+<li><strong>获得想要的感觉刺激</strong>。</li>
+</ol>
+<p>比如：</p>
+<table>
+<thead>
+<tr>
+<th>外在行为</th>
+<th>可能的感觉意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>捂耳尖叫</td>
+<td>声音太大，受不了了</td>
+</tr>
+<tr>
+<td>拍手跳跃</td>
+<td>身体需要兴奋或调节</td>
+</tr>
+<tr>
+<td>撞墙</td>
+<td>需要深压和身体反馈</td>
+</tr>
+<tr>
+<td>拒绝穿某件衣服</td>
+<td>材质/缝线/标签不舒服</td>
+</tr>
+<tr>
+<td>挑食</td>
+<td>味道、口感、温度太刺激</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="四、感觉调节的底层逻辑"><a class="anchor" href="#四、感觉调节的底层逻辑" aria-hidden="true">#</a>四、感觉调节的底层逻辑</h2>
+<p>一句大白话：</p>
+<blockquote>
+<p>不是让孩子“忍住”，而是先帮他找到更舒服、更安全、更可控的调节方式。</p>
+</blockquote>
+<p>调节方式分两类：</p>
+<h3 id="1.-减少过载"><a class="anchor" href="#1.-减少过载" aria-hidden="true">#</a>1. 减少过载</h3>
+<p>比如：</p>
+<ul>
+<li>降低声音；</li>
+<li>戴耳机；</li>
+<li>减少灯光；</li>
+<li>提前预告；</li>
+<li>减少人群；</li>
+<li>缩短停留时间；</li>
+<li>选择柔软衣物；</li>
+<li>给安静角。</li>
+</ul>
+<h3 id="2.-提供需要的感觉"><a class="anchor" href="#2.-提供需要的感觉" aria-hidden="true">#</a>2. 提供需要的感觉</h3>
+<p>比如：</p>
+<ul>
+<li>跳床；</li>
+<li>推墙；</li>
+<li>捏球；</li>
+<li>深压抱枕；</li>
+<li>背小包；</li>
+<li>搬书；</li>
+<li>走感统路线；</li>
+<li>玩水；</li>
+<li>荡秋千，前提安全。</li>
+</ul>
+<hr>
+<h2 id="五、感觉支持三步法"><a class="anchor" href="#五、感觉支持三步法" aria-hidden="true">#</a>五、感觉支持三步法</h2>
+<h3 id="第一步观察"><a class="anchor" href="#第一步观察" aria-hidden="true">#</a>第一步：观察</h3>
+<p>看孩子在什么情况下最容易出问题：</p>
+<ul>
+<li>在什么声音环境？</li>
+<li>在什么衣服/触觉下？</li>
+<li>在什么时候最烦躁？</li>
+<li>在什么活动后更安静？</li>
+<li>哪些动作会让他平静？</li>
+</ul>
+<h3 id="第二步判断功能"><a class="anchor" href="#第二步判断功能" aria-hidden="true">#</a>第二步：判断功能</h3>
+<p>问：</p>
+<ul>
+<li>他是在逃避感觉刺激吗？</li>
+<li>他是在寻求感觉刺激吗？</li>
+<li>他是不是只是太累、太饿、太热、太痛？</li>
+</ul>
+<h3 id="第三步做支持"><a class="anchor" href="#第三步做支持" aria-hidden="true">#</a>第三步：做支持</h3>
+<ul>
+<li>先改环境；</li>
+<li>再给工具；</li>
+<li>再教表达；</li>
+<li>最后再练耐受。</li>
+</ul>
+<hr>
+<h2 id="六、常见感觉支持工具"><a class="anchor" href="#六、常见感觉支持工具" aria-hidden="true">#</a>六、常见感觉支持工具</h2>
+<h3 id="1.-降噪耳机"><a class="anchor" href="#1.-降噪耳机" aria-hidden="true">#</a>1. 降噪耳机</h3>
+<p>适合：</p>
+<ul>
+<li>商场；</li>
+<li>机场；</li>
+<li>理发；</li>
+<li>吸尘器；</li>
+<li>吹风机；</li>
+<li>课间嘈杂环境。</li>
+</ul>
+<p>用法：</p>
+<ul>
+<li>先在平静时练；</li>
+<li>先短时间戴；</li>
+<li>再进入轻刺激环境；</li>
+<li>戴上后立刻表扬。</li>
+</ul>
+<h3 id="2.-视觉提示"><a class="anchor" href="#2.-视觉提示" aria-hidden="true">#</a>2. 视觉提示</h3>
+<p>适合：</p>
+<ul>
+<li>预告变化；</li>
+<li>任务顺序；</li>
+<li>安静角规则；</li>
+<li>出门流程；</li>
+<li>洗头步骤。</li>
+</ul>
+<h3 id="3.-触觉支持"><a class="anchor" href="#3.-触觉支持" aria-hidden="true">#</a>3. 触觉支持</h3>
+<ul>
+<li>柔软衣物；</li>
+<li>去标签；</li>
+<li>弹性袜；</li>
+<li>宽松裤；</li>
+<li>毛巾包裹；</li>
+<li>压力毯或抱枕，需安全。</li>
+</ul>
+<h3 id="4.-本体觉支持"><a class="anchor" href="#4.-本体觉支持" aria-hidden="true">#</a>4. 本体觉支持</h3>
+<ul>
+<li>推墙；</li>
+<li>搬物；</li>
+<li>抱枕挤压；</li>
+<li>背书包；</li>
+<li>爬坡；</li>
+<li>深压活动。</li>
+</ul>
+<h3 id="5.-感觉角"><a class="anchor" href="#5.-感觉角" aria-hidden="true">#</a>5. 感觉角</h3>
+<p>一个可控的小空间，里面放：</p>
+<ul>
+<li>捏捏球；</li>
+<li>抱枕；</li>
+<li>软垫；</li>
+<li>耳机；</li>
+<li>计时器；</li>
+<li>情绪卡。</li>
+</ul>
+<hr>
+<h2 id="七、感觉寻求型孩子怎么支持"><a class="anchor" href="#七、感觉寻求型孩子怎么支持" aria-hidden="true">#</a>七、感觉寻求型孩子怎么支持</h2>
+<p>感觉寻求型孩子喜欢：</p>
+<ul>
+<li>跳；</li>
+<li>碰撞；</li>
+<li>转圈；</li>
+<li>摇晃；</li>
+<li>咬物；</li>
+<li>大动作；</li>
+<li>重压。</li>
+</ul>
+<h3 id="支持策略"><a class="anchor" href="#支持策略" aria-hidden="true">#</a>支持策略</h3>
+<ol>
+<li><strong>给安全出口</strong>：跳床、推墙、搬东西、感统路线；</li>
+<li><strong>设规则</strong>：红区不撞，绿区可以跳；</li>
+<li><strong>把寻求变成任务奖励</strong>：做完2个任务，可以跳10下；</li>
+<li><strong>教替代</strong>：想跳时说“我要跳”；想压时说“抱枕”；</li>
+<li><strong>避免过度禁止</strong>：不危险的重复动作不必全删。</li>
+</ol>
+<h3 id="例子"><a class="anchor" href="#例子" aria-hidden="true">#</a>例子</h3>
+<p>孩子上课坐不住、总想站起来。<br>
+你可以：</p>
+<ul>
+<li>每5分钟安排一次“推墙10秒”；</li>
+<li>用重书包作为短时本体觉输入；</li>
+<li>在桌面后安排短跳跃；</li>
+<li>用计时器帮助等待。</li>
+</ul>
+<hr>
+<h2 id="八、感觉逃避型孩子怎么支持"><a class="anchor" href="#八、感觉逃避型孩子怎么支持" aria-hidden="true">#</a>八、感觉逃避型孩子怎么支持</h2>
+<p>感觉逃避型孩子常常对：</p>
+<ul>
+<li>声音；</li>
+<li>光线；</li>
+<li>触碰；</li>
+<li>气味；</li>
+<li>某些食物口感；</li>
+<li>洗头、刷牙、理发；</li>
+<li>人多地方。</li>
+</ul>
+<h3 id="支持策略-2"><a class="anchor" href="#支持策略-2" aria-hidden="true">#</a>支持策略</h3>
+<ol>
+<li><strong>提前预告</strong>：不是突然来；</li>
+<li><strong>降低刺激</strong>：声音小、灯柔和、人少；</li>
+<li><strong>给工具</strong>：耳机、帽子、毛巾、安静角；</li>
+<li><strong>分步骤暴露</strong>：先远看，再靠近，再短时间接触；</li>
+<li><strong>教表达</strong>：太吵、太亮、太扎、我要出去；</li>
+<li><strong>不要硬逼</strong>：硬逼往往让孩子更敏感。</li>
+</ol>
+<h3 id="例子洗头"><a class="anchor" href="#例子洗头" aria-hidden="true">#</a>例子：洗头</h3>
+<p>孩子怕洗头。<br>
+可以这样拆：</p>
+<ul>
+<li>先摸水；</li>
+<li>再把水拍在手上；</li>
+<li>再淋一点到肩膀；</li>
+<li>再淋到头发；</li>
+<li>再短时间冲洗；</li>
+<li>再慢慢增加。</li>
+</ul>
+<hr>
+<h2 id="九、出门前的感觉预告"><a class="anchor" href="#九、出门前的感觉预告" aria-hidden="true">#</a>九、出门前的感觉预告</h2>
+<p>很多崩溃发生在“没预告”。</p>
+<h3 id="出门前可以说"><a class="anchor" href="#出门前可以说" aria-hidden="true">#</a>出门前可以说：</h3>
+<blockquote>
+<p>“今天去超市，会有灯和人。”<br>
+“你可以戴耳机。”<br>
+“先走到门口，再上车。”<br>
+“如果太吵，你可以说太吵了。”</p>
+</blockquote>
+<h3 id="配合视觉卡"><a class="anchor" href="#配合视觉卡" aria-hidden="true">#</a>配合视觉卡：</h3>
+<div class="flowchart" role="group" aria-label="流程图"><div class="flow-step"><span class="flow-num">1</span><span>家</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">2</span><span>车</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">3</span><span>超市</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">4</span><span>结账</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">5</span><span>回家</span></div></div>
+<details class="raw-flow"><summary>查看原始流程文本</summary>
+<pre><code class="language-text">家 → 车 → 超市 → 结账 → 回家
+</code></pre>
+</details>
+<h3 id="配合小目标"><a class="anchor" href="#配合小目标" aria-hidden="true">#</a>配合小目标：</h3>
+<ul>
+<li>进门不跑；</li>
+<li>在超市待5分钟；</li>
+<li>用耳机；</li>
+<li>说“太吵”；</li>
+<li>选择一个东西就结束。</li>
+</ul>
+<hr>
+<h2 id="十、感觉过载时怎么做"><a class="anchor" href="#十、感觉过载时怎么做" aria-hidden="true">#</a>十、感觉过载时怎么做</h2>
+<p>感觉过载通常不是“耍脾气”，而是系统已经满了。</p>
+<h3 id="现场sop"><a class="anchor" href="#现场sop" aria-hidden="true">#</a>现场SOP</h3>
+<ol>
+<li>降低声音；</li>
+<li>减少人；</li>
+<li>少说话；</li>
+<li>移到安静区；</li>
+<li>给耳机、抱枕或毯子；</li>
+<li>允许少量运动或深压；</li>
+<li>等待恢复；</li>
+<li>恢复后再复盘。</li>
+</ol>
+<h3 id="不要做"><a class="anchor" href="#不要做" aria-hidden="true">#</a>不要做</h3>
+<ul>
+<li>继续讲道理；</li>
+<li>围着问“为什么”；</li>
+<li>让多人同时安慰；</li>
+<li>逼他看人；</li>
+<li>继续加任务。</li>
+</ul>
+<hr>
+<h2 id="十一、感觉饮食和进食支持"><a class="anchor" href="#十一、感觉饮食和进食支持" aria-hidden="true">#</a>十一、感觉饮食和进食支持</h2>
+<h3 id="常见感觉问题表现"><a class="anchor" href="#常见感觉问题表现" aria-hidden="true">#</a>常见感觉问题表现</h3>
+<ul>
+<li>只吃极少数食物；</li>
+<li>不接受新的口感；</li>
+<li>对温度敏感；</li>
+<li>不吃混合食物；</li>
+<li>只吃脆的/软的/某种颜色；</li>
+<li>一闻到味道就拒绝。</li>
+</ul>
+<h3 id="支持原则"><a class="anchor" href="#支持原则" aria-hidden="true">#</a>支持原则</h3>
+<ol>
+<li>不强迫；</li>
+<li>从孩子能接受的相近食物开始；</li>
+<li>先看、闻、碰，再尝；</li>
+<li>每次只改变一个维度；</li>
+<li>记录哪些口感能接受。</li>
+</ol>
+<h3 id="进阶策略"><a class="anchor" href="#进阶策略" aria-hidden="true">#</a>进阶策略</h3>
+<ul>
+<li>先接受新食物在盘里；</li>
+<li>再用手碰；</li>
+<li>再舔；</li>
+<li>再咬一小口；</li>
+<li>慢慢扩大范围。</li>
+</ul>
+<h3 id="注意"><a class="anchor" href="#注意" aria-hidden="true">#</a>注意</h3>
+<p>严重挑食、吞咽困难、体重下降、呕吐、便秘要先做医学排查。</p>
+<hr>
+<h2 id="十二、感觉支持与行为支持如何配合"><a class="anchor" href="#十二、感觉支持与行为支持如何配合" aria-hidden="true">#</a>十二、感觉支持与行为支持如何配合</h2>
+<p>很多行为干预失败，是因为忽略了感觉。</p>
+<p>比如：</p>
+<ul>
+<li>孩子一进教室就烦躁；</li>
+<li>你以为是“不配合”；</li>
+<li>其实是教室太吵、太亮、太乱。</li>
+</ul>
+<p>这时最优先的不是加任务，而是：</p>
+<ul>
+<li>降噪；</li>
+<li>调光；</li>
+<li>减少干扰；</li>
+<li>提供感觉工具；</li>
+<li>再回到教学。</li>
+</ul>
+<hr>
+<h2 id="十三、感觉目标怎么写"><a class="anchor" href="#十三、感觉目标怎么写" aria-hidden="true">#</a>十三、感觉目标怎么写？</h2>
+<h3 id="错误写法"><a class="anchor" href="#错误写法" aria-hidden="true">#</a>错误写法</h3>
+<pre><code class="language-text">改善感觉问题。
+让孩子不怕声音。
+减少拍手。
+</code></pre>
+<h3 id="正确写法"><a class="anchor" href="#正确写法" aria-hidden="true">#</a>正确写法</h3>
+<pre><code class="language-text">在嘈杂环境中，儿童能在成人提示下使用耳机或递出“太吵”卡请求离开，在5次机会中完成4次，连续2周达到。
+</code></pre>
+<pre><code class="language-text">在洗头场景中，儿童能在步骤图提示下完成从摸水到冲洗头发的3个步骤，身体提示不超过1次，连续5次达到。
+</code></pre>
+<pre><code class="language-text">在需要身体调节时，儿童能通过推墙、抱枕压一压或捏球选择1种方式安静下来，连续3节课达到。
+</code></pre>
+<hr>
+<h2 id="十四、数据记录模板"><a class="anchor" href="#十四、数据记录模板" aria-hidden="true">#</a>十四、数据记录模板</h2>
+<h3 id="1.-感觉触发记录表"><a class="anchor" href="#1.-感觉触发记录表" aria-hidden="true">#</a>1. 感觉触发记录表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>场景</th>
+<th>触发刺激</th>
+<th>孩子反应</th>
+<th>处理方式</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="2.-感觉工具使用表"><a class="anchor" href="#2.-感觉工具使用表" aria-hidden="true">#</a>2. 感觉工具使用表</h3>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>使用场景</th>
+<th style="text-align:right">使用时长</th>
+<th>效果</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>耳机</td>
+<td></td>
+<td style="text-align:right"></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>捏球</td>
+<td></td>
+<td style="text-align:right"></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>安静角</td>
+<td></td>
+<td style="text-align:right"></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>深压抱枕</td>
+<td></td>
+<td style="text-align:right"></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>视觉卡</td>
+<td></td>
+<td style="text-align:right"></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="3.-感觉调节行为表"><a class="anchor" href="#3.-感觉调节行为表" aria-hidden="true">#</a>3. 感觉调节行为表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>目标调节行为</th>
+<th style="text-align:right">独立次数</th>
+<th style="text-align:right">提示次数</th>
+<th style="text-align:right">过载次数</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="十五、家长版解释话术"><a class="anchor" href="#十五、家长版解释话术" aria-hidden="true">#</a>十五、家长版解释话术</h2>
+<h3 id="1.-解释感觉差异"><a class="anchor" href="#1.-解释感觉差异" aria-hidden="true">#</a>1. 解释感觉差异</h3>
+<pre><code class="language-text">孩子不是故意挑剔，而是他的大脑对声音、触感、气味或动作的感受和别人不一样。
+我们要做的是帮他找到更舒服的方式，而不是一味逼他忍。
+</code></pre>
+<h3 id="2.-解释为什么要用耳机或安静角"><a class="anchor" href="#2.-解释为什么要用耳机或安静角" aria-hidden="true">#</a>2. 解释为什么要用耳机或安静角</h3>
+<pre><code class="language-text">耳机和安静角不是逃避，而是调节工具。
+先让孩子有办法稳定下来，他才有可能慢慢适应更复杂的环境。
+</code></pre>
+<h3 id="3.-解释为什么不能硬逼洗头穿衣"><a class="anchor" href="#3.-解释为什么不能硬逼洗头穿衣" aria-hidden="true">#</a>3. 解释为什么不能硬逼洗头穿衣</h3>
+<pre><code class="language-text">硬逼通常会让孩子更排斥。
+我们会先做小步骤适应，比如摸水、短时间冲头、去标签、选柔软衣服，然后慢慢加。
+</code></pre>
+<h3 id="4.-家庭练习建议"><a class="anchor" href="#4.-家庭练习建议" aria-hidden="true">#</a>4. 家庭练习建议</h3>
+<pre><code class="language-text">您可以先观察孩子最怕什么、最喜欢什么身体感觉。
+怕声音就先准备耳机，喜欢压就用抱枕，喜欢跳就安排短跳跃。
+先让孩子稳定，再慢慢练耐受。
+</code></pre>
+<hr>
+<h2 id="十六、新人常见错误"><a class="anchor" href="#十六、新人常见错误" aria-hidden="true">#</a>十六、新人常见错误</h2>
+<h3 id="错误1把所有行为都当成不听话"><a class="anchor" href="#错误1把所有行为都当成不听话" aria-hidden="true">#</a>错误1：把所有行为都当成不听话</h3>
+<p>改法：<br>
+先问是不是感觉问题。</p>
+<h3 id="错误2直接强迫适应"><a class="anchor" href="#错误2直接强迫适应" aria-hidden="true">#</a>错误2：直接强迫适应</h3>
+<p>改法：<br>
+小步暴露，逐步增加。</p>
+<h3 id="错误3只压制不替代"><a class="anchor" href="#错误3只压制不替代" aria-hidden="true">#</a>错误3：只压制，不替代</h3>
+<p>改法：<br>
+给跳、压、推、捏等合法出口。</p>
+<h3 id="错误4忽略环境"><a class="anchor" href="#错误4忽略环境" aria-hidden="true">#</a>错误4：忽略环境</h3>
+<p>改法：<br>
+调光、降噪、减人、减乱。</p>
+<h3 id="错误5感觉工具不给孩子随时可用"><a class="anchor" href="#错误5感觉工具不给孩子随时可用" aria-hidden="true">#</a>错误5：感觉工具不给孩子随时可用</h3>
+<p>改法：<br>
+工具要可见、可拿、可用。</p>
+<h3 id="错误6爆发后还继续训练"><a class="anchor" href="#错误6爆发后还继续训练" aria-hidden="true">#</a>错误6：爆发后还继续训练</h3>
+<p>改法：<br>
+先降温，恢复后再练。</p>
+<h3 id="错误7挑食时只靠哄骗"><a class="anchor" href="#错误7挑食时只靠哄骗" aria-hidden="true">#</a>错误7：挑食时只靠哄骗</h3>
+<p>改法：<br>
+用渐进暴露，不强迫。</p>
+<h3 id="错误8没记录触发因素"><a class="anchor" href="#错误8没记录触发因素" aria-hidden="true">#</a>错误8：没记录触发因素</h3>
+<p>改法：<br>
+记录何时、何地、什么刺激引发。</p>
+<hr>
+<h2 id="十七、感觉支持计划模板"><a class="anchor" href="#十七、感觉支持计划模板" aria-hidden="true">#</a>十七、感觉支持计划模板</h2>
+<pre><code class="language-text">儿童姓名：
+日期：
+训练师：
+
+一、主要感觉特点
+□ 听觉敏感
+□ 触觉敏感
+□ 视觉敏感
+□ 味觉/嗅觉敏感
+□ 前庭觉寻求/回避
+□ 本体觉寻求
+
+二、常见触发
+
+三、常用调节方式
+
+四、可接受工具
+□ 耳机
+□ 安静角
+□ 捏球
+□ 抱枕
+□ 深压
+□ 视觉卡
+□ 计时器
+
+五、训练目标
+
+六、渐进计划
+
+七、数据记录方式
+
+八、家庭协作
+</code></pre>
+<hr>
+<h2 id="十八、课堂自查表"><a class="anchor" href="#十八、课堂自查表" aria-hidden="true">#</a>十八、课堂自查表</h2>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>是/否</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>我是否先观察了感觉触发？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否区分了感觉寻求和感觉逃避？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否给了安全的调节工具？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否降低了环境刺激？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否避免了硬逼和羞辱？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否把感觉支持和沟通训练结合？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否记录了触发和效果？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否考虑了医学问题？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否让家长知道工具怎么用？</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="十九、空白打印模板"><a class="anchor" href="#十九、空白打印模板" aria-hidden="true">#</a>十九、空白打印模板</h2>
+<h3 id="1.-感觉观察表"><a class="anchor" href="#1.-感觉观察表" aria-hidden="true">#</a>1. 感觉观察表</h3>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>可能刺激</th>
+<th>孩子反应</th>
+<th>处理方式</th>
+<th>效果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="2.-感觉工具计划表"><a class="anchor" href="#2.-感觉工具计划表" aria-hidden="true">#</a>2. 感觉工具计划表</h3>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>目标场景</th>
+<th>使用步骤</th>
+<th>观察效果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="3.-感觉适应练习表"><a class="anchor" href="#3.-感觉适应练习表" aria-hidden="true">#</a>3. 感觉适应练习表</h3>
+<table>
+<thead>
+<tr>
+<th>目标刺激</th>
+<th>当前可接受程度</th>
+<th>下一小步</th>
+<th>强化方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>声音</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>触觉</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>洗头</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>穿衣</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>食物</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="二十、新人必须记住的10句话"><a class="anchor" href="#二十、新人必须记住的10句话" aria-hidden="true">#</a>二十、新人必须记住的10句话</h2>
+<ol>
+<li>很多情绪问题背后是感觉问题。</li>
+<li>孩子不是故意矫情，而是感受真的不一样。</li>
+<li>先降刺激，再教适应。</li>
+<li>感觉寻求需要安全出口。</li>
+<li>感觉逃避需要工具和预告。</li>
+<li>耳机、安静角、视觉卡都可能是重要支持。</li>
+<li>不要硬逼孩子忍。</li>
+<li>挑食、洗头、理发、穿衣都可能有感觉原因。</li>
+<li>爆发时先调节，恢复后再训练。</li>
+<li>感觉支持的目标，是让孩子更舒适、更安全、更能参与生活。</li>
+</ol>
+<hr>
+<h2 id="二十一、最后给新人训练师的话"><a class="anchor" href="#二十一、最后给新人训练师的话" aria-hidden="true">#</a>二十一、最后给新人训练师的话</h2>
+<p>感觉问题很容易被误解成“任性”“脾气差”“不服管”。<br>
+但如果你愿意认真观察，你会发现：</p>
+<ul>
+<li>有些孩子是在躲太吵的世界；</li>
+<li>有些孩子是在找身体稳定感；</li>
+<li>有些孩子是在告诉你：这个触感、这个声音、这个味道，真的让我难受。</li>
+</ul>
+<p>优秀的训练师不是强迫孩子适应所有刺激，<br>
+而是帮他一步一步学会：</p>
+<blockquote>
+<p>哪些刺激我可以接受；<br>
+哪些刺激我可以避开；<br>
+我可以怎样表达不舒服；<br>
+我可以怎样安全地调节自己。</p>
+</blockquote>
+<p>这就是感觉处理和感觉调节支持的真正意义。</p>
+
+  <div class="footer">由 asd-sensory-processing-and-regulation.md 转换生成。保留原文清单、表格、模板和代码块；流程型文本已增强为图例展示，并保留原始文本。</div>
+</main>
+</div>
+</body>
+</html>

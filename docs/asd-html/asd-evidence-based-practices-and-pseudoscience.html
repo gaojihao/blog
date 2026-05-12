@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>循证实践与伪科学辨别手册</title>
+<style>
+:root{--bg:#f7f7fb;--paper:#fff;--ink:#1f2937;--muted:#6b7280;--brand:#2563eb;--brand2:#7c3aed;--line:#e5e7eb;--soft:#eff6ff;--warn:#fff7ed;--code:#111827;--codebg:#f3f4f6;--shadow:0 20px 60px rgba(15,23,42,.10)}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#f8fafc,#eef2ff 45%,#fdf2f8);color:var(--ink);font:16px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif}.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:26px;max-width:1440px;margin:0 auto;padding:28px}.sidebar{position:sticky;top:20px;align-self:start;max-height:calc(100vh - 40px);overflow:auto;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}.sidebar h2{font-size:16px;margin:0 0 10px}.sidebar a{display:block;color:#334155;text-decoration:none;border-radius:10px;padding:7px 9px;margin:2px 0;font-size:13px;line-height:1.35}.sidebar a:hover{background:var(--soft);color:var(--brand)}.sidebar .toc-l2{padding-left:18px}.sidebar .toc-l3{padding-left:32px;color:#64748b}.content{min-width:0;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:44px 52px}.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:28px}.badge{display:inline-flex;gap:8px;align-items:center;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;border-radius:999px;padding:8px 14px;font-size:13px}.navlink{color:var(--brand);text-decoration:none;font-weight:600}h1{font-size:34px;line-height:1.25;margin:0 0 22px;color:#0f172a}h2{font-size:26px;margin:44px 0 14px;padding-top:14px;border-top:1px solid var(--line)}h3{font-size:21px;margin:30px 0 10px}h4{font-size:18px;margin:24px 0 8px}p{margin:12px 0}blockquote{margin:18px 0;padding:14px 18px;border-left:5px solid var(--brand);background:var(--soft);border-radius:12px;color:#1e3a8a}table{width:100%;border-collapse:collapse;margin:18px 0;overflow:hidden;border-radius:14px;display:table}th,td{border:1px solid var(--line);padding:10px 12px;vertical-align:top}th{background:#f1f5f9;text-align:left}tr:nth-child(even) td{background:#fafafa}pre{background:#0b1020;color:#e5e7eb;border-radius:16px;padding:18px;overflow:auto;line-height:1.55}code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace}p code,li code,td code{background:var(--codebg);color:#be123c;padding:2px 6px;border-radius:6px}ul,ol{padding-left:1.5em}.anchor{opacity:.25;text-decoration:none;margin-right:8px;color:var(--brand)}h1:hover .anchor,h2:hover .anchor,h3:hover .anchor{opacity:1}.flowchart{margin:22px 0;padding:18px;border:1px solid #bfdbfe;background:linear-gradient(180deg,#eff6ff,#fff);border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:8px}.flow-step{width:min(640px,100%);display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid #dbeafe;border-radius:14px;padding:12px 14px;box-shadow:0 8px 22px rgba(37,99,235,.08)}.flow-num{flex:0 0 auto;width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;background:var(--brand);color:white;font-weight:700;font-size:13px}.flow-arrow{color:var(--brand);font-size:22px;font-weight:800;line-height:1}.raw-flow{margin:8px 0 20px;color:var(--muted)}.raw-flow summary{cursor:pointer}.footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}.callout{background:var(--warn);border:1px solid #fed7aa;border-radius:16px;padding:14px 16px;margin:18px 0}.page-list{columns:2;column-gap:28px}.page-list a{display:block;break-inside:avoid;text-decoration:none;color:#1d4ed8;padding:8px 0;border-bottom:1px dashed #dbeafe}.meta{color:var(--muted);font-size:14px}@media(max-width:960px){.layout{display:block;padding:14px}.sidebar{position:relative;max-height:none;margin-bottom:16px}.content{padding:26px 20px}.page-list{columns:1}h1{font-size:28px}h2{font-size:23px}table{display:block;overflow-x:auto;white-space:normal}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <h2>目录</h2>
+  <a class="navlink" href="index.html">← HTML总索引</a>
+  <a class="toc-l1" href="#循证实践与伪科学辨别手册">循证实践与伪科学辨别手册</a>
+<a class="toc-l2" href="#一、先用一句话讲清楚循证实践">一、先用一句话讲清楚循证实践</a>
+<a class="toc-l2" href="#二、为什么训练师必须懂循证">二、为什么训练师必须懂循证</a>
+<a class="toc-l2" href="#三、循证实践常见类别">三、循证实践常见类别</a>
+<a class="toc-l3" href="#1.-强化">1. 强化</a>
+<a class="toc-l3" href="#2.-提示和提示撤销">2. 提示和提示撤销</a>
+<a class="toc-l3" href="#3.-任务分析">3. 任务分析</a>
+<a class="toc-l3" href="#4.-链式教学">4. 链式教学</a>
+<a class="toc-l3" href="#5.-前事干预">5. 前事干预</a>
+<a class="toc-l3" href="#6.-功能沟通训练fct">6. 功能沟通训练FCT</a>
+<a class="toc-l3" href="#7.-差别强化">7. 差别强化</a>
+<a class="toc-l3" href="#8.-自然情境教学">8. 自然情境教学</a>
+<a class="toc-l3" href="#9.-视觉支持">9. 视觉支持</a>
+<a class="toc-l3" href="#10.-社交叙事-社交故事">10. 社交叙事/社交故事</a>
+<a class="toc-l3" href="#11.-同伴介入">11. 同伴介入</a>
+<a class="toc-l3" href="#12.-自我管理">12. 自我管理</a>
+<a class="toc-l3" href="#13.-视频示范">13. 视频示范</a>
+<a class="toc-l3" href="#14.-家长实施干预">14. 家长实施干预</a>
+<a class="toc-l2" href="#四、常见干预模式的定位">四、常见干预模式的定位</a>
+<a class="toc-l3" href="#aba">ABA</a>
+<a class="toc-l3" href="#dtt">DTT</a>
+<a class="toc-l3" href="#net">NET</a>
+<a class="toc-l3" href="#esdm">ESDM</a>
+<a class="toc-l3" href="#prt">PRT</a>
+<a class="toc-l3" href="#dir-floortime">DIR/Floortime</a>
+<a class="toc-l3" href="#teacch">TEACCH</a>
+<a class="toc-l3" href="#pecs-aac">PECS/AAC</a>
+<a class="toc-l2" href="#五、如何判断一个方法是否靠谱">五、如何判断一个方法是否靠谱</a>
+<a class="toc-l3" href="#问题1有没有研究支持">问题1：有没有研究支持？</a>
+<a class="toc-l3" href="#问题2适合什么孩子">问题2：适合什么孩子？</a>
+<a class="toc-l3" href="#问题3有没有风险">问题3：有没有风险？</a>
+<a class="toc-l3" href="#问题4有没有数据验证">问题4：有没有数据验证？</a>
+<a class="toc-l3" href="#问题5是否尊重孩子">问题5：是否尊重孩子？</a>
+<a class="toc-l2" href="#六、伪科学或高风险说法警报">六、伪科学或高风险说法警报</a>
+<a class="toc-l2" href="#七、常见争议项目如何回应家长">七、常见争议项目如何回应家长</a>
+<a class="toc-l3" href="#1.-感统训练能不能治自闭症">1. 感统训练能不能治自闭症？</a>
+<a class="toc-l3" href="#2.-补剂能不能让孩子开口">2. 补剂能不能让孩子开口？</a>
+<a class="toc-l3" href="#3.-只做aba够不够">3. 只做ABA够不够？</a>
+<a class="toc-l3" href="#4.-aac会不会影响说话">4. AAC会不会影响说话？</a>
+<a class="toc-l2" href="#八、循证方法选择流程">八、循证方法选择流程</a>
+<a class="toc-l3" href="#第一步明确目标">第一步：明确目标</a>
+<a class="toc-l3" href="#第二步分析孩子水平">第二步：分析孩子水平</a>
+<a class="toc-l3" href="#第三步选择实践">第三步：选择实践</a>
+<a class="toc-l3" href="#第四步记录数据">第四步：记录数据</a>
+<a class="toc-l3" href="#第五步调整">第五步：调整</a>
+<a class="toc-l2" href="#九、专家级训练师的循证态度">九、专家级训练师的循证态度</a>
+<a class="toc-l2" href="#十、循证实践选择表">十、循证实践选择表</a>
+<a class="toc-l2" href="#十一、伪科学辨别表">十一、伪科学辨别表</a>
+<a class="toc-l2" href="#十二、家长沟通模板">十二、家长沟通模板</a>
+<a class="toc-l2" href="#十三、新人常见错误">十三、新人常见错误</a>
+<a class="toc-l2" href="#十四、专家必须记住的10句话">十四、专家必须记住的10句话</a>
+<a class="toc-l2" href="#十五、最后提醒">十五、最后提醒</a>
+</aside>
+<main class="content">
+  <div class="topbar"><span class="badge">ASD训练师资料库 · 第 30 篇</span><a class="navlink" href="../asd-evidence-based-practices-and-pseudoscience.md">查看Markdown源文档</a></div>
+  <h1 id="循证实践与伪科学辨别手册"><a class="anchor" href="#循证实践与伪科学辨别手册" aria-hidden="true">#</a>循证实践与伪科学辨别手册</h1>
+<blockquote>
+<p>适用对象：高级训练师、个案负责人、督导、机构课程负责人、家长指导老师。<br>
+使用场景：选择干预方法、回应家长疑问、机构课程设计、辨别热门疗法、制定专业边界。<br>
+核心目的：让训练师从“听说有效”升级为“知道证据在哪里、适合谁、怎么安全使用”。</p>
+</blockquote>
+<hr>
+<h2 id="一、先用一句话讲清楚循证实践"><a class="anchor" href="#一、先用一句话讲清楚循证实践" aria-hidden="true">#</a>一、先用一句话讲清楚循证实践</h2>
+<p>一句大白话：</p>
+<blockquote>
+<p>循证实践就是优先使用经过研究支持、临床经验验证、并且适合这个孩子和家庭的方法。</p>
+</blockquote>
+<p>它不是只看论文，也不是只看经验，而是三者结合：</p>
+<ol>
+<li>研究证据；</li>
+<li>专业判断；</li>
+<li>孩子和家庭的实际情况。</li>
+</ol>
+<hr>
+<h2 id="二、为什么训练师必须懂循证"><a class="anchor" href="#二、为什么训练师必须懂循证" aria-hidden="true">#</a>二、为什么训练师必须懂循证</h2>
+<p>家长会遇到很多说法：</p>
+<ul>
+<li>这个疗法能治好自闭症；</li>
+<li>吃某种补剂能开口；</li>
+<li>排毒能改善自闭症；</li>
+<li>只做感统就够了；</li>
+<li>只做ABA就够了；</li>
+<li>不用看医生，训练就能解决全部问题。</li>
+</ul>
+<p>专家级训练师必须能温和但坚定地说：</p>
+<blockquote>
+<p>我们看证据，看风险，看孩子是否适合，而不是只看宣传。</p>
+</blockquote>
+<hr>
+<h2 id="三、循证实践常见类别"><a class="anchor" href="#三、循证实践常见类别" aria-hidden="true">#</a>三、循证实践常见类别</h2>
+<p>以下是自闭症干预中常见且较有研究支持的实践类别。</p>
+<h3 id="1.-强化"><a class="anchor" href="#1.-强化" aria-hidden="true">#</a>1. 强化</h3>
+<p>通过目标行为后的有效结果，让目标行为增加。</p>
+<h3 id="2.-提示和提示撤销"><a class="anchor" href="#2.-提示和提示撤销" aria-hidden="true">#</a>2. 提示和提示撤销</h3>
+<p>帮助孩子成功，再逐步减少帮助。</p>
+<h3 id="3.-任务分析"><a class="anchor" href="#3.-任务分析" aria-hidden="true">#</a>3. 任务分析</h3>
+<p>把复杂技能拆成小步骤。</p>
+<h3 id="4.-链式教学"><a class="anchor" href="#4.-链式教学" aria-hidden="true">#</a>4. 链式教学</h3>
+<p>按步骤教生活技能。</p>
+<h3 id="5.-前事干预"><a class="anchor" href="#5.-前事干预" aria-hidden="true">#</a>5. 前事干预</h3>
+<p>在问题行为发生前调整环境和任务。</p>
+<h3 id="6.-功能沟通训练fct"><a class="anchor" href="#6.-功能沟通训练fct" aria-hidden="true">#</a>6. 功能沟通训练FCT</h3>
+<p>用合适沟通替代问题行为。</p>
+<h3 id="7.-差别强化"><a class="anchor" href="#7.-差别强化" aria-hidden="true">#</a>7. 差别强化</h3>
+<p>强化替代行为、低频问题行为或不相容行为。</p>
+<h3 id="8.-自然情境教学"><a class="anchor" href="#8.-自然情境教学" aria-hidden="true">#</a>8. 自然情境教学</h3>
+<p>在真实动机和生活场景中教学。</p>
+<h3 id="9.-视觉支持"><a class="anchor" href="#9.-视觉支持" aria-hidden="true">#</a>9. 视觉支持</h3>
+<p>用图片、文字、流程卡帮助理解。</p>
+<h3 id="10.-社交叙事-社交故事"><a class="anchor" href="#10.-社交叙事-社交故事" aria-hidden="true">#</a>10. 社交叙事/社交故事</h3>
+<p>用简单故事解释社交情境和规则。</p>
+<h3 id="11.-同伴介入"><a class="anchor" href="#11.-同伴介入" aria-hidden="true">#</a>11. 同伴介入</h3>
+<p>训练同伴参与支持社交。</p>
+<h3 id="12.-自我管理"><a class="anchor" href="#12.-自我管理" aria-hidden="true">#</a>12. 自我管理</h3>
+<p>让孩子学会记录和调节自己的行为。</p>
+<h3 id="13.-视频示范"><a class="anchor" href="#13.-视频示范" aria-hidden="true">#</a>13. 视频示范</h3>
+<p>用视频展示目标行为。</p>
+<h3 id="14.-家长实施干预"><a class="anchor" href="#14.-家长实施干预" aria-hidden="true">#</a>14. 家长实施干预</h3>
+<p>培训家长在自然生活中使用策略。</p>
+<hr>
+<h2 id="四、常见干预模式的定位"><a class="anchor" href="#四、常见干预模式的定位" aria-hidden="true">#</a>四、常见干预模式的定位</h2>
+<h3 id="aba"><a class="anchor" href="#aba" aria-hidden="true">#</a>ABA</h3>
+<p>大白话：</p>
+<blockquote>
+<p>用行为科学方法分析和教学。</p>
+</blockquote>
+<p>包含强化、提示、任务分析、数据、FCT等。<br>
+风险：如果做得机械、忽略关系和孩子感受，会变成刷题和服从训练。</p>
+<h3 id="dtt"><a class="anchor" href="#dtt" aria-hidden="true">#</a>DTT</h3>
+<p>适合教清晰、可重复练习的技能。<br>
+不适合单独解决真实社交和生活泛化。</p>
+<h3 id="net"><a class="anchor" href="#net" aria-hidden="true">#</a>NET</h3>
+<p>适合把语言、社交、沟通放进生活。<br>
+风险：没有目标就变成陪玩。</p>
+<h3 id="esdm"><a class="anchor" href="#esdm" aria-hidden="true">#</a>ESDM</h3>
+<p>强调发展、关系、自然互动和行为原则结合。<br>
+适合早期儿童。</p>
+<h3 id="prt"><a class="anchor" href="#prt" aria-hidden="true">#</a>PRT</h3>
+<p>抓关键反应，如动机、主动性、自我管理。<br>
+适合提升主动沟通和泛化。</p>
+<h3 id="dir-floortime"><a class="anchor" href="#dir-floortime" aria-hidden="true">#</a>DIR/Floortime</h3>
+<p>强调情绪关系、跟随兴趣和互动圈。<br>
+适合补关系和互动动机，但也需要目标和记录。</p>
+<h3 id="teacch"><a class="anchor" href="#teacch" aria-hidden="true">#</a>TEACCH</h3>
+<p>强调结构化环境和视觉支持。<br>
+适合提升理解、独立工作和环境适应。</p>
+<h3 id="pecs-aac"><a class="anchor" href="#pecs-aac" aria-hidden="true">#</a>PECS/AAC</h3>
+<p>帮助无语言或表达困难儿童沟通。<br>
+不是放弃口语，而是支持表达。</p>
+<hr>
+<h2 id="五、如何判断一个方法是否靠谱"><a class="anchor" href="#五、如何判断一个方法是否靠谱" aria-hidden="true">#</a>五、如何判断一个方法是否靠谱</h2>
+<h3 id="问题1有没有研究支持"><a class="anchor" href="#问题1有没有研究支持" aria-hidden="true">#</a>问题1：有没有研究支持？</h3>
+<p>不是广告、个案故事、宣传视频，而是同行评审研究、指南或系统综述。</p>
+<h3 id="问题2适合什么孩子"><a class="anchor" href="#问题2适合什么孩子" aria-hidden="true">#</a>问题2：适合什么孩子？</h3>
+<p>没有方法适合所有孩子。</p>
+<p>要问：</p>
+<ul>
+<li>年龄；</li>
+<li>语言水平；</li>
+<li>智力水平；</li>
+<li>行为风险；</li>
+<li>家庭资源；</li>
+<li>场景需求。</li>
+</ul>
+<h3 id="问题3有没有风险"><a class="anchor" href="#问题3有没有风险" aria-hidden="true">#</a>问题3：有没有风险？</h3>
+<p>比如：</p>
+<ul>
+<li>身体伤害；</li>
+<li>延误医学治疗；</li>
+<li>经济负担；</li>
+<li>羞辱或强迫；</li>
+<li>让家长产生虚假希望。</li>
+</ul>
+<h3 id="问题4有没有数据验证"><a class="anchor" href="#问题4有没有数据验证" aria-hidden="true">#</a>问题4：有没有数据验证？</h3>
+<p>用了这个方法后：</p>
+<ul>
+<li>目标行为增加了吗？</li>
+<li>问题行为减少了吗？</li>
+<li>是否泛化？</li>
+<li>是否对孩子和家庭可持续？</li>
+</ul>
+<h3 id="问题5是否尊重孩子"><a class="anchor" href="#问题5是否尊重孩子" aria-hidden="true">#</a>问题5：是否尊重孩子？</h3>
+<p>有效不代表伦理上可以接受。<br>
+专家要同时看效果和尊严。</p>
+<hr>
+<h2 id="六、伪科学或高风险说法警报"><a class="anchor" href="#六、伪科学或高风险说法警报" aria-hidden="true">#</a>六、伪科学或高风险说法警报</h2>
+<p>看到以下话术要警惕：</p>
+<ul>
+<li>保证治愈；</li>
+<li>适合所有孩子；</li>
+<li>不需要评估；</li>
+<li>不需要数据；</li>
+<li>排斥所有医学建议；</li>
+<li>只用一种方法解决全部问题；</li>
+<li>价格极高但证据很弱；</li>
+<li>让孩子痛苦但说“必须忍”；</li>
+<li>要求停药或拒医；</li>
+<li>宣称短期奇迹。</li>
+</ul>
+<hr>
+<h2 id="七、常见争议项目如何回应家长"><a class="anchor" href="#七、常见争议项目如何回应家长" aria-hidden="true">#</a>七、常见争议项目如何回应家长</h2>
+<h3 id="1.-感统训练能不能治自闭症"><a class="anchor" href="#1.-感统训练能不能治自闭症" aria-hidden="true">#</a>1. 感统训练能不能治自闭症？</h3>
+<p>回应：</p>
+<pre><code class="language-text">感觉调节可以帮助孩子更舒适、更稳定地参与学习生活，但它不能单独“治好自闭症”。如果孩子有明显感觉敏感或寻求，我们可以把感觉支持作为综合方案的一部分。
+</code></pre>
+<h3 id="2.-补剂能不能让孩子开口"><a class="anchor" href="#2.-补剂能不能让孩子开口" aria-hidden="true">#</a>2. 补剂能不能让孩子开口？</h3>
+<p>回应：</p>
+<pre><code class="language-text">孩子语言发展通常需要沟通动机、模仿、理解、表达机会和系统训练。补剂是否需要使用，应该咨询医生，不建议把开口希望完全寄托在补剂上。
+</code></pre>
+<h3 id="3.-只做aba够不够"><a class="anchor" href="#3.-只做aba够不够" aria-hidden="true">#</a>3. 只做ABA够不够？</h3>
+<p>回应：</p>
+<pre><code class="language-text">ABA里的很多技术非常有用，但孩子还需要游戏、关系、生活自理、感觉支持、学校融合和家庭泛化。我们更推荐综合个别化方案。
+</code></pre>
+<h3 id="4.-aac会不会影响说话"><a class="anchor" href="#4.-aac会不会影响说话" aria-hidden="true">#</a>4. AAC会不会影响说话？</h3>
+<p>回应：</p>
+<pre><code class="language-text">AAC是表达工具，不是阻止说话。很多孩子先通过图片或设备理解沟通有用，再逐步发展口语。
+</code></pre>
+<hr>
+<h2 id="八、循证方法选择流程"><a class="anchor" href="#八、循证方法选择流程" aria-hidden="true">#</a>八、循证方法选择流程</h2>
+<h3 id="第一步明确目标"><a class="anchor" href="#第一步明确目标" aria-hidden="true">#</a>第一步：明确目标</h3>
+<p>不是问“用什么疗法”，而是问：</p>
+<blockquote>
+<p>要解决什么目标？</p>
+</blockquote>
+<p>例如：</p>
+<ul>
+<li>主动请求；</li>
+<li>减少逃跑；</li>
+<li>学会洗手；</li>
+<li>提高共同注意；</li>
+<li>适应学校。</li>
+</ul>
+<h3 id="第二步分析孩子水平"><a class="anchor" href="#第二步分析孩子水平" aria-hidden="true">#</a>第二步：分析孩子水平</h3>
+<ul>
+<li>语言；</li>
+<li>理解；</li>
+<li>动机；</li>
+<li>感觉；</li>
+<li>行为功能；</li>
+<li>家庭资源。</li>
+</ul>
+<h3 id="第三步选择实践"><a class="anchor" href="#第三步选择实践" aria-hidden="true">#</a>第三步：选择实践</h3>
+<p>例如：</p>
+<ul>
+<li>主动请求：NET + FCT + 强化；</li>
+<li>洗手：任务分析 + 链式教学 + 视觉支持；</li>
+<li>逃跑：前事干预 + FCT + 安全计划；</li>
+<li>同伴互动：同伴介入 + 社交故事 + 轮流游戏。</li>
+</ul>
+<h3 id="第四步记录数据"><a class="anchor" href="#第四步记录数据" aria-hidden="true">#</a>第四步：记录数据</h3>
+<p>没有数据，就不知道是否有效。</p>
+<h3 id="第五步调整"><a class="anchor" href="#第五步调整" aria-hidden="true">#</a>第五步：调整</h3>
+<p>如果无效，不是怪孩子，而是调整目标、强化、提示、环境或策略。</p>
+<hr>
+<h2 id="九、专家级训练师的循证态度"><a class="anchor" href="#九、专家级训练师的循证态度" aria-hidden="true">#</a>九、专家级训练师的循证态度</h2>
+<p>专家不是“只认一种方法”。<br>
+专家会说：</p>
+<blockquote>
+<p>对这个孩子、这个目标、这个家庭、这个阶段，哪种方法组合最合适？</p>
+</blockquote>
+<p>专家也不会盲目追热点。<br>
+专家会看：证据、风险、数据、伦理和家庭可行性。</p>
+<hr>
+<h2 id="十、循证实践选择表"><a class="anchor" href="#十、循证实践选择表" aria-hidden="true">#</a>十、循证实践选择表</h2>
+<table>
+<thead>
+<tr>
+<th>目标</th>
+<th>推荐实践</th>
+<th>数据记录</th>
+<th>注意事项</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>主动请求</td>
+<td>NET、FCT、强化</td>
+<td>独立请求次数</td>
+<td>初期表达后马上满足</td>
+</tr>
+<tr>
+<td>洗手</td>
+<td>任务分析、链式、视觉支持</td>
+<td>独立步骤数</td>
+<td>身体提示逐步撤销</td>
+</tr>
+<tr>
+<td>攻击</td>
+<td>ABC、FCT、前事干预、差别强化</td>
+<td>频率/强度</td>
+<td>高风险需督导</td>
+</tr>
+<tr>
+<td>共同注意</td>
+<td>NET、游戏、自然强化</td>
+<td>分享次数</td>
+<td>不强迫眼神</td>
+</tr>
+<tr>
+<td>学校适应</td>
+<td>视觉日程、前事干预、同伴支持</td>
+<td>参与率</td>
+<td>家校一致</td>
+</tr>
+<tr>
+<td>挑食</td>
+<td>渐进暴露、感觉支持、医学排查</td>
+<td>接受步骤</td>
+<td>严重需专业转介</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="十一、伪科学辨别表"><a class="anchor" href="#十一、伪科学辨别表" aria-hidden="true">#</a>十一、伪科学辨别表</h2>
+<table>
+<thead>
+<tr>
+<th>说法</th>
+<th>风险判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>保证治好</td>
+<td>高风险</td>
+</tr>
+<tr>
+<td>不需要评估</td>
+<td>高风险</td>
+</tr>
+<tr>
+<td>只靠一种方法解决所有问题</td>
+<td>高风险</td>
+</tr>
+<tr>
+<td>需要大量花费但无数据</td>
+<td>谨慎</td>
+</tr>
+<tr>
+<td>不许看医生</td>
+<td>高风险</td>
+</tr>
+<tr>
+<td>有目标、有数据、有边界</td>
+<td>相对可靠</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="十二、家长沟通模板"><a class="anchor" href="#十二、家长沟通模板" aria-hidden="true">#</a>十二、家长沟通模板</h2>
+<pre><code class="language-text">我们选择干预方法时，会看三件事：
+第一，这个方法有没有研究和临床支持；
+第二，是否适合您孩子目前的能力和需求；
+第三，做了以后数据有没有变化。
+我们不会轻易承诺治愈，但会用可测量目标持续推进。
+</code></pre>
+<hr>
+<h2 id="十三、新人常见错误"><a class="anchor" href="#十三、新人常见错误" aria-hidden="true">#</a>十三、新人常见错误</h2>
+<ol>
+<li>听到热门疗法就跟风；</li>
+<li>只学一种流派；</li>
+<li>不看数据；</li>
+<li>把个案故事当普遍证据；</li>
+<li>忽略风险；</li>
+<li>用方法压过孩子需要；</li>
+<li>对家长过度承诺；</li>
+<li>不知道什么时候转介。</li>
+</ol>
+<hr>
+<h2 id="十四、专家必须记住的10句话"><a class="anchor" href="#十四、专家必须记住的10句话" aria-hidden="true">#</a>十四、专家必须记住的10句话</h2>
+<ol>
+<li>没有一种方法适合所有孩子。</li>
+<li>循证不是死板，是证据、经验和个体需要结合。</li>
+<li>目标决定方法，不是方法决定目标。</li>
+<li>数据验证效果。</li>
+<li>伦理限制手段。</li>
+<li>家庭可行性决定持续性。</li>
+<li>热门不等于有效。</li>
+<li>个案故事不等于科学证据。</li>
+<li>风险高的方法要格外谨慎。</li>
+<li>专家永远保留更新和修正的能力。</li>
+</ol>
+<hr>
+<h2 id="十五、最后提醒"><a class="anchor" href="#十五、最后提醒" aria-hidden="true">#</a>十五、最后提醒</h2>
+<p>循证实践的目的，不是让训练师背一堆名词，<br>
+而是让我们在面对家长和孩子时，能少一点盲目，多一点负责。</p>
+<p>真正专业的训练师，不会被“神奇疗法”带跑，<br>
+也不会把某一种技术神化。<br>
+他会始终回到孩子本身：</p>
+<blockquote>
+<p>这个孩子现在需要什么？<br>
+哪个方法最安全、最有证据、最可执行？<br>
+数据告诉我们是否有效？</p>
+</blockquote>
+
+  <div class="footer">由 asd-evidence-based-practices-and-pseudoscience.md 转换生成。保留原文清单、表格、模板和代码块；流程型文本已增强为图例展示，并保留原始文本。</div>
+</main>
+</div>
+</body>
+</html>

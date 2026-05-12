@@ -1,0 +1,1392 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>功能沟通训练FCT实操手册</title>
+<style>
+:root{--bg:#f7f7fb;--paper:#fff;--ink:#1f2937;--muted:#6b7280;--brand:#2563eb;--brand2:#7c3aed;--line:#e5e7eb;--soft:#eff6ff;--warn:#fff7ed;--code:#111827;--codebg:#f3f4f6;--shadow:0 20px 60px rgba(15,23,42,.10)}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#f8fafc,#eef2ff 45%,#fdf2f8);color:var(--ink);font:16px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif}.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:26px;max-width:1440px;margin:0 auto;padding:28px}.sidebar{position:sticky;top:20px;align-self:start;max-height:calc(100vh - 40px);overflow:auto;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}.sidebar h2{font-size:16px;margin:0 0 10px}.sidebar a{display:block;color:#334155;text-decoration:none;border-radius:10px;padding:7px 9px;margin:2px 0;font-size:13px;line-height:1.35}.sidebar a:hover{background:var(--soft);color:var(--brand)}.sidebar .toc-l2{padding-left:18px}.sidebar .toc-l3{padding-left:32px;color:#64748b}.content{min-width:0;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:44px 52px}.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:28px}.badge{display:inline-flex;gap:8px;align-items:center;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;border-radius:999px;padding:8px 14px;font-size:13px}.navlink{color:var(--brand);text-decoration:none;font-weight:600}h1{font-size:34px;line-height:1.25;margin:0 0 22px;color:#0f172a}h2{font-size:26px;margin:44px 0 14px;padding-top:14px;border-top:1px solid var(--line)}h3{font-size:21px;margin:30px 0 10px}h4{font-size:18px;margin:24px 0 8px}p{margin:12px 0}blockquote{margin:18px 0;padding:14px 18px;border-left:5px solid var(--brand);background:var(--soft);border-radius:12px;color:#1e3a8a}table{width:100%;border-collapse:collapse;margin:18px 0;overflow:hidden;border-radius:14px;display:table}th,td{border:1px solid var(--line);padding:10px 12px;vertical-align:top}th{background:#f1f5f9;text-align:left}tr:nth-child(even) td{background:#fafafa}pre{background:#0b1020;color:#e5e7eb;border-radius:16px;padding:18px;overflow:auto;line-height:1.55}code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace}p code,li code,td code{background:var(--codebg);color:#be123c;padding:2px 6px;border-radius:6px}ul,ol{padding-left:1.5em}.anchor{opacity:.25;text-decoration:none;margin-right:8px;color:var(--brand)}h1:hover .anchor,h2:hover .anchor,h3:hover .anchor{opacity:1}.flowchart{margin:22px 0;padding:18px;border:1px solid #bfdbfe;background:linear-gradient(180deg,#eff6ff,#fff);border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:8px}.flow-step{width:min(640px,100%);display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid #dbeafe;border-radius:14px;padding:12px 14px;box-shadow:0 8px 22px rgba(37,99,235,.08)}.flow-num{flex:0 0 auto;width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;background:var(--brand);color:white;font-weight:700;font-size:13px}.flow-arrow{color:var(--brand);font-size:22px;font-weight:800;line-height:1}.raw-flow{margin:8px 0 20px;color:var(--muted)}.raw-flow summary{cursor:pointer}.footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}.callout{background:var(--warn);border:1px solid #fed7aa;border-radius:16px;padding:14px 16px;margin:18px 0}.page-list{columns:2;column-gap:28px}.page-list a{display:block;break-inside:avoid;text-decoration:none;color:#1d4ed8;padding:8px 0;border-bottom:1px dashed #dbeafe}.meta{color:var(--muted);font-size:14px}@media(max-width:960px){.layout{display:block;padding:14px}.sidebar{position:relative;max-height:none;margin-bottom:16px}.content{padding:26px 20px}.page-list{columns:1}h1{font-size:28px}h2{font-size:23px}table{display:block;overflow-x:auto;white-space:normal}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <h2>目录</h2>
+  <a class="navlink" href="index.html">← HTML总索引</a>
+  <a class="toc-l1" href="#功能沟通训练fct实操手册">功能沟通训练FCT实操手册</a>
+<a class="toc-l2" href="#一、先用一句话讲清楚fct">一、先用一句话讲清楚FCT</a>
+<a class="toc-l2" href="#二、为什么问题行为常常是沟通">二、为什么问题行为常常是沟通？</a>
+<a class="toc-l2" href="#三、fct适合解决哪些问题">三、FCT适合解决哪些问题？</a>
+<a class="toc-l3" href="#1.-为了获得东西">1. 为了获得东西</a>
+<a class="toc-l3" href="#2.-为了逃避任务">2. 为了逃避任务</a>
+<a class="toc-l3" href="#3.-为了获得关注">3. 为了获得关注</a>
+<a class="toc-l3" href="#4.-为了感觉需求或逃避刺激">4. 为了感觉需求或逃避刺激</a>
+<a class="toc-l2" href="#四、fct的核心逻辑">四、FCT的核心逻辑</a>
+<a class="toc-l3" href="#旧路">旧路</a>
+<a class="toc-l3" href="#新路">新路</a>
+<a class="toc-l2" href="#五、fct实施五步法">五、FCT实施五步法</a>
+<a class="toc-l3" href="#第一步找出问题行为功能">第一步：找出问题行为功能</a>
+<a class="toc-l3" href="#第二步选择替代表达方式">第二步：选择替代表达方式</a>
+<a class="toc-l3" href="#第三步在孩子刚想要时教">第三步：在孩子刚想要时教</a>
+<a class="toc-l3" href="#第四步新表达后马上满足">第四步：新表达后马上满足</a>
+<a class="toc-l3" href="#第五步逐渐提高要求">第五步：逐渐提高要求</a>
+<a class="toc-l2" href="#六、替代表达怎么选">六、替代表达怎么选？</a>
+<a class="toc-l3" href="#1.-无语言或语言很少的孩子">1. 无语言或语言很少的孩子</a>
+<a class="toc-l3" href="#2.-有单词的孩子">2. 有单词的孩子</a>
+<a class="toc-l3" href="#3.-有短句的孩子">3. 有短句的孩子</a>
+<a class="toc-l3" href="#4.-高语言但情绪差时说不出的孩子">4. 高语言但情绪差时说不出的孩子</a>
+<a class="toc-l2" href="#七、最常用的fct表达清单">七、最常用的FCT表达清单</a>
+<a class="toc-l3" href="#1.-请求类">1. 请求类</a>
+<a class="toc-l3" href="#2.-拒绝类">2. 拒绝类</a>
+<a class="toc-l3" href="#3.-休息逃避类">3. 休息逃避类</a>
+<a class="toc-l3" href="#4.-感觉调节类">4. 感觉调节类</a>
+<a class="toc-l3" href="#5.-关注社交类">5. 关注社交类</a>
+<a class="toc-l3" href="#6.-安全求助类">6. 安全求助类</a>
+<a class="toc-l2" href="#八、fct案例一孩子尖叫要东西">八、FCT案例一：孩子尖叫要东西</a>
+<a class="toc-l3" href="#场景">场景</a>
+<a class="toc-l3" href="#abc">ABC</a>
+<a class="toc-l3" href="#替代表达">替代表达</a>
+<a class="toc-l3" href="#sop">SOP</a>
+<a class="toc-l3" href="#注意">注意</a>
+<a class="toc-l2" href="#九、fct案例二孩子打人逃避任务">九、FCT案例二：孩子打人逃避任务</a>
+<a class="toc-l3" href="#场景-2">场景</a>
+<a class="toc-l3" href="#abc-2">ABC</a>
+<a class="toc-l3" href="#替代表达-2">替代表达</a>
+<a class="toc-l3" href="#sop-2">SOP</a>
+<a class="toc-l3" href="#注意-2">注意</a>
+<a class="toc-l2" href="#十、fct案例三孩子跑出教室">十、FCT案例三：孩子跑出教室</a>
+<a class="toc-l3" href="#场景-3">场景</a>
+<a class="toc-l3" href="#abc-3">ABC</a>
+<a class="toc-l3" href="#替代表达-3">替代表达</a>
+<a class="toc-l3" href="#sop-3">SOP</a>
+<a class="toc-l3" href="#注意-3">注意</a>
+<a class="toc-l2" href="#十一、fct案例四孩子捂耳尖叫">十一、FCT案例四：孩子捂耳尖叫</a>
+<a class="toc-l3" href="#场景-4">场景</a>
+<a class="toc-l3" href="#功能">功能</a>
+<a class="toc-l3" href="#替代表达-4">替代表达</a>
+<a class="toc-l3" href="#sop-4">SOP</a>
+<a class="toc-l3" href="#注意-4">注意</a>
+<a class="toc-l2" href="#十二、fct案例五孩子通过扔东西要关注">十二、FCT案例五：孩子通过扔东西要关注</a>
+<a class="toc-l3" href="#场景-5">场景</a>
+<a class="toc-l3" href="#功能-2">功能</a>
+<a class="toc-l3" href="#替代表达-5">替代表达</a>
+<a class="toc-l3" href="#sop-5">SOP</a>
+<a class="toc-l3" href="#注意-5">注意</a>
+<a class="toc-l2" href="#十三、图片沟通怎么做">十三、图片沟通怎么做？</a>
+<a class="toc-l3" href="#1.-准备图片">1. 准备图片</a>
+<a class="toc-l3" href="#2.-初学阶段不要放太多">2. 初学阶段不要放太多</a>
+<a class="toc-l3" href="#3.-递卡教学sop">3. 递卡教学SOP</a>
+<a class="toc-l3" href="#4.-图片不是终点">4. 图片不是终点</a>
+<a class="toc-l2" href="#十四、沟通板怎么设计">十四、沟通板怎么设计？</a>
+<a class="toc-l3" href="#1.-初级沟通板">1. 初级沟通板</a>
+<a class="toc-l3" href="#2.-家庭常用沟通板">2. 家庭常用沟通板</a>
+<a class="toc-l3" href="#3.-学校常用沟通板">3. 学校常用沟通板</a>
+<a class="toc-l3" href="#4.-沟通板使用原则">4. 沟通板使用原则</a>
+<a class="toc-l2" href="#十五、aac会不会影响说话">十五、AAC会不会影响说话？</a>
+<a class="toc-l2" href="#十六、fct训练中的强化原则">十六、FCT训练中的强化原则</a>
+<a class="toc-l3" href="#1.-立即回应">1. 立即回应</a>
+<a class="toc-l3" href="#2.-高成功率">2. 高成功率</a>
+<a class="toc-l3" href="#3.-后期再加入规则">3. 后期再加入规则</a>
+<a class="toc-l3" href="#4.-问题行为不直接有效">4. 问题行为不直接有效</a>
+<a class="toc-l2" href="#十七、如何从“马上满足”过渡到“按规则满足”">十七、如何从“马上满足”过渡到“按规则满足”</a>
+<a class="toc-l3" href="#过渡阶梯">过渡阶梯</a>
+<a class="toc-l2" href="#十八、fct数据怎么记录">十八、FCT数据怎么记录？</a>
+<a class="toc-l3" href="#1.-替代表达记录表">1. 替代表达记录表</a>
+<a class="toc-l3" href="#2.-行为替换进展表">2. 行为替换进展表</a>
+<a class="toc-l3" href="#3.-提示等级记录">3. 提示等级记录</a>
+<a class="toc-l3" href="#判断进步">判断进步</a>
+<a class="toc-l2" href="#十九、fct目标怎么写">十九、FCT目标怎么写？</a>
+<a class="toc-l3" href="#模板">模板</a>
+<a class="toc-l3" href="#示例1请求">示例1：请求</a>
+<a class="toc-l3" href="#示例2休息">示例2：休息</a>
+<a class="toc-l3" href="#示例3感觉逃避">示例3：感觉逃避</a>
+<a class="toc-l2" href="#二十、fct常见错误">二十、FCT常见错误</a>
+<a class="toc-l3" href="#错误1没有先分析功能">错误1：没有先分析功能</a>
+<a class="toc-l3" href="#错误2替代表达太难">错误2：替代表达太难</a>
+<a class="toc-l3" href="#错误3新表达不够快">错误3：新表达不够快</a>
+<a class="toc-l3" href="#错误4问题行为仍然更有效">错误4：问题行为仍然更有效</a>
+<a class="toc-l3" href="#错误5刚学会就频繁拒绝">错误5：刚学会就频繁拒绝</a>
+<a class="toc-l3" href="#错误6沟通工具拿不到">错误6：沟通工具拿不到</a>
+<a class="toc-l3" href="#错误7只在训练室用">错误7：只在训练室用</a>
+<a class="toc-l3" href="#错误8忽略孩子早期信号">错误8：忽略孩子早期信号</a>
+<a class="toc-l2" href="#二十一、家长版解释话术">二十一、家长版解释话术</a>
+<a class="toc-l3" href="#1.-解释fct">1. 解释FCT</a>
+<a class="toc-l3" href="#2.-解释为什么要先满足">2. 解释为什么要先满足</a>
+<a class="toc-l3" href="#3.-解释图片不是倒退">3. 解释图片不是倒退</a>
+<a class="toc-l3" href="#4.-解释家长要一致">4. 解释家长要一致</a>
+<a class="toc-l2" href="#二十二、fct教案模板">二十二、FCT教案模板</a>
+<a class="toc-l2" href="#二十三、fct课堂自查表">二十三、FCT课堂自查表</a>
+<a class="toc-l2" href="#二十四、空白打印模板">二十四、空白打印模板</a>
+<a class="toc-l3" href="#1.-替代表达选择表">1. 替代表达选择表</a>
+<a class="toc-l3" href="#2.-fct机会记录表">2. FCT机会记录表</a>
+<a class="toc-l3" href="#3.-沟通卡清单">3. 沟通卡清单</a>
+<a class="toc-l2" href="#二十五、新人必须记住的10句话">二十五、新人必须记住的10句话</a>
+<a class="toc-l2" href="#二十六、最后给新人训练师的话">二十六、最后给新人训练师的话</a>
+</aside>
+<main class="content">
+  <div class="topbar"><span class="badge">ASD训练师资料库 · 第 11 篇</span><a class="navlink" href="../asd-functional-communication-training.md">查看Markdown源文档</a></div>
+  <h1 id="功能沟通训练fct实操手册"><a class="anchor" href="#功能沟通训练fct实操手册" aria-hidden="true">#</a>功能沟通训练FCT实操手册</h1>
+<blockquote>
+<p>适用对象：自闭症康复训练师、语言训练老师、家长指导老师、影子老师、融合教育老师。<br>
+使用场景：儿童不会表达需求，或经常用哭闹、尖叫、打人、抢东西、逃跑、躺地、自伤等方式表达“我要、不要、帮我、休息、太吵了”。<br>
+核心目的：帮助训练师教会孩子用更安全、更清楚、更有效的方式沟通，从源头减少问题行为。<br>
+重要提醒：FCT是行为支持和沟通训练的重要方法，但严重自伤、伤人、逃跑、吞物、癫痫样表现或疑似精神症状，必须同步上报督导并建议专业评估。</p>
+</blockquote>
+<hr>
+<h2 id="一、先用一句话讲清楚fct"><a class="anchor" href="#一、先用一句话讲清楚fct" aria-hidden="true">#</a>一、先用一句话讲清楚FCT</h2>
+<p>FCT，全称 Functional Communication Training，常译为“功能沟通训练”。</p>
+<p>一句大白话：</p>
+<blockquote>
+<p>FCT就是教孩子用更合适的方式，说出他原本想用问题行为表达的意思。</p>
+</blockquote>
+<p>比如：</p>
+<table>
+<thead>
+<tr>
+<th>以前孩子怎么表达</th>
+<th>实际想表达</th>
+<th>我们教的新表达</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>尖叫</td>
+<td>我要继续玩</td>
+<td>“还要”/递还要卡</td>
+</tr>
+<tr>
+<td>打人</td>
+<td>我不想做了</td>
+<td>“休息”/递休息卡</td>
+</tr>
+<tr>
+<td>抢零食</td>
+<td>我想吃</td>
+<td>“我要饼干”/指图片</td>
+</tr>
+<tr>
+<td>跑出教室</td>
+<td>这里太吵</td>
+<td>“太吵了”/拿耳机卡</td>
+</tr>
+<tr>
+<td>躺地</td>
+<td>任务太难</td>
+<td>“帮我”/“简单一点”</td>
+</tr>
+</tbody>
+</table>
+<p>FCT的核心不是让孩子“别闹”，而是：</p>
+<blockquote>
+<p>给孩子一条比闹更快、更省力、更安全的沟通路。</p>
+</blockquote>
+<hr>
+<h2 id="二、为什么问题行为常常是沟通"><a class="anchor" href="#二、为什么问题行为常常是沟通" aria-hidden="true">#</a>二、为什么问题行为常常是沟通？</h2>
+<p>很多ASD孩子不是没有需求，而是不会用别人听得懂的方式表达。</p>
+<p>当孩子不会说：</p>
+<ul>
+<li>“我想要”；</li>
+<li>“我不要”；</li>
+<li>“我不舒服”；</li>
+<li>“我害怕”；</li>
+<li>“太吵了”；</li>
+<li>“我需要帮忙”；</li>
+<li>“我想休息”；</li>
+</ul>
+<p>他就可能用身体和行为表达：</p>
+<ul>
+<li>哭；</li>
+<li>叫；</li>
+<li>打；</li>
+<li>抢；</li>
+<li>跑；</li>
+<li>躺；</li>
+<li>推；</li>
+<li>咬；</li>
+<li>扔。</li>
+</ul>
+<p>训练师要记住：</p>
+<blockquote>
+<p>问题行为很多时候不是孩子的坏脾气，而是孩子当前最熟练的语言。</p>
+</blockquote>
+<p>我们的任务是帮他换一种语言。</p>
+<hr>
+<h2 id="三、fct适合解决哪些问题"><a class="anchor" href="#三、fct适合解决哪些问题" aria-hidden="true">#</a>三、FCT适合解决哪些问题？</h2>
+<h3 id="1.-为了获得东西"><a class="anchor" href="#1.-为了获得东西" aria-hidden="true">#</a>1. 为了获得东西</h3>
+<p>表现：</p>
+<ul>
+<li>抢玩具；</li>
+<li>哭着要手机；</li>
+<li>拉大人去拿零食；</li>
+<li>尖叫要求继续动画。</li>
+</ul>
+<p>教：</p>
+<ul>
+<li>“我要”；</li>
+<li>“还要”；</li>
+<li>“打开”；</li>
+<li>“给我”；</li>
+<li>“我想玩手机5分钟”。</li>
+</ul>
+<h3 id="2.-为了逃避任务"><a class="anchor" href="#2.-为了逃避任务" aria-hidden="true">#</a>2. 为了逃避任务</h3>
+<p>表现：</p>
+<ul>
+<li>一写作业就哭；</li>
+<li>一上桌面就躺地；</li>
+<li>扔材料；</li>
+<li>打老师；</li>
+<li>跑开。</li>
+</ul>
+<p>教：</p>
+<ul>
+<li>“休息”；</li>
+<li>“帮我”；</li>
+<li>“太难了”；</li>
+<li>“少一点”；</li>
+<li>“我想等一下”。</li>
+</ul>
+<h3 id="3.-为了获得关注"><a class="anchor" href="#3.-为了获得关注" aria-hidden="true">#</a>3. 为了获得关注</h3>
+<p>表现：</p>
+<ul>
+<li>大人聊天时尖叫；</li>
+<li>故意扔东西；</li>
+<li>跑开让大人追；</li>
+<li>不停打断。</li>
+</ul>
+<p>教：</p>
+<ul>
+<li>“看我”；</li>
+<li>“陪我玩”；</li>
+<li>轻拍肩膀；</li>
+<li>举手；</li>
+<li>递“找妈妈”卡。</li>
+</ul>
+<h3 id="4.-为了感觉需求或逃避刺激"><a class="anchor" href="#4.-为了感觉需求或逃避刺激" aria-hidden="true">#</a>4. 为了感觉需求或逃避刺激</h3>
+<p>表现：</p>
+<ul>
+<li>捂耳尖叫；</li>
+<li>冲出嘈杂教室；</li>
+<li>拒绝理发洗头；</li>
+<li>撞墙寻求压力；</li>
+<li>不停跳。</li>
+</ul>
+<p>教：</p>
+<ul>
+<li>“太吵了”；</li>
+<li>“我要耳机”；</li>
+<li>“我要出去”；</li>
+<li>“我要压一压”；</li>
+<li>“我要跳一跳”。</li>
+</ul>
+<hr>
+<h2 id="四、fct的核心逻辑"><a class="anchor" href="#四、fct的核心逻辑" aria-hidden="true">#</a>四、FCT的核心逻辑</h2>
+<p>FCT不是单独教一句话，而是一个完整替换过程。</p>
+<h3 id="旧路"><a class="anchor" href="#旧路" aria-hidden="true">#</a>旧路</h3>
+<div class="flowchart" role="group" aria-label="流程图"><div class="flow-step"><span class="flow-num">1</span><span>孩子想要手机</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">2</span><span>尖叫</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">3</span><span>家长给手机</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">4</span><span>尖叫变多</span></div></div>
+<details class="raw-flow"><summary>查看原始流程文本</summary>
+<pre><code class="language-text">孩子想要手机 → 尖叫 → 家长给手机 → 尖叫变多
+</code></pre>
+</details>
+<h3 id="新路"><a class="anchor" href="#新路" aria-hidden="true">#</a>新路</h3>
+<div class="flowchart" role="group" aria-label="流程图"><div class="flow-step"><span class="flow-num">1</span><span>孩子想要手机</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">2</span><span>递手机卡/说“手机”</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">3</span><span>家长给1分钟手机</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">4</span><span>合适表达变多</span></div></div>
+<details class="raw-flow"><summary>查看原始流程文本</summary>
+<pre><code class="language-text">孩子想要手机 → 递手机卡/说“手机” → 家长给1分钟手机 → 合适表达变多
+</code></pre>
+</details>
+<p>核心规则：</p>
+<blockquote>
+<p>旧行为不再直接有效，新表达马上有效。</p>
+</blockquote>
+<p>如果孩子尖叫仍然最快拿到手机，他就没有理由学新表达。</p>
+<hr>
+<h2 id="五、fct实施五步法"><a class="anchor" href="#五、fct实施五步法" aria-hidden="true">#</a>五、FCT实施五步法</h2>
+<h3 id="第一步找出问题行为功能"><a class="anchor" href="#第一步找出问题行为功能" aria-hidden="true">#</a>第一步：找出问题行为功能</h3>
+<p>先用ABC记录判断：</p>
+<ul>
+<li>他是在要东西？</li>
+<li>逃避任务？</li>
+<li>要关注？</li>
+<li>感觉需求？</li>
+</ul>
+<p>没有功能分析，FCT容易教错。</p>
+<p>例子：孩子打人。</p>
+<p>可能意思不同：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>打人的意思可能是</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>老师拿出作业</td>
+<td>我不想做</td>
+</tr>
+<tr>
+<td>同伴拿他车</td>
+<td>这是我的/我要车</td>
+</tr>
+<tr>
+<td>妈妈打电话</td>
+<td>看我</td>
+</tr>
+<tr>
+<td>教室很吵</td>
+<td>我想离开</td>
+</tr>
+</tbody>
+</table>
+<p>不同功能，要教不同表达。</p>
+<h3 id="第二步选择替代表达方式"><a class="anchor" href="#第二步选择替代表达方式" aria-hidden="true">#</a>第二步：选择替代表达方式</h3>
+<p>替代表达必须：</p>
+<ol>
+<li>孩子做得到；</li>
+<li>比问题行为更省力；</li>
+<li>大人能马上理解；</li>
+<li>能得到类似结果；</li>
+<li>方便在多个场景使用。</li>
+</ol>
+<p>表达方式可以是：</p>
+<ul>
+<li>眼神；</li>
+<li>伸手；</li>
+<li>指物；</li>
+<li>递物；</li>
+<li>手势；</li>
+<li>图片卡；</li>
+<li>沟通板；</li>
+<li>单词；</li>
+<li>短句；</li>
+<li>打字；</li>
+<li>电子AAC设备。</li>
+</ul>
+<p>AAC大白话解释：</p>
+<blockquote>
+<p>AAC就是辅助沟通工具，比如图片、手势、沟通板、平板语音按钮。它不是放弃说话，而是先给孩子一个能表达的工具。</p>
+</blockquote>
+<h3 id="第三步在孩子刚想要时教"><a class="anchor" href="#第三步在孩子刚想要时教" aria-hidden="true">#</a>第三步：在孩子刚想要时教</h3>
+<p>不要等孩子已经爆炸再教。</p>
+<p>最好的时机：</p>
+<ul>
+<li>孩子看向想要物；</li>
+<li>伸手；</li>
+<li>拉大人；</li>
+<li>皱眉；</li>
+<li>快要哭但还没爆；</li>
+<li>任务开始有点抗拒；</li>
+<li>环境刚变吵。</li>
+</ul>
+<h3 id="第四步新表达后马上满足"><a class="anchor" href="#第四步新表达后马上满足" aria-hidden="true">#</a>第四步：新表达后马上满足</h3>
+<p>刚开始一定要让新表达非常有效。</p>
+<p>孩子递“休息卡” → 马上休息。<br>
+孩子说“帮我” → 马上帮。<br>
+孩子指“耳机” → 马上给耳机。<br>
+孩子说“还要” → 马上继续。</p>
+<h3 id="第五步逐渐提高要求"><a class="anchor" href="#第五步逐渐提高要求" aria-hidden="true">#</a>第五步：逐渐提高要求</h3>
+<p>等孩子稳定后，再慢慢提高：</p>
+<ul>
+<li>从递卡到说词；</li>
+<li>从一个词到短句；</li>
+<li>从马上满足到等待；</li>
+<li>从每次都满足到按规则满足；</li>
+<li>从一个场景到多个场景。</li>
+</ul>
+<hr>
+<h2 id="六、替代表达怎么选"><a class="anchor" href="#六、替代表达怎么选" aria-hidden="true">#</a>六、替代表达怎么选？</h2>
+<h3 id="1.-无语言或语言很少的孩子"><a class="anchor" href="#1.-无语言或语言很少的孩子" aria-hidden="true">#</a>1. 无语言或语言很少的孩子</h3>
+<p>可以先用：</p>
+<ul>
+<li>指；</li>
+<li>递图片；</li>
+<li>拿物品给大人；</li>
+<li>手势；</li>
+<li>简单声音。</li>
+</ul>
+<p>目标不是一开始说完整句，而是先让孩子知道：</p>
+<blockquote>
+<p>我可以用一个动作让别人明白我。</p>
+</blockquote>
+<h3 id="2.-有单词的孩子"><a class="anchor" href="#2.-有单词的孩子" aria-hidden="true">#</a>2. 有单词的孩子</h3>
+<p>可以教：</p>
+<ul>
+<li>要；</li>
+<li>不要；</li>
+<li>帮；</li>
+<li>开；</li>
+<li>停；</li>
+<li>走；</li>
+<li>休息；</li>
+<li>还要。</li>
+</ul>
+<h3 id="3.-有短句的孩子"><a class="anchor" href="#3.-有短句的孩子" aria-hidden="true">#</a>3. 有短句的孩子</h3>
+<p>可以教：</p>
+<ul>
+<li>我要____；</li>
+<li>我不要____；</li>
+<li>请帮我____；</li>
+<li>我要休息；</li>
+<li>太吵了；</li>
+<li>我想离开；</li>
+<li>再等一下。</li>
+</ul>
+<h3 id="4.-高语言但情绪差时说不出的孩子"><a class="anchor" href="#4.-高语言但情绪差时说不出的孩子" aria-hidden="true">#</a>4. 高语言但情绪差时说不出的孩子</h3>
+<p>可以同时使用：</p>
+<ul>
+<li>情绪卡；</li>
+<li>休息卡；</li>
+<li>文字卡；</li>
+<li>手机备忘录；</li>
+<li>手势；</li>
+<li>约定暗号。</li>
+</ul>
+<p>提醒：<br>
+会说话的孩子也可能需要AAC。因为崩溃时语言系统可能暂时“掉线”。</p>
+<hr>
+<h2 id="七、最常用的fct表达清单"><a class="anchor" href="#七、最常用的fct表达清单" aria-hidden="true">#</a>七、最常用的FCT表达清单</h2>
+<h3 id="1.-请求类"><a class="anchor" href="#1.-请求类" aria-hidden="true">#</a>1. 请求类</h3>
+<ul>
+<li>我要；</li>
+<li>还要；</li>
+<li>给我；</li>
+<li>打开；</li>
+<li>帮我；</li>
+<li>轮到我；</li>
+<li>我想玩；</li>
+<li>我想吃；</li>
+<li>我想看。</li>
+</ul>
+<h3 id="2.-拒绝类"><a class="anchor" href="#2.-拒绝类" aria-hidden="true">#</a>2. 拒绝类</h3>
+<ul>
+<li>不要；</li>
+<li>停；</li>
+<li>我不喜欢；</li>
+<li>我不想做；</li>
+<li>不舒服；</li>
+<li>换一个。</li>
+</ul>
+<h3 id="3.-休息逃避类"><a class="anchor" href="#3.-休息逃避类" aria-hidden="true">#</a>3. 休息逃避类</h3>
+<ul>
+<li>休息；</li>
+<li>等一下；</li>
+<li>太难了；</li>
+<li>少一点；</li>
+<li>帮我；</li>
+<li>我想离开；</li>
+<li>我想安静。</li>
+</ul>
+<h3 id="4.-感觉调节类"><a class="anchor" href="#4.-感觉调节类" aria-hidden="true">#</a>4. 感觉调节类</h3>
+<ul>
+<li>太吵了；</li>
+<li>我要耳机；</li>
+<li>太亮了；</li>
+<li>不要碰我；</li>
+<li>我要压一压；</li>
+<li>我要跳一跳；</li>
+<li>我要安静角。</li>
+</ul>
+<h3 id="5.-关注社交类"><a class="anchor" href="#5.-关注社交类" aria-hidden="true">#</a>5. 关注社交类</h3>
+<ul>
+<li>看我；</li>
+<li>陪我；</li>
+<li>妈妈来；</li>
+<li>老师帮我；</li>
+<li>我想说话；</li>
+<li>我有事；</li>
+<li>我想给你看。</li>
+</ul>
+<h3 id="6.-安全求助类"><a class="anchor" href="#6.-安全求助类" aria-hidden="true">#</a>6. 安全求助类</h3>
+<ul>
+<li>我害怕；</li>
+<li>我疼；</li>
+<li>我迷路了；</li>
+<li>我要打电话；</li>
+<li>我不认识他；</li>
+<li>不要碰我；</li>
+<li>我要找妈妈/老师。</li>
+</ul>
+<hr>
+<h2 id="八、fct案例一孩子尖叫要东西"><a class="anchor" href="#八、fct案例一孩子尖叫要东西" aria-hidden="true">#</a>八、FCT案例一：孩子尖叫要东西</h2>
+<h3 id="场景"><a class="anchor" href="#场景" aria-hidden="true">#</a>场景</h3>
+<p>孩子看到饼干，拿不到就尖叫。</p>
+<h3 id="abc"><a class="anchor" href="#abc" aria-hidden="true">#</a>ABC</h3>
+<table>
+<thead>
+<tr>
+<th>A</th>
+<th>B</th>
+<th>C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>饼干在柜子上，孩子够不到</td>
+<td>尖叫、拉家长</td>
+<td>家长给饼干</td>
+</tr>
+</tbody>
+</table>
+<p>功能：获得饼干。</p>
+<h3 id="替代表达"><a class="anchor" href="#替代表达" aria-hidden="true">#</a>替代表达</h3>
+<p>根据能力选择：</p>
+<ul>
+<li>指饼干；</li>
+<li>递“饼干”图片；</li>
+<li>说“饼”；</li>
+<li>说“我要饼干”。</li>
+</ul>
+<h3 id="sop"><a class="anchor" href="#sop" aria-hidden="true">#</a>SOP</h3>
+<ol>
+<li>饼干放在看得见够不着的位置；</li>
+<li>孩子看或伸手时，马上提示：“饼干”；</li>
+<li>孩子指/递卡/说词；</li>
+<li>立刻给一小块；</li>
+<li>重复5–10次；</li>
+<li>逐渐减少提示。</li>
+</ol>
+<h3 id="注意"><a class="anchor" href="#注意" aria-hidden="true">#</a>注意</h3>
+<p>不要孩子尖叫很久才教。<br>
+要在尖叫前或刚开始时抓住机会。</p>
+<hr>
+<h2 id="九、fct案例二孩子打人逃避任务"><a class="anchor" href="#九、fct案例二孩子打人逃避任务" aria-hidden="true">#</a>九、FCT案例二：孩子打人逃避任务</h2>
+<h3 id="场景-2"><a class="anchor" href="#场景-2" aria-hidden="true">#</a>场景</h3>
+<p>一拿出作业，孩子就打老师。</p>
+<h3 id="abc-2"><a class="anchor" href="#abc-2" aria-hidden="true">#</a>ABC</h3>
+<table>
+<thead>
+<tr>
+<th>A</th>
+<th>B</th>
+<th>C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>老师拿出配对卡</td>
+<td>孩子打老师手</td>
+<td>老师把卡片收走，让孩子休息</td>
+</tr>
+</tbody>
+</table>
+<p>功能：逃避任务。</p>
+<h3 id="替代表达-2"><a class="anchor" href="#替代表达-2" aria-hidden="true">#</a>替代表达</h3>
+<ul>
+<li>递“休息”卡；</li>
+<li>说“休息”；</li>
+<li>说“帮我”；</li>
+<li>说“太难了”；</li>
+<li>举手表示暂停。</li>
+</ul>
+<h3 id="sop-2"><a class="anchor" href="#sop-2" aria-hidden="true">#</a>SOP</h3>
+<ol>
+<li>任务开始前准备休息卡；</li>
+<li>任务量降到很小，比如做2个；</li>
+<li>孩子开始烦躁时，提示递休息卡；</li>
+<li>递卡后马上休息30秒；</li>
+<li>休息后回来做1个简单任务；</li>
+<li>再给休息或强化；</li>
+<li>后续逐渐增加任务量。</li>
+</ol>
+<h3 id="注意-2"><a class="anchor" href="#注意-2" aria-hidden="true">#</a>注意</h3>
+<p>不能让“打人”直接取消全部任务。<br>
+但可以让“休息卡”有效。</p>
+<hr>
+<h2 id="十、fct案例三孩子跑出教室"><a class="anchor" href="#十、fct案例三孩子跑出教室" aria-hidden="true">#</a>十、FCT案例三：孩子跑出教室</h2>
+<h3 id="场景-3"><a class="anchor" href="#场景-3" aria-hidden="true">#</a>场景</h3>
+<p>教室吵或任务难时，孩子冲出门。</p>
+<h3 id="abc-3"><a class="anchor" href="#abc-3" aria-hidden="true">#</a>ABC</h3>
+<table>
+<thead>
+<tr>
+<th>A</th>
+<th>B</th>
+<th>C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>教室声音大/老师要求做题</td>
+<td>孩子冲向门口</td>
+<td>老师追出去，孩子离开教室</td>
+</tr>
+</tbody>
+</table>
+<p>可能功能：逃避环境、逃避任务，或获得追逐关注。</p>
+<h3 id="替代表达-3"><a class="anchor" href="#替代表达-3" aria-hidden="true">#</a>替代表达</h3>
+<ul>
+<li>“出去”；</li>
+<li>“休息”；</li>
+<li>“太吵了”；</li>
+<li>“我要安静角”；</li>
+<li>递离开卡。</li>
+</ul>
+<h3 id="sop-3"><a class="anchor" href="#sop-3" aria-hidden="true">#</a>SOP</h3>
+<ol>
+<li>安全优先，门口设安全管理；</li>
+<li>在孩子平静时教“出去/休息”卡；</li>
+<li>发现孩子看门、站起、烦躁时，马上提示递卡；</li>
+<li>递卡后带去指定安静区1–2分钟；</li>
+<li>安静区结束后回到任务或较低要求；</li>
+<li>记录跑离次数和递卡次数。</li>
+</ol>
+<h3 id="注意-3"><a class="anchor" href="#注意-3" aria-hidden="true">#</a>注意</h3>
+<p>如果孩子冲马路、冲出机构，需要安全计划和人员分工，不是单靠FCT即可。</p>
+<hr>
+<h2 id="十一、fct案例四孩子捂耳尖叫"><a class="anchor" href="#十一、fct案例四孩子捂耳尖叫" aria-hidden="true">#</a>十一、FCT案例四：孩子捂耳尖叫</h2>
+<h3 id="场景-4"><a class="anchor" href="#场景-4" aria-hidden="true">#</a>场景</h3>
+<p>商场、教室、吹风机声音大时尖叫。</p>
+<h3 id="功能"><a class="anchor" href="#功能" aria-hidden="true">#</a>功能</h3>
+<p>逃避声音刺激。</p>
+<h3 id="替代表达-4"><a class="anchor" href="#替代表达-4" aria-hidden="true">#</a>替代表达</h3>
+<ul>
+<li>“太吵”；</li>
+<li>“耳机”；</li>
+<li>“停”；</li>
+<li>“我要出去”；</li>
+<li>捂耳+递耳机卡。</li>
+</ul>
+<h3 id="sop-4"><a class="anchor" href="#sop-4" aria-hidden="true">#</a>SOP</h3>
+<ol>
+<li>提前准备耳机和“太吵”卡；</li>
+<li>进入噪音环境前预告；</li>
+<li>孩子刚捂耳时，提示“太吵”；</li>
+<li>孩子说/指后，马上给耳机或带到安静处；</li>
+<li>等稳定后短时间再进入；</li>
+<li>逐步增加停留时间。</li>
+</ol>
+<h3 id="注意-4"><a class="anchor" href="#注意-4" aria-hidden="true">#</a>注意</h3>
+<p>不要在孩子明显痛苦时逼他忍。<br>
+先让他有表达和保护自己的工具。</p>
+<hr>
+<h2 id="十二、fct案例五孩子通过扔东西要关注"><a class="anchor" href="#十二、fct案例五孩子通过扔东西要关注" aria-hidden="true">#</a>十二、FCT案例五：孩子通过扔东西要关注</h2>
+<h3 id="场景-5"><a class="anchor" href="#场景-5" aria-hidden="true">#</a>场景</h3>
+<p>妈妈和别人说话时，孩子扔杯子。</p>
+<h3 id="功能-2"><a class="anchor" href="#功能-2" aria-hidden="true">#</a>功能</h3>
+<p>获得关注。</p>
+<h3 id="替代表达-5"><a class="anchor" href="#替代表达-5" aria-hidden="true">#</a>替代表达</h3>
+<ul>
+<li>轻拍妈妈；</li>
+<li>递“妈妈看我”卡；</li>
+<li>说“看我”；</li>
+<li>举手；</li>
+<li>说“我有事”。</li>
+</ul>
+<h3 id="sop-5"><a class="anchor" href="#sop-5" aria-hidden="true">#</a>SOP</h3>
+<ol>
+<li>妈妈聊天前给孩子一个任务或玩具；</li>
+<li>提前说：“有事轻拍妈妈”；</li>
+<li>练习轻拍后妈妈马上回应；</li>
+<li>孩子扔东西时低反应，安全处理；</li>
+<li>引导孩子轻拍或递卡；</li>
+<li>用合适方式叫妈妈后，妈妈马上给关注。</li>
+</ol>
+<h3 id="注意-5"><a class="anchor" href="#注意-5" aria-hidden="true">#</a>注意</h3>
+<p>孩子安静等待时，要主动给关注。<br>
+不要只有闹的时候才看他。</p>
+<hr>
+<h2 id="十三、图片沟通怎么做"><a class="anchor" href="#十三、图片沟通怎么做" aria-hidden="true">#</a>十三、图片沟通怎么做？</h2>
+<h3 id="1.-准备图片"><a class="anchor" href="#1.-准备图片" aria-hidden="true">#</a>1. 准备图片</h3>
+<p>先准备最常用的：</p>
+<ul>
+<li>我要；</li>
+<li>还要；</li>
+<li>打开；</li>
+<li>帮我；</li>
+<li>休息；</li>
+<li>不要；</li>
+<li>太吵；</li>
+<li>耳机；</li>
+<li>厕所；</li>
+<li>喝水；</li>
+<li>妈妈；</li>
+<li>老师。</li>
+</ul>
+<p>图片要：</p>
+<ul>
+<li>清楚；</li>
+<li>大小合适；</li>
+<li>方便拿；</li>
+<li>可以贴魔术贴；</li>
+<li>放在孩子拿得到的位置。</li>
+</ul>
+<h3 id="2.-初学阶段不要放太多"><a class="anchor" href="#2.-初学阶段不要放太多" aria-hidden="true">#</a>2. 初学阶段不要放太多</h3>
+<p>一次给1–3张即可。<br>
+太多会让孩子不知道选什么。</p>
+<h3 id="3.-递卡教学sop"><a class="anchor" href="#3.-递卡教学sop" aria-hidden="true">#</a>3. 递卡教学SOP</h3>
+<ol>
+<li>孩子想要泡泡；</li>
+<li>老师把“泡泡”卡放在孩子面前；</li>
+<li>轻提示孩子拿卡递给老师；</li>
+<li>老师接卡，马上说“泡泡”；</li>
+<li>立刻吹泡泡；</li>
+<li>逐渐减少手部提示；</li>
+<li>后续增加“我要+泡泡”。</li>
+</ol>
+<h3 id="4.-图片不是终点"><a class="anchor" href="#4.-图片不是终点" aria-hidden="true">#</a>4. 图片不是终点</h3>
+<p>图片可以逐步升级为：</p>
+<ul>
+<li>图片+声音；</li>
+<li>图片+单词；</li>
+<li>两张图片组合；</li>
+<li>短句条；</li>
+<li>口语；</li>
+<li>电子AAC。</li>
+</ul>
+<hr>
+<h2 id="十四、沟通板怎么设计"><a class="anchor" href="#十四、沟通板怎么设计" aria-hidden="true">#</a>十四、沟通板怎么设计？</h2>
+<h3 id="1.-初级沟通板"><a class="anchor" href="#1.-初级沟通板" aria-hidden="true">#</a>1. 初级沟通板</h3>
+<pre><code class="language-text">[我要] [不要] [帮我]
+[休息] [喝水] [厕所]
+[还要] [打开] [太吵]
+</code></pre>
+<h3 id="2.-家庭常用沟通板"><a class="anchor" href="#2.-家庭常用沟通板" aria-hidden="true">#</a>2. 家庭常用沟通板</h3>
+<pre><code class="language-text">[吃] [喝水] [手机]
+[玩具] [出去] [睡觉]
+[洗澡] [厕所] [妈妈]
+[不要] [帮我] [休息]
+</code></pre>
+<h3 id="3.-学校常用沟通板"><a class="anchor" href="#3.-学校常用沟通板" aria-hidden="true">#</a>3. 学校常用沟通板</h3>
+<pre><code class="language-text">[老师] [同学] [铅笔]
+[书] [厕所] [喝水]
+[休息] [帮我] [太吵]
+[我不会] [等一下] [完成]
+</code></pre>
+<h3 id="4.-沟通板使用原则"><a class="anchor" href="#4.-沟通板使用原则" aria-hidden="true">#</a>4. 沟通板使用原则</h3>
+<ul>
+<li>放在孩子随时能拿到的地方；</li>
+<li>大人要示范使用；</li>
+<li>孩子使用后必须回应；</li>
+<li>不要只在训练时拿出来；</li>
+<li>不要把沟通板当考试题。</li>
+</ul>
+<hr>
+<h2 id="十五、aac会不会影响说话"><a class="anchor" href="#十五、aac会不会影响说话" aria-hidden="true">#</a>十五、AAC会不会影响说话？</h2>
+<p>很多家长担心：</p>
+<blockquote>
+<p>用图片或设备，孩子是不是更不说话？</p>
+</blockquote>
+<p>训练师可以这样解释：</p>
+<pre><code class="language-text">AAC不是放弃说话，而是先给孩子一个能表达的工具。
+当孩子发现沟通有用，他的沟通动机会增加。
+我们使用图片时，也会同步说出口语，比如孩子递“水”卡，我们马上说“水”，再给水。
+这样图片反而可以帮助语言发展。
+</code></pre>
+<p>重点：</p>
+<ul>
+<li>图片和口语一起用；</li>
+<li>不逼孩子在崩溃时说话；</li>
+<li>有声音就鼓励声音；</li>
+<li>逐渐从图片过渡到词语和句子；</li>
+<li>对长期口语困难者，AAC本身也是重要沟通权利。</li>
+</ul>
+<hr>
+<h2 id="十六、fct训练中的强化原则"><a class="anchor" href="#十六、fct训练中的强化原则" aria-hidden="true">#</a>十六、FCT训练中的强化原则</h2>
+<p>FCT中，新表达刚开始必须非常有效。</p>
+<h3 id="1.-立即回应"><a class="anchor" href="#1.-立即回应" aria-hidden="true">#</a>1. 立即回应</h3>
+<p>孩子递“休息卡”，马上休息。<br>
+孩子说“打开”，马上打开。</p>
+<h3 id="2.-高成功率"><a class="anchor" href="#2.-高成功率" aria-hidden="true">#</a>2. 高成功率</h3>
+<p>初期不要频繁拒绝孩子的新表达。<br>
+否则他会觉得：</p>
+<blockquote>
+<p>说了也没用，那我还是哭吧。</p>
+</blockquote>
+<h3 id="3.-后期再加入规则"><a class="anchor" href="#3.-后期再加入规则" aria-hidden="true">#</a>3. 后期再加入规则</h3>
+<p>等新表达稳定后，再教：</p>
+<ul>
+<li>等待；</li>
+<li>轮流；</li>
+<li>不是每次都可以；</li>
+<li>可以换一个；</li>
+<li>先做后要；</li>
+<li>延迟满足。</li>
+</ul>
+<h3 id="4.-问题行为不直接有效"><a class="anchor" href="#4.-问题行为不直接有效" aria-hidden="true">#</a>4. 问题行为不直接有效</h3>
+<p>如果孩子尖叫，尽量不要直接给最终物。<br>
+等稍微平静，提示合适表达，再给。</p>
+<hr>
+<h2 id="十七、如何从“马上满足”过渡到“按规则满足”"><a class="anchor" href="#十七、如何从“马上满足”过渡到“按规则满足”" aria-hidden="true">#</a>十七、如何从“马上满足”过渡到“按规则满足”</h2>
+<p>FCT初期：</p>
+<div class="flowchart" role="group" aria-label="流程图"><div class="flow-step"><span class="flow-num">1</span><span>孩子说休息</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">2</span><span>马上休息</span></div></div>
+<details class="raw-flow"><summary>查看原始流程文本</summary>
+<pre><code class="language-text">孩子说休息 → 马上休息
+</code></pre>
+</details>
+<p>后期要逐步变成：</p>
+<div class="flowchart" role="group" aria-label="流程图"><div class="flow-step"><span class="flow-num">1</span><span>孩子说休息</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">2</span><span>做完1个</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">3</span><span>休息
+孩子说手机</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">4</span><span>等1分钟</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">5</span><span>手机
+孩子说还要</span></div><div class="flow-arrow">↓</div><div class="flow-step"><span class="flow-num">6</span><span>轮到你时再玩</span></div></div>
+<details class="raw-flow"><summary>查看原始流程文本</summary>
+<pre><code class="language-text">孩子说休息 → 做完1个 → 休息
+孩子说手机 → 等1分钟 → 手机
+孩子说还要 → 轮到你时再玩
+</code></pre>
+</details>
+<h3 id="过渡阶梯"><a class="anchor" href="#过渡阶梯" aria-hidden="true">#</a>过渡阶梯</h3>
+<h4>阶段1：每次表达都满足</h4>
+<p>目标：让孩子相信新表达有效。</p>
+<h4>阶段2：短等待</h4>
+<p>表达后等1–5秒。</p>
+<h4>阶段3：先小任务后满足</h4>
+<p>表达后说：</p>
+<blockquote>
+<p>“先放1个，再休息。”</p>
+</blockquote>
+<h4>阶段4：选择替代</h4>
+<p>不能给手机时：</p>
+<blockquote>
+<p>“手机没有，可以选小车或积木。”</p>
+</blockquote>
+<h4>阶段5：规则化</h4>
+<p>例如：</p>
+<blockquote>
+<p>“每天手机10分钟。”<br>
+“作业后玩。”<br>
+“超市只买1样。”</p>
+</blockquote>
+<p>注意：<br>
+不要在孩子刚学会表达时马上大量拒绝。否则旧行为会回来。</p>
+<hr>
+<h2 id="十八、fct数据怎么记录"><a class="anchor" href="#十八、fct数据怎么记录" aria-hidden="true">#</a>十八、FCT数据怎么记录？</h2>
+<h3 id="1.-替代表达记录表"><a class="anchor" href="#1.-替代表达记录表" aria-hidden="true">#</a>1. 替代表达记录表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>场景</th>
+<th>目标表达</th>
+<th style="text-align:right">独立次数</th>
+<th style="text-align:right">提示次数</th>
+<th style="text-align:right">问题行为次数</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="2.-行为替换进展表"><a class="anchor" href="#2.-行为替换进展表" aria-hidden="true">#</a>2. 行为替换进展表</h3>
+<table>
+<thead>
+<tr>
+<th>周次</th>
+<th style="text-align:right">问题行为次数</th>
+<th style="text-align:right">替代表达次数</th>
+<th style="text-align:right">平均持续时间</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第1周</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td>第2周</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td>第3周</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+<tr>
+<td>第4周</td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td style="text-align:right"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="3.-提示等级记录"><a class="anchor" href="#3.-提示等级记录" aria-hidden="true">#</a>3. 提示等级记录</h3>
+<table>
+<thead>
+<tr>
+<th>机会</th>
+<th>独立I</th>
+<th>手势G</th>
+<th>图片P</th>
+<th>语言V</th>
+<th>身体辅助PH</th>
+<th>问题行为B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>5</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="判断进步"><a class="anchor" href="#判断进步" aria-hidden="true">#</a>判断进步</h3>
+<p>FCT有效时，你会看到：</p>
+<ul>
+<li>问题行为次数下降；</li>
+<li>替代表达次数上升；</li>
+<li>表达越来越独立；</li>
+<li>情绪恢复更快；</li>
+<li>家庭和学校都能使用；</li>
+<li>孩子不再需要升级到激烈行为。</li>
+</ul>
+<hr>
+<h2 id="十九、fct目标怎么写"><a class="anchor" href="#十九、fct目标怎么写" aria-hidden="true">#</a>十九、FCT目标怎么写？</h2>
+<h3 id="模板"><a class="anchor" href="#模板" aria-hidden="true">#</a>模板</h3>
+<pre><code class="language-text">在________场景中，当________发生时，儿童能通过________表达________，在____次机会中独立完成____次，连续____天/节课达到，同时目标问题行为下降到____。
+</code></pre>
+<h3 id="示例1请求"><a class="anchor" href="#示例1请求" aria-hidden="true">#</a>示例1：请求</h3>
+<pre><code class="language-text">在零食场景中，当儿童想继续吃但零食袋关闭时，儿童能通过递“还要”卡或说“还要”请求继续，5次机会中独立完成4次，连续3天达到，同时尖叫次数下降到每天不超过1次。
+</code></pre>
+<h3 id="示例2休息"><a class="anchor" href="#示例2休息" aria-hidden="true">#</a>示例2：休息</h3>
+<pre><code class="language-text">在桌面任务中，当儿童出现烦躁、推材料等早期信号时，儿童能递“休息”卡或说“休息”，5次机会中完成4次，连续3节课达到，同时打人行为下降50%。
+</code></pre>
+<h3 id="示例3感觉逃避"><a class="anchor" href="#示例3感觉逃避" aria-hidden="true">#</a>示例3：感觉逃避</h3>
+<pre><code class="language-text">在嘈杂环境中，当儿童感到声音不适时，儿童能指“太吵”卡或说“太吵了”，并请求耳机或离开，3次机会中完成2次，连续2周达到。
+</code></pre>
+<hr>
+<h2 id="二十、fct常见错误"><a class="anchor" href="#二十、fct常见错误" aria-hidden="true">#</a>二十、FCT常见错误</h2>
+<h3 id="错误1没有先分析功能"><a class="anchor" href="#错误1没有先分析功能" aria-hidden="true">#</a>错误1：没有先分析功能</h3>
+<p>孩子打人是为了逃避任务，你却教他说“我要玩具”，当然没用。</p>
+<p>改法：<br>
+先做ABC，再选表达。</p>
+<h3 id="错误2替代表达太难"><a class="anchor" href="#错误2替代表达太难" aria-hidden="true">#</a>错误2：替代表达太难</h3>
+<p>孩子不会说话，你要求他说完整句。</p>
+<p>改法：<br>
+先用图片、手势、单词。</p>
+<h3 id="错误3新表达不够快"><a class="anchor" href="#错误3新表达不够快" aria-hidden="true">#</a>错误3：新表达不够快</h3>
+<p>孩子递卡后，大人半天不回应。<br>
+孩子会回到尖叫。</p>
+<p>改法：<br>
+初期新表达必须马上有效。</p>
+<h3 id="错误4问题行为仍然更有效"><a class="anchor" href="#错误4问题行为仍然更有效" aria-hidden="true">#</a>错误4：问题行为仍然更有效</h3>
+<p>孩子哭闹马上得手机，说“手机”反而要等。<br>
+那孩子当然继续哭闹。</p>
+<p>改法：<br>
+让合适表达比问题行为更有效。</p>
+<h3 id="错误5刚学会就频繁拒绝"><a class="anchor" href="#错误5刚学会就频繁拒绝" aria-hidden="true">#</a>错误5：刚学会就频繁拒绝</h3>
+<p>孩子刚学会“还要”，大人总说“不可以”。</p>
+<p>改法：<br>
+初期多满足，后期再教等待和规则。</p>
+<h3 id="错误6沟通工具拿不到"><a class="anchor" href="#错误6沟通工具拿不到" aria-hidden="true">#</a>错误6：沟通工具拿不到</h3>
+<p>图片卡放在柜子里，孩子需要时拿不到。</p>
+<p>改法：<br>
+沟通工具必须随手可得。</p>
+<h3 id="错误7只在训练室用"><a class="anchor" href="#错误7只在训练室用" aria-hidden="true">#</a>错误7：只在训练室用</h3>
+<p>家里、学校不用，孩子无法泛化。</p>
+<p>改法：<br>
+同一张卡、同一句话，多场景使用。</p>
+<h3 id="错误8忽略孩子早期信号"><a class="anchor" href="#错误8忽略孩子早期信号" aria-hidden="true">#</a>错误8：忽略孩子早期信号</h3>
+<p>等孩子已经崩溃才教。</p>
+<p>改法：<br>
+在皱眉、推开、看门、伸手时就提示表达。</p>
+<hr>
+<h2 id="二十一、家长版解释话术"><a class="anchor" href="#二十一、家长版解释话术" aria-hidden="true">#</a>二十一、家长版解释话术</h2>
+<h3 id="1.-解释fct"><a class="anchor" href="#1.-解释fct" aria-hidden="true">#</a>1. 解释FCT</h3>
+<pre><code class="language-text">孩子现在不是没有需求，而是不会用合适方式说出来。
+功能沟通训练就是教他用图片、手势或语言表达，比如“我要”“休息”“帮我”。
+当这些新表达变得有效，哭闹和打人的必要性就会下降。
+</code></pre>
+<h3 id="2.-解释为什么要先满足"><a class="anchor" href="#2.-解释为什么要先满足" aria-hidden="true">#</a>2. 解释为什么要先满足</h3>
+<pre><code class="language-text">刚开始孩子学新表达，我们要让他马上发现：这样说有用。
+等他稳定会用了，我们再慢慢教等待、轮流和规则。
+如果一开始说了也没用，他就会回到原来的哭闹方式。
+</code></pre>
+<h3 id="3.-解释图片不是倒退"><a class="anchor" href="#3.-解释图片不是倒退" aria-hidden="true">#</a>3. 解释图片不是倒退</h3>
+<pre><code class="language-text">图片不是倒退，而是给孩子一个表达工具。
+我们会一边让他用图片，一边配合口语示范。
+目标是让他先能表达，再逐步提高到声音、词语或句子。
+</code></pre>
+<h3 id="4.-解释家长要一致"><a class="anchor" href="#4.-解释家长要一致" aria-hidden="true">#</a>4. 解释家长要一致</h3>
+<pre><code class="language-text">如果孩子哭闹时能得到东西，但用卡片时得不到，他会选择哭闹。
+所以全家要尽量一致：合适表达马上回应，问题行为不直接满足。
+</code></pre>
+<hr>
+<h2 id="二十二、fct教案模板"><a class="anchor" href="#二十二、fct教案模板" aria-hidden="true">#</a>二十二、FCT教案模板</h2>
+<pre><code class="language-text">儿童姓名：
+日期：
+训练师：
+
+一、目标问题行为
+具体定义：
+发生频率：
+持续时间：
+危险程度：
+
+二、ABC与功能假设
+常见前因A：
+行为B：
+后果C：
+初步功能：
+□ 获得物品
+□ 逃避任务
+□ 获得关注
+□ 感觉需求/逃避刺激
+□ 混合功能
+
+三、替代表达
+当前表达方式：
+计划教的新表达：
+表达形式：
+□ 眼神
+□ 指物
+□ 手势
+□ 图片
+□ 沟通板
+□ 单词
+□ 短句
+□ AAC设备
+
+四、教学场景
+
+五、提示方式
+
+六、强化/自然结果
+
+七、问题行为后处理
+
+八、数据记录
+替代表达次数：
+问题行为次数：
+提示等级：
+
+九、泛化计划
+家庭：
+学校：
+公共场所：
+
+十、后续提高计划
+等待：
+句子扩展：
+规则化：
+</code></pre>
+<hr>
+<h2 id="二十三、fct课堂自查表"><a class="anchor" href="#二十三、fct课堂自查表" aria-hidden="true">#</a>二十三、FCT课堂自查表</h2>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>是/否</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>我是否知道这个问题行为的功能？</td>
+<td></td>
+</tr>
+<tr>
+<td>我选的替代表达是否符合孩子当前能力？</td>
+<td></td>
+</tr>
+<tr>
+<td>替代表达是否比问题行为更省力？</td>
+<td></td>
+</tr>
+<tr>
+<td>孩子表达后我是否马上回应？</td>
+<td></td>
+</tr>
+<tr>
+<td>问题行为是否没有直接得到主要好处？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否在孩子爆发前的早期信号介入？</td>
+<td></td>
+</tr>
+<tr>
+<td>沟通卡/工具是否孩子随时能拿到？</td>
+<td></td>
+</tr>
+<tr>
+<td>家长是否知道怎么回应新表达？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否记录了替代表达次数？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否记录了问题行为是否下降？</td>
+<td></td>
+</tr>
+<tr>
+<td>我是否有后期等待和规则化计划？</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="二十四、空白打印模板"><a class="anchor" href="#二十四、空白打印模板" aria-hidden="true">#</a>二十四、空白打印模板</h2>
+<h3 id="1.-替代表达选择表"><a class="anchor" href="#1.-替代表达选择表" aria-hidden="true">#</a>1. 替代表达选择表</h3>
+<table>
+<thead>
+<tr>
+<th>问题行为</th>
+<th>可能功能</th>
+<th>孩子想表达</th>
+<th>替代表达</th>
+<th>表达形式</th>
+<th>立即结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="2.-fct机会记录表"><a class="anchor" href="#2.-fct机会记录表" aria-hidden="true">#</a>2. FCT机会记录表</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>场景</th>
+<th style="text-align:right">机会</th>
+<th>独立表达</th>
+<th>提示表达</th>
+<th>问题行为</th>
+<th>大人回应</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">2</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">3</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">4</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td style="text-align:right">5</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="3.-沟通卡清单"><a class="anchor" href="#3.-沟通卡清单" aria-hidden="true">#</a>3. 沟通卡清单</h3>
+<table>
+<thead>
+<tr>
+<th>卡片</th>
+<th>是否已制作</th>
+<th>常用场景</th>
+<th>家长会用吗</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>我要</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>还要</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>帮我</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>休息</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>不要</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>打开</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>太吵</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>耳机</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>厕所</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>喝水</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="二十五、新人必须记住的10句话"><a class="anchor" href="#二十五、新人必须记住的10句话" aria-hidden="true">#</a>二十五、新人必须记住的10句话</h2>
+<ol>
+<li>问题行为常常是孩子当前最熟练的沟通方式。</li>
+<li>FCT不是压行为，而是教新表达。</li>
+<li>没有功能分析，就容易教错表达。</li>
+<li>替代表达必须比问题行为更容易。</li>
+<li>新表达刚开始必须马上有效。</li>
+<li>图片、手势、AAC不是倒退，而是沟通工具。</li>
+<li>会说话的孩子，崩溃时也可能需要辅助沟通。</li>
+<li>等孩子爆炸后再教，通常太晚。</li>
+<li>家庭、学校、机构要一致回应。</li>
+<li>最终目标是让孩子用安全、清楚、被理解的方式表达自己。</li>
+</ol>
+<hr>
+<h2 id="二十六、最后给新人训练师的话"><a class="anchor" href="#二十六、最后给新人训练师的话" aria-hidden="true">#</a>二十六、最后给新人训练师的话</h2>
+<p>孩子每一次哭闹、尖叫、抢夺、逃跑，背后都可能藏着一句没有说出口的话：</p>
+<blockquote>
+<p>“我想要。”<br>
+“我不要。”<br>
+“我太难受。”<br>
+“我不会。”<br>
+“请帮帮我。”</p>
+</blockquote>
+<p>FCT就是把这些藏在行为里的话，翻译成别人能听懂的沟通方式。</p>
+<p>当孩子第一次不用哭，而是递出“休息卡”；<br>
+第一次不用打人，而是说“帮我”；<br>
+第一次不用尖叫，而是说“太吵了”；<br>
+那一刻，他不是只学会了一个词，<br>
+而是学会了：</p>
+<blockquote>
+<p>我的感受可以被理解；<br>
+我的需求可以被回应；<br>
+我有比崩溃更好的办法。</p>
+</blockquote>
+<p>这就是功能沟通训练真正的价值。</p>
+
+  <div class="footer">由 asd-functional-communication-training.md 转换生成。保留原文清单、表格、模板和代码块；流程型文本已增强为图例展示，并保留原始文本。</div>
+</main>
+</div>
+</body>
+</html>
