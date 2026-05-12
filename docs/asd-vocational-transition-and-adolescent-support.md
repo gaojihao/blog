@@ -1,6 +1,8 @@
 ---
 title: 青春期支持、职业转衔与成年准备手册
 permalink: /asd-vocational-transition-and-adolescent-support/
+description: "帮助训练师把ASD青少年的支持从“课堂训练”延伸到“身体、心理、安全、职业和成年生活”。"
+keywords: "青春期支持、职业转衔与成年准备手册,先用一句话讲清楚青春期转衔,为什么ASD青少年需要特殊支持,青春期支持的五大主线,青春期身体变化教学,自闭症,ASD,康复训练"
 ---
 
 # 青春期支持、职业转衔与成年准备手册

@@ -1,11 +1,66 @@
 import { defineUserConfig } from 'vuepress'
 import KnznTheme from '../../src/node'
 
+const SITE_URL = 'https://lizhi1026.top'
+const SITE_TITLE = '栗志'
+const SITE_DESC =
+  '栗志的个人主页：全栈开发工程师与 AI 从业者，关注全栈工程、AI 应用、Claude Code 源码解析、表达力训练与儿童行为干预等内容。'
+const SITE_OG_IMAGE = `${SITE_URL}/images/avatar.jpg`
+
 export default defineUserConfig({
   // 站点配置
   lang: 'zh-CN',
-  title: '栗志',
-  description: '栗志的个人主页：全栈开发工程师与 AI 从业者，关注全栈工程、AI 应用和优秀产品体验。',
+  title: SITE_TITLE,
+  description: SITE_DESC,
+  head: [
+    ['meta', { name: 'viewport', content: 'width=device-width,initial-scale=1,viewport-fit=cover' }],
+    ['meta', { name: 'theme-color', content: '#ffffff' }],
+    ['meta', { name: 'author', content: '栗志' }],
+    ['meta', { name: 'keywords', content: '栗志,Li Zhi,全栈开发,AI 应用,Claude Code,表达力训练,自闭症干预,ASD,前端,Node.js,VuePress' }],
+    ['meta', { name: 'robots', content: 'index,follow' }],
+    ['meta', { name: 'format-detection', content: 'telephone=no' }],
+    ['link', { rel: 'canonical', href: SITE_URL + '/' }],
+    // Open Graph
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:site_name', content: SITE_TITLE }],
+    ['meta', { property: 'og:title', content: SITE_TITLE }],
+    ['meta', { property: 'og:description', content: SITE_DESC }],
+    ['meta', { property: 'og:url', content: SITE_URL + '/' }],
+    ['meta', { property: 'og:image', content: SITE_OG_IMAGE }],
+    ['meta', { property: 'og:locale', content: 'zh_CN' }],
+    // Twitter
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:title', content: SITE_TITLE }],
+    ['meta', { name: 'twitter:description', content: SITE_DESC }],
+    ['meta', { name: 'twitter:image', content: SITE_OG_IMAGE }],
+    // JSON-LD: WebSite + Person
+    [
+      'script',
+      { type: 'application/ld+json' },
+      JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'WebSite',
+            url: SITE_URL + '/',
+            name: SITE_TITLE,
+            description: SITE_DESC,
+            inLanguage: 'zh-CN',
+          },
+          {
+            '@type': 'Person',
+            name: '栗志',
+            alternateName: 'Li Zhi',
+            url: SITE_URL + '/',
+            image: SITE_OG_IMAGE,
+            sameAs: ['https://github.com/gaojihao'],
+            jobTitle: '全栈开发工程师 / AI 从业者',
+            email: 'mailto:lizhi1026@1026.com',
+          },
+        ],
+      }),
+    ],
+  ],
   // debug: true,
   // bundler: webpackBundler(),
   theme: KnznTheme({

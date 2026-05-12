@@ -1,6 +1,8 @@
 ---
 title: Claude Code 源码解析
 permalink: /claude/
+description: "Claude Code 源码深度解析合集：Agent Loop、上下文管理、错误恢复、Hook 系统、MCP、Memory、多 Agent 协作、Permission、Session 存储、Task 管理、Tool 系统。"
+keywords: "Claude Code,Claude Code 源码,Agent Loop,MCP,Hook,Memory,Permission,Tool 系统"
 ---
 
 <style>

@@ -1,6 +1,8 @@
 ---
 title: NET自然情境教学实操手册
 permalink: /asd-net-natural-environment-teaching/
+description: "帮助新人训练师学会在真实生活和孩子兴趣中教学，让孩子把桌面上学到的能力真正用到生活里。"
+keywords: "NET自然情境教学实操手册,先用一句话讲清楚NET,NET像什么？,NET和“陪玩”有什么区别？,NET适合教什么？,自闭症,ASD,康复训练"
 ---
 
 # NET自然情境教学实操手册

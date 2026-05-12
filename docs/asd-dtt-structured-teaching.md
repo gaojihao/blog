@@ -1,6 +1,8 @@
 ---
 title: DTT回合式结构化教学实操手册
 permalink: /asd-dtt-structured-teaching/
+description: "帮助新人掌握一节DTT课怎么设计、怎么下指令、怎么摆材料、怎么提示、怎么强化、怎么纠错、怎么记录数据。"
+keywords: "DTT回合式结构化教学实操手册,先用一句话讲清楚DTT,DTT像什么？,DTT适合教什么？,DTT不适合单独解决什么？,自闭症,ASD,康复训练"
 ---
 
 # DTT回合式结构化教学实操手册

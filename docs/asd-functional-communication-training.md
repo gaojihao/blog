@@ -1,6 +1,8 @@
 ---
 title: 功能沟通训练FCT实操手册
 permalink: /asd-functional-communication-training/
+description: "帮助训练师教会孩子用更安全、更清楚、更有效的方式沟通，从源头减少问题行为。"
+keywords: "功能沟通训练FCT实操手册,先用一句话讲清楚FCT,为什么问题行为常常是沟通？,FCT适合解决哪些问题？,FCT的核心逻辑,自闭症,ASD,康复训练"
 ---
 
 # 功能沟通训练FCT实操手册

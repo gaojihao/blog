@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lizhi1026.top/sitemap.xml

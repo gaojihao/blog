@@ -1,6 +1,8 @@
 ---
 title: ABC行为记录与行为功能分析入门手册
 permalink: /asd-abc-behavior-record-and-function-analysis/
+description: "帮助新人从“孩子不听话”的模糊判断，升级为“看懂行为前后发生了什么，并教会孩子更好的替代方式”。"
+keywords: "ABC行为记录与行为功能分析入门手册,先用一句话讲清楚ABC,行为功能是什么？,为什么不能只说“问题行为”？,ABC记录的标准写法,自闭症,ASD,康复训练"
 ---
 
 # ABC行为记录与行为功能分析入门手册

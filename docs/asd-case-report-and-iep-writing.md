@@ -1,6 +1,8 @@
 ---
 title: 个案报告与IEP目标撰写实操手册
 permalink: /asd-case-report-and-iep-writing/
+description: "帮助新人写出清楚、可测量、可执行、能反馈的个案报告和IEP目标。"
+keywords: "个案报告与IEP目标撰写实操手册,先用一句话讲清楚IEP,个案报告和IEP有什么区别,报告写作的五条原则,初评报告结构,自闭症,ASD,康复训练"
 ---
 
 # 个案报告与IEP目标撰写实操手册

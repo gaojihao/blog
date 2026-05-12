@@ -1,6 +1,8 @@
 ---
 title: 家长培训与家庭泛化实操手册
 permalink: /asd-parent-training-and-home-generalization/
+description: "帮助新人从“只会教孩子”升级为“会教家长”，让训练成果真正回到家庭生活里。"
+keywords: "家长培训与家庭泛化实操手册,先用一句话讲清楚家长培训,为什么家长培训这么重要？,家长培训的核心原则,课后反馈三明治法,自闭症,ASD,康复训练"
 ---
 
 # 家长培训与家庭泛化实操手册

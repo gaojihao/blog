@@ -6,8 +6,8 @@
   "types": "lib/node/index.d.ts",
   "scripts": {
     "docs:dev": "vuepress dev docs",
-    "docs:build": "vuepress build docs",
-    "docs:deploy": "vuepress build docs",
+    "docs:build": "node scripts/inject-html-seo.js && node scripts/generate-sitemap.js && vuepress build docs",
+    "docs:deploy": "node scripts/inject-html-seo.js && node scripts/generate-sitemap.js && vuepress build docs",
     "build": "tsc -b tsconfig.build.json && node scripts && yarn copy && yarn clean",
     "publish:npm": "yarn build && npm publish",
     "clean": "rimraf  *.tsbuildinfo",

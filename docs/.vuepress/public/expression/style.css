@@ -425,3 +425,44 @@ ul li::marker { color: var(--terracotta); }
   .main { padding: 20px; max-width: none; }
   body { background: white; }
 }
+
+/* Accessibility & polish */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Visible focus state for keyboard users */
+a:focus-visible,
+.module-card:focus-visible,
+.nav-link:focus-visible,
+.sidebar-home:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Selection */
+::selection { background: var(--terracotta); color: var(--paper); }
+
+/* Custom scrollbar for sidebar */
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: var(--terracotta); }
+.sidebar { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+
+/* Anchor offset so h2/section don't hide under top edge when navigated */
+section[id], [id^="doc-"], [id^="sec-"], [id^="p"] {
+  scroll-margin-top: 24px;
+}
+
+/* When .module-card is an anchor (used in index.html), keep card hover lift */
+a.module-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px var(--shadow);
+}

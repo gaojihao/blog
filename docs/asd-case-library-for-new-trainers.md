@@ -1,6 +1,8 @@
 ---
 title: 新人训练师典型案例库
 permalink: /asd-case-library-for-new-trainers/
+description: "通过典型场景帮助新人练习“看现象、找功能、定目标、给SOP、避坑”。"
+keywords: "新人训练师典型案例库,案例使用方法,案例1：一收手机就尖叫,案例2：一上桌面就躺地,案例3：出门边走边跳和拍手,自闭症,ASD,康复训练"
 ---
 
 # 新人训练师典型案例库
