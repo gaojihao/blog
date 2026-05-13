@@ -1,6 +1,7 @@
 import type { ThemePageData } from '../node'
 export type LayoutType =
   | 'HomeLayout'
+  | 'AboutLayout'
   | 'CategoriesLayout'
   | 'TagsLayout'
   | 'SearchLayout'

@@ -14,7 +14,7 @@ const logoUrl = computed(() => {
 })
 
 const displayTitle = computed(() =>
-  language.value === 'zh' ? siteData.value.title : themeOptions.value.siteTitleEn || 'Li Zhi'
+  language.value === 'zh' ? siteData.value.title : themeOptions.value.siteTitleEn || 'Li Ziqi'
 )
 </script>
 <template>

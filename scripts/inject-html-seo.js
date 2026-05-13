@@ -9,9 +9,9 @@ const PUBLIC_DIR = path.resolve(__dirname, '../docs/.vuepress/public')
 const SITE_OG_IMAGE = `${SITE_URL}/images/avatar.jpg`
 
 const KEYWORDS_BY_DIR = {
-  claude: 'Claude Code,Claude Code 源码,Anthropic,Agent Loop,MCP,Hook,Memory,Permission,Tool 系统,栗志',
-  expression: '表达力,沟通训练,刻意练习,演讲技巧,面试话术,述职话术,产品推销,沟通基础,栗志',
-  asd: '自闭症,ASD,康复训练,行为干预,ABA,DTT,NET,IEP,新人训练师,栗志',
+  claude: 'Claude Code,Claude Code 源码,Anthropic,Agent Loop,MCP,Hook,Memory,Permission,Tool 系统,栗子期',
+  expression: '表达力,沟通训练,刻意练习,演讲技巧,面试话术,述职话术,产品推销,沟通基础,栗子期',
+  asd: '自闭症,ASD,康复训练,行为干预,ABA,DTT,NET,IEP,新人训练师,栗子期',
 }
 
 const FALLBACK_DESC_BY_DIR = {
@@ -62,7 +62,7 @@ function inject(html, file) {
   const title = getTitle(html) || dir
   const existingDesc = getMetaContent(html, 'description')
   const desc = existingDesc || FALLBACK_DESC_BY_DIR[dir] || ''
-  const keywords = KEYWORDS_BY_DIR[dir] || '栗志,博客'
+  const keywords = KEYWORDS_BY_DIR[dir] || '栗子期,博客'
 
   const additions = []
   const escAttr = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
@@ -74,7 +74,7 @@ function inject(html, file) {
   if (!hasMeta(html, 'name=["\']robots["\']'))
     additions.push(`<meta name="robots" content="index,follow">`)
   if (!hasMeta(html, 'name=["\']author["\']'))
-    additions.push(`<meta name="author" content="栗志">`)
+    additions.push(`<meta name="author" content="栗子期">`)
   if (!hasLink(html, 'canonical'))
     additions.push(`<link rel="canonical" href="${canonicalUrl}">`)
 
@@ -89,7 +89,7 @@ function inject(html, file) {
   if (!hasMeta(html, 'property=["\']og:image["\']'))
     additions.push(`<meta property="og:image" content="${SITE_OG_IMAGE}">`)
   if (!hasMeta(html, 'property=["\']og:site_name["\']'))
-    additions.push(`<meta property="og:site_name" content="栗志">`)
+    additions.push(`<meta property="og:site_name" content="栗子期">`)
   if (!hasMeta(html, 'property=["\']og:locale["\']'))
     additions.push(`<meta property="og:locale" content="zh_CN">`)
 
@@ -109,10 +109,10 @@ function inject(html, file) {
       '@type': 'Article',
       headline: title,
       description: desc,
-      author: { '@type': 'Person', name: '栗志', url: SITE_URL + '/' },
+      author: { '@type': 'Person', name: '栗子期', url: SITE_URL + '/' },
       publisher: {
         '@type': 'Organization',
-        name: '栗志',
+        name: '栗子期',
         logo: { '@type': 'ImageObject', url: SITE_OG_IMAGE },
       },
       mainEntityOfPage: canonicalUrl,

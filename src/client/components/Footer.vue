@@ -11,7 +11,7 @@ currentYear =
   currentYear === themeOptions.value.siteStartDate ? 'Present' : currentYear
 
 const displayTitle = computed(() =>
-  language.value === 'zh' ? siteLocale.value.title : themeOptions.value.siteTitleEn || 'Li Zhi'
+  language.value === 'zh' ? siteLocale.value.title : themeOptions.value.siteTitleEn || 'Li Ziqi'
 )
 </script>
 <template>

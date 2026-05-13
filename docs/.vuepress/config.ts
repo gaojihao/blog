@@ -2,9 +2,9 @@ import { defineUserConfig } from 'vuepress'
 import KnznTheme from '../../src/node'
 
 const SITE_URL = 'https://lizhi1026.top'
-const SITE_TITLE = '栗志'
+const SITE_TITLE = '栗子期'
 const SITE_DESC =
-  '栗志的个人主页：全栈开发工程师与 AI 从业者，关注全栈工程、AI 应用、Claude Code 源码解析、表达力训练与儿童行为干预等内容。'
+  '栗子期的个人主页：全栈开发工程师与 AI 从业者，关注全栈工程、AI 应用、Claude Code 源码解析、表达力训练与儿童行为干预等内容。'
 const SITE_OG_IMAGE = `${SITE_URL}/images/avatar.jpg`
 
 export default defineUserConfig({
@@ -15,8 +15,8 @@ export default defineUserConfig({
   head: [
     ['meta', { name: 'viewport', content: 'width=device-width,initial-scale=1,viewport-fit=cover' }],
     ['meta', { name: 'theme-color', content: '#ffffff' }],
-    ['meta', { name: 'author', content: '栗志' }],
-    ['meta', { name: 'keywords', content: '栗志,Li Zhi,全栈开发,AI 应用,Claude Code,表达力训练,自闭症干预,ASD,前端,Node.js,VuePress' }],
+    ['meta', { name: 'author', content: '栗子期' }],
+    ['meta', { name: 'keywords', content: '栗子期,Li Ziqi,全栈开发,AI 应用,Claude Code,表达力训练,自闭症干预,ASD,前端,Node.js,VuePress' }],
     ['meta', { name: 'robots', content: 'index,follow' }],
     ['meta', { name: 'format-detection', content: 'telephone=no' }],
     ['link', { rel: 'canonical', href: SITE_URL + '/' }],
@@ -49,8 +49,8 @@ export default defineUserConfig({
           },
           {
             '@type': 'Person',
-            name: '栗志',
-            alternateName: 'Li Zhi',
+            name: '栗子期',
+            alternateName: 'Li Ziqi',
             url: SITE_URL + '/',
             image: SITE_OG_IMAGE,
             sameAs: ['https://github.com/gaojihao'],
@@ -65,7 +65,7 @@ export default defineUserConfig({
   // bundler: webpackBundler(),
   theme: KnznTheme({
     // 英文站点标题
-    siteTitleEn: 'Li Zhi',
+    siteTitleEn: 'Li Ziqi',
     // logo
     logo: '/images/logo-light.svg',
     darkLogo: '/images/logo-dark.svg',
@@ -82,7 +82,7 @@ export default defineUserConfig({
      * 博主信息相关
      */
     // 博主名称
-    blogger: '栗志',
+    blogger: '栗子期',
     // 铭言
     slogan: '用工程化思维连接产品、代码与 AI。',
     // 头像
@@ -110,7 +110,7 @@ export default defineUserConfig({
     // 导航
     navbar: [
       { text: '首页', link: '/', i18n: { zh: '首页', en: 'Home' } },
-      { text: '关于我', link: '/#/about', i18n: { zh: '关于我', en: 'About' } },
+      { text: '关于我', link: '/about/', i18n: { zh: '关于我', en: 'About' } },
       { text: '工具箱', link: '/tools/', i18n: { zh: '工具箱', en: 'Tools' } },
       { text: '联系我', link: 'mailto:lizhi1026@1026.com', i18n: { zh: '联系我', en: 'Contact' } },
     ],

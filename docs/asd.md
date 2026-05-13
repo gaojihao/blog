@@ -2,7 +2,7 @@
 title: ASD康复训练师资料库
 permalink: /asd/
 description: "ASD 康复训练师资料库：从新手观察员到专家督导的完整成长路径，覆盖观察评估、ABA / DTT / NET 教学、行为干预、家庭与学校协作、督导伦理与循证实践。"
-keywords: "自闭症,ASD,康复训练,行为干预,ABA,DTT,NET,IEP,新人训练师,督导,栗志"
+keywords: "自闭症,ASD,康复训练,行为干预,ABA,DTT,NET,IEP,新人训练师,督导,栗子期"
 ---
 
 <style>

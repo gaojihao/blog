@@ -9,6 +9,7 @@ import { isPostsLayout } from '../utils'
 
 export const layoutMap: Record<string, LayoutType> = {
   '/': 'HomeLayout',
+  '/about/': 'AboutLayout',
   '/tags/': 'TagsLayout',
   '/categories/': 'CategoriesLayout',
   '/search/': 'SearchLayout',

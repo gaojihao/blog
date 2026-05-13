@@ -95,7 +95,7 @@ for (const file of targets) {
 
   if (!fmHas(newFm, 'description')) {
     let desc = pickDescription(body)
-    if (!desc && title) desc = `${title}：栗志整理的实战手册与方法论。`
+    if (!desc && title) desc = `${title}：栗子期整理的实战手册与方法论。`
     if (desc) newFm = fmSet(newFm, 'description', JSON.stringify(desc))
   }
   if (!fmHas(newFm, 'keywords')) {
@@ -104,15 +104,15 @@ for (const file of targets) {
     if (base.startsWith('asd-')) {
       kw = pickKeywords(title, body)
     } else if (base === 'asd.md') {
-      kw = '自闭症,ASD,康复训练,行为干预,ABA,DTT,NET,IEP,新人训练师,督导,栗志'
+      kw = '自闭症,ASD,康复训练,行为干预,ABA,DTT,NET,IEP,新人训练师,督导,栗子期'
     } else if (base === 'tools.md') {
-      kw = '开发者工具,在线工具,前端工具,JSON 格式化,Base64,URL 编码,时间戳,栗志'
+      kw = '开发者工具,在线工具,前端工具,JSON 格式化,Base64,URL 编码,时间戳,栗子期'
     } else if (base === 'claude.md') {
       kw = 'Claude Code,Claude Code 源码,Agent Loop,MCP,Hook,Memory,Permission,Tool 系统'
     } else if (base === 'expression.md') {
-      kw = '表达力,沟通训练,刻意练习,演讲,面试话术,述职,沟通基础,栗志'
+      kw = '表达力,沟通训练,刻意练习,演讲,面试话术,述职,沟通基础,栗子期'
     } else {
-      kw = '栗志,Li Zhi,博客,全栈,AI'
+      kw = '栗子期,Li Ziqi,博客,全栈,AI'
     }
     newFm = fmSet(newFm, 'keywords', JSON.stringify(kw))
   }

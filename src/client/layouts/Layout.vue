@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useLayout } from '../hooks'
 import HomeLayout from './HomeLayout.vue'
+import AboutLayout from './AboutLayout.vue'
 import CategoriesLayout from './CategoriesLayout.vue'
 import TagsLayout from './TagsLayout.vue'
 import SearchLayout from './SearchLayout.vue'
@@ -13,6 +14,7 @@ const layout = useLayout()
 
 const map = {
   HomeLayout,
+  AboutLayout,
   CategoriesLayout,
   TagsLayout,
   SearchLayout,
