@@ -12,14 +12,14 @@ const themeOptions = useThemeOptions()
 const scrollTop = useScrollTop()
 const isActiveCls = computed(
   () =>
-    ['HomeLayout', 'PostsLayout', 'SearchLayout'].includes(layout.value) &&
+    ['HomeLayout', 'AboutLayout', 'PostsLayout', 'SearchLayout'].includes(layout.value) &&
     assetScrollToTop(scrollTop.value)
 )
 const isLogo = computed(() =>
   layout.value === 'HomeLayout' ? !isActiveCls.value : true
 )
 const isPersonalHeader = computed(
-  () => ['HomeLayout', 'ToolsLayout'].includes(layout.value) && themeOptions.value.enableBlog === false
+  () => ['HomeLayout', 'AboutLayout', 'ToolsLayout'].includes(layout.value) && themeOptions.value.enableBlog === false
 )
 </script>
 <template>
