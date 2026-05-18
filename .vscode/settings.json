@@ -25,9 +25,9 @@
     "**/.idea": true
   },
   "editor.codeActionsOnSave": {
-    "source.fixAll.stylelint": true,
-    "source.fixAll.eslint": true
-  },
+    "source.fixAll.stylelint": "explicit",
+    "source.fixAll.eslint": "explicit"
+},
   "stylelint.validate": ["html", "vue", "js", "scss"],
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"

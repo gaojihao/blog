@@ -420,6 +420,56 @@ ul li::marker { color: var(--terracotta); }
   h2 { font-size: 32px; }
 }
 
+@media (max-width: 768px) {
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body { overflow-x: hidden; word-wrap: break-word; overflow-wrap: break-word; font-size: 15.5px; line-height: 1.8; }
+  .container { max-width: 100%; }
+  .sidebar { max-height: 42vh; padding: 22px 18px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .sidebar .doc-no { font-size: 28px; }
+  .sidebar .doc-title { font-size: 12px; margin-bottom: 18px; }
+  .toc a { padding: 5px 8px; font-size: 12.5px; }
+  .toc a.indent { padding-left: 18px; font-size: 12px; }
+  .main { padding: 28px 18px 60px; max-width: 100%; }
+  .hero { margin-bottom: 48px; padding-bottom: 36px; }
+  .hero h1 { font-size: 30px; letter-spacing: -0.5px; }
+  .hero-subtitle { font-size: 17px; margin-bottom: 24px; }
+  .hero-eyebrow { font-size: 10px; letter-spacing: 4px; margin-bottom: 16px; }
+  .hero-quote { padding: 14px 18px; font-size: 14.5px; margin-bottom: 24px; }
+  h1, h2, h3, h4, p { overflow-wrap: break-word; word-wrap: break-word; }
+  h2 { font-size: 24px; }
+  h3 { font-size: 19px; }
+  h4 { font-size: 17px; }
+  section { margin-bottom: 56px; }
+  .dim-grid, .module-grid { grid-template-columns: 1fr; gap: 14px; }
+  .layer-card { padding: 18px 16px; }
+  /* Tables: allow horizontal scroll if wide, smaller padding/font */
+  table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; font-size: 13.5px; white-space: normal; margin: 20px 0; }
+  th, td { padding: 10px 12px; }
+  /* Code/pre boxes */
+  pre, .flow-box { overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 14px; font-size: 13px; max-width: 100%; }
+  pre code { white-space: pre; }
+  img, video, svg { max-width: 100%; height: auto; }
+  blockquote { margin: 18px 0; padding: 14px 16px; font-size: 15px; }
+  .pull-quote { font-size: 17px; padding: 22px 18px; margin: 24px 0; }
+  ul, ol { margin: 14px 0 14px 20px; }
+  ul li, ol li { margin-bottom: 8px; }
+  a { word-break: break-word; overflow-wrap: anywhere; }
+}
+
+@media (max-width: 480px) {
+  body { font-size: 15px; }
+  .sidebar { padding: 18px 14px; max-height: 38vh; }
+  .main { padding: 22px 14px 48px; }
+  .hero h1 { font-size: 26px; }
+  .hero-subtitle { font-size: 16px; }
+  h2 { font-size: 21px; }
+  h3 { font-size: 18px; }
+  .hero-eyebrow { letter-spacing: 3px; }
+  table { font-size: 13px; }
+  th, td { padding: 8px 10px; }
+  pre, .flow-box { padding: 12px; font-size: 12.5px; }
+}
+
 @media print {
   .sidebar, .progress-bar, .nav-row { display: none; }
   .main { padding: 20px; max-width: none; }
