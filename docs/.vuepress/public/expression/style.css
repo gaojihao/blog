@@ -422,8 +422,12 @@ ul li::marker { color: var(--terracotta); }
 
 @media (max-width: 768px) {
   html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-  body { overflow-x: hidden; word-wrap: break-word; overflow-wrap: break-word; font-size: 15.5px; line-height: 1.8; }
+  html, body { overflow-x: hidden; max-width: 100vw; }
+  body { word-wrap: break-word; overflow-wrap: break-word; font-size: 15.5px; line-height: 1.8; }
+  /* CRITICAL: container is a grid; its 1fr track expands to grid items'
+     min-content unless we explicitly give items min-width: 0. */
   .container { max-width: 100%; }
+  .container > * { min-width: 0 !important; max-width: 100% !important; }
   .sidebar { max-height: 42vh; padding: 22px 18px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
   .sidebar .doc-no { font-size: 28px; }
   .sidebar .doc-title { font-size: 12px; margin-bottom: 18px; }
@@ -440,7 +444,19 @@ ul li::marker { color: var(--terracotta); }
   h3 { font-size: 19px; }
   h4 { font-size: 17px; }
   section { margin-bottom: 56px; }
-  .dim-grid, .module-grid { grid-template-columns: 1fr; gap: 14px; }
+  /* Force all grid layouts to single column; !important beats inline
+     style="grid-template-columns:..." that some pages use. */
+  .three-layers, .compare, .nav-row, .dim-grid, .module-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+  /* Neutralize inline grid-column/grid-row span on grid children so a
+     `span 2` or `1/-1` declaration can't reintroduce implicit columns. */
+  .three-layers > *, .compare > *, .nav-row > *,
+  .dim-grid > *, .module-grid > * {
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
   .layer-card { padding: 18px 16px; }
   /* Tables: allow horizontal scroll if wide, smaller padding/font */
   table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; font-size: 13.5px; white-space: normal; margin: 20px 0; }

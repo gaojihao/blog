@@ -5,18 +5,26 @@ const fs = require('fs');
 const path = require('path');
 
 const dir = path.resolve(__dirname, '../docs/.vuepress/public/claude');
-const MARKER = '/* mobile-patch-v1 */';
+const MARKER = '/* mobile-patch-v5 */';
 
 const PATCH = `
 ${MARKER}
+html, body { overflow-x: hidden; max-width: 100vw; word-wrap: break-word; overflow-wrap: break-word; }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-body { overflow-x: hidden; word-wrap: break-word; overflow-wrap: break-word; }
-img, video, svg { max-width: 100%; height: auto; }
+img, video, svg { max-width: 100% !important; height: auto !important; }
+.mermaid svg { max-width: 100% !important; height: auto !important; }
 a { word-break: break-word; overflow-wrap: anywhere; }
 pre { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 pre code { white-space: pre; word-break: normal; overflow-wrap: normal; }
 table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
 .mermaid { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+/* Custom "pre-like" containers used in some Claude pages (.tree in memory-system,
+   .codeblock / .code-block / .shell-block in others) — same scroll treatment. */
+.tree, .codeblock, .code-block, .shell-block, .terminal {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100% !important;
+}
 
 @media (max-width: 900px) {
   .layout { grid-template-columns: 1fr !important; gap: 0 !important; }
@@ -38,7 +46,33 @@ table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; max
     grid-template-columns: 1fr !important;
     gap: 14px !important;
   }
-  .card, .col-card, .callout, .arch-box { padding: 18px !important; }
+  /* CRITICAL: grid items default to min-width: auto (= their min-content).
+     A long unbreakable token (file path, identifier) or any block descendant
+     can force the 1fr track to expand past the parent and push the page wider
+     than the viewport. Setting min-width: 0 lets the track honor 1fr. The
+     .layout > * variant catches the top-level grid (sidebar + main) where
+     <main> would otherwise blow up the grid. */
+  .layout > *,
+  .card-grid > *, .card-grid.col-2 > *, .two-col > *, .three-col > *,
+  .phase-grid > *, .arch-grid > *, .grid-2 > *, .grid-3 > *, .grid-4 > *,
+  .col-2 > *, .col-3 > * {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  /* Flex rows used for side-by-side blocks: stack on mobile so wide
+     min-content (long English tokens / code) can't push the page wider
+     than the viewport. */
+  .flow-row, .recovery-chain, .hero-meta {
+    flex-wrap: wrap !important;
+  }
+  .flow-row > *, .flow-block {
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+  }
+  .card, .col-card, .callout, .arch-box { padding: 18px !important; min-width: 0 !important; }
+  .card *, .col-card *, .callout *, .arch-box * { min-width: 0 !important; max-width: 100% !important; }
   .toc { padding: 18px 20px !important; }
   .toc ol { columns: 1 !important; }
   .hero-meta { gap: 12px !important; }
@@ -72,13 +106,18 @@ for (const name of fs.readdirSync(dir)) {
   const full = path.join(dir, name);
   let html = fs.readFileSync(full, 'utf8');
 
+  // Strip any prior patch block (v1 or v2) before re-injecting current version.
+  // Match from any "/* mobile-patch-vN */" up to the last "}" before "</style>".
+  html = html.replace(
+    /\n?\/\* mobile-patch-v\d+ \*\/[\s\S]*?(?=<\/style>)/,
+    ''
+  );
+
   if (html.includes(MARKER)) {
     skipped++;
     continue;
   }
 
-  // Find the last </style> in the head and insert patch right before it.
-  // We assume each file has at least one <style> block.
   const lastStyleEnd = html.lastIndexOf('</style>');
   if (lastStyleEnd === -1) {
     skipped++;
