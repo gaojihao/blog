@@ -9,6 +9,7 @@ import SearchLayout from './SearchLayout.vue'
 import PostLayout from './PostLayout.vue'
 import PostsLayout from './PostsLayout.vue'
 import ToolsLayout from './ToolsLayout.vue'
+import PromptsLayout from './PromptsLayout.vue'
 import Header from '../components/Header.vue'
 const layout = useLayout()
 
@@ -21,6 +22,7 @@ const map = {
   PostLayout,
   PostsLayout,
   ToolsLayout,
+  PromptsLayout,
 }
 
 const currentLayout = computed(() => map[layout.value])

@@ -23,6 +23,7 @@ const copy = computed(() => {
     hello: zh ? '你好，我是' : 'Hello, I am',
     learnMore: zh ? '了解更多' : 'Learn more',
     tools: zh ? '工具箱' : 'Tools',
+    prompts: zh ? '提示词库' : 'Prompts',
   }
 })
 </script>
@@ -56,6 +57,7 @@ const copy = computed(() => {
           <a class="primary-action" href="/about/">{{ copy.learnMore }}</a>
           <a class="secondary-action" :href="contactHref">{{ language === 'zh' ? '联系我' : 'Contact' }}</a>
           <a class="secondary-action" href="/tools/">{{ copy.tools }}</a>
+          <a class="secondary-action" href="/prompts/">{{ copy.prompts }}</a>
           <a
             class="secondary-action"
             :href="copy.github"

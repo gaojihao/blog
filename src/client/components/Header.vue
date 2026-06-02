@@ -12,21 +12,25 @@ const themeOptions = useThemeOptions()
 const scrollTop = useScrollTop()
 const isActiveCls = computed(
   () =>
-    ['HomeLayout', 'AboutLayout', 'PostsLayout', 'SearchLayout'].includes(layout.value) &&
-    assetScrollToTop(scrollTop.value)
+    ['HomeLayout', 'AboutLayout', 'PostsLayout', 'SearchLayout'].includes(
+      layout.value
+    ) && assetScrollToTop(scrollTop.value)
 )
 const isLogo = computed(() =>
   layout.value === 'HomeLayout' ? !isActiveCls.value : true
 )
 const isPersonalHeader = computed(
-  () => ['HomeLayout', 'AboutLayout', 'ToolsLayout'].includes(layout.value) && themeOptions.value.enableBlog === false
+  () =>
+    ['HomeLayout', 'AboutLayout', 'ToolsLayout', 'PromptsLayout'].includes(
+      layout.value
+    ) && themeOptions.value.enableBlog === false
 )
 </script>
 <template>
   <header
     class="theme-header"
     :is-logo="!isActiveCls"
-    :class="{ active: isActiveCls, 'personal-header': isPersonalHeader }"
+    :class="{ 'active': isActiveCls, 'personal-header': isPersonalHeader }"
   >
     <Logo v-show="isLogo" />
     <span v-if="!isLogo"></span>

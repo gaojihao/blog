@@ -112,6 +112,7 @@ export default defineUserConfig({
       { text: '首页', link: '/', i18n: { zh: '首页', en: 'Home' } },
       { text: '关于我', link: '/about/', i18n: { zh: '关于我', en: 'About' } },
       { text: '工具箱', link: '/tools/', i18n: { zh: '工具箱', en: 'Tools' } },
+      { text: '提示词', link: '/prompts/', i18n: { zh: '提示词', en: 'Prompts' } },
       { text: '联系我', link: 'mailto:lizhi1026@1026.com', i18n: { zh: '联系我', en: 'Contact' } },
     ],
 

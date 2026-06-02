@@ -6,6 +6,7 @@ export type LayoutType =
   | 'TagsLayout'
   | 'SearchLayout'
   | 'ToolsLayout'
+  | 'PromptsLayout'
   | 'PostsLayout'
   | 'PostLayout'
 
