@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shrinko — Privacy Policy & Terms of Use</title>
+<meta name="description" content="Privacy Policy and Terms of Use for Shrinko, the 100% on-device macOS image compressor. Your images never leave your Mac." />
+<meta name="color-scheme" content="light dark" />
+<!--
+  PLACEHOLDERS to review before publishing:
+    • Contact email .......... support@shrinko.app   (search: __CONTACT_EMAIL__)
+    • Governing-law region ... [JURISDICTION]         (search: __JURISDICTION__)
+    • Developer legal name ... uses "the developer of Shrinko" throughout; insert a
+                               formal entity name if you have one.
+  This document is a tailored template, not legal advice — have it reviewed.
+-->
+<style>
+  :root {
+    --brand: #059669;
+    --brand-strong: #047857;
+    --brand-tint: rgba(5, 150, 105, 0.12);
+    --brand-ring: rgba(5, 150, 105, 0.28);
+
+    --bg: #ffffff;
+    --bg-elevated: #f5f5f7;
+    --surface: #ffffff;
+    --sidebar-bg: #fbfbfd;
+    --text: #1d1d1f;
+    --text-secondary: #515154;
+    --text-tertiary: #86868b;
+    --border: #e4e4e9;
+    --border-strong: #d2d2d7;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 28px rgba(0,0,0,.06);
+
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+    --sb: 288px;       /* sidebar width */
+    --maxw: 760px;     /* content column */
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --brand: #10b981;
+      --brand-strong: #34d399;
+      --brand-tint: rgba(16, 185, 129, 0.16);
+      --brand-ring: rgba(16, 185, 129, 0.34);
+
+      --bg: #0b0b0d;
+      --bg-elevated: #1c1c1e;
+      --surface: #161618;
+      --sidebar-bg: #121214;
+      --text: #f5f5f7;
+      --text-secondary: #aeaeb2;
+      --text-tertiary: #8e8e93;
+      --border: #2a2a2d;
+      --border-strong: #3a3a3d;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.5);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; scroll-padding-top: 28px; -webkit-text-size-adjust: 100%; }
+  @media (max-width: 899px) { html { scroll-padding-top: 74px; } }
+
+  body {
+    margin: 0;
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  a { color: var(--brand-strong); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .logo {
+    width: 28px; height: 28px; flex: none;
+    border-radius: 8px;
+    background: linear-gradient(145deg, var(--brand), var(--brand-strong));
+    display: grid; place-items: center;
+    color: #fff; font-weight: 800; font-size: 16px;
+    box-shadow: 0 1px 0 rgba(255,255,255,.25) inset, 0 4px 12px var(--brand-ring);
+  }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: var(--mono); font-size: 11.5px; font-weight: 600;
+    color: var(--brand-strong);
+    background: var(--brand-tint);
+    border: 1px solid var(--brand-ring);
+    padding: 6px 10px; border-radius: 999px;
+    letter-spacing: 0; line-height: 1.3;
+  }
+  .chip .dot { width: 7px; height: 7px; flex: none; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 3px var(--brand-tint); }
+
+  /* ---------------- Sidebar (left menu) ---------------- */
+  .sidebar {
+    background: var(--sidebar-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 18px;
+  }
+  .sidebar-brand {
+    display: flex; align-items: center; gap: 11px;
+    color: var(--text); font-weight: 650; font-size: 17px; letter-spacing: -0.01em;
+    margin-bottom: 16px;
+  }
+  .sidebar-brand:hover { text-decoration: none; }
+  .sidebar-brand small {
+    display: block; font-family: var(--mono); font-size: 9.5px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-tertiary);
+    margin-top: 2px;
+  }
+  .sidebar .chip { margin-bottom: 20px; }
+
+  .sidenav { display: block; }
+  .nav-group { margin-bottom: 2px; }
+  .nav-doc {
+    display: block;
+    font-weight: 600; font-size: 15px;
+    color: var(--text);
+    padding: 8px 11px; border-radius: 8px;
+    transition: background .16s ease, color .16s ease;
+  }
+  .nav-doc:hover { background: var(--brand-tint); text-decoration: none; }
+  .nav-doc.active { color: var(--brand-strong); background: var(--brand-tint); }
+
+  .subnav {
+    list-style: none; margin: 3px 0 12px; padding: 0;
+    margin-left: 17px; border-left: 1px solid var(--border);
+  }
+  .subnav li { margin: 0; }
+  .subnav a {
+    display: block; font-size: 13px; line-height: 1.4;
+    color: var(--text-secondary);
+    padding: 5px 12px; margin-left: -1px;
+    border-left: 2px solid transparent;
+    transition: color .16s ease, border-color .16s ease, background .16s ease;
+  }
+  .subnav a:hover { color: var(--text); text-decoration: none; }
+  .subnav a.current {
+    color: var(--brand-strong); font-weight: 560;
+    border-left-color: var(--brand);
+  }
+
+  .sidebar-foot {
+    margin-top: 22px; padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12.5px; color: var(--text-tertiary);
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .sidebar-foot a { color: var(--text-secondary); }
+
+  /* ---------------- Content ---------------- */
+  .content-wrap { background: var(--bg); min-height: 100vh; }
+  .content { max-width: var(--maxw); margin: 0 auto; padding: 44px 26px 60px; }
+
+  .doc-head { margin-bottom: 4px; }
+  .doc-head h2 { font-size: 30px; letter-spacing: -0.02em; margin: 0 0 6px; }
+  .updated { color: var(--text-tertiary); font-size: 14px; font-family: var(--mono); }
+
+  .intro {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--brand);
+    border-radius: 12px;
+    padding: 16px 18px;
+    color: var(--text-secondary);
+    font-size: 15.5px;
+    margin: 22px 0 34px;
+    box-shadow: var(--shadow);
+  }
+  .intro strong { color: var(--text); }
+
+  section.clause { margin: 0 0 30px; scroll-margin-top: 28px; }
+  section.clause h3 {
+    font-size: 19px; letter-spacing: -0.01em; margin: 0 0 10px;
+    display: flex; gap: 10px; align-items: baseline;
+  }
+  section.clause h3 .num {
+    font-family: var(--mono); font-size: 13px; font-weight: 700;
+    color: var(--brand-strong); flex: none; min-width: 1.6em;
+  }
+  @media (max-width: 899px) { section.clause { scroll-margin-top: 74px; } }
+
+  p { margin: 0 0 14px; }
+  ul { margin: 0 0 16px; padding-left: 22px; }
+  li { margin: 0 0 8px; }
+  ul li::marker { color: var(--brand); }
+
+  .callout {
+    background: var(--brand-tint);
+    border: 1px solid var(--brand-ring);
+    border-radius: 10px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin: 0 0 16px;
+  }
+  .callout strong { color: var(--brand-strong); }
+
+  code, .kbd {
+    font-family: var(--mono); font-size: 0.9em;
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 5px; color: var(--text);
+  }
+  @media (prefers-color-scheme: dark) { code, .kbd { background: #0b0b0d; } }
+
+  .legalese { color: var(--text-secondary); font-size: 14.5px; }
+
+  footer {
+    max-width: var(--maxw); margin: 0 auto;
+    padding: 26px 26px 60px;
+    border-top: 1px solid var(--border);
+    color: var(--text-tertiary); font-size: 14px;
+  }
+  footer a { color: var(--text-secondary); }
+  .footer-grid { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; }
+  .footer-grid .spacer { flex: 1 1 auto; }
+
+  /* ---------------- Mobile top bar + backdrop ---------------- */
+  .topbar-mobile { display: none; }
+  .menu-btn {
+    appearance: none; border: 1px solid var(--border-strong);
+    background: var(--surface); color: var(--text);
+    width: 40px; height: 36px; border-radius: 9px;
+    font-size: 17px; line-height: 1; cursor: pointer;
+  }
+  .backdrop { display: none; }
+
+  .toplink {
+    position: fixed; right: 20px; bottom: 20px;
+    width: 42px; height: 42px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--border-strong);
+    color: var(--text-secondary);
+    display: grid; place-items: center; font-size: 18px;
+    box-shadow: var(--shadow); opacity: 0; pointer-events: none;
+    transition: opacity .25s ease; z-index: 30;
+  }
+  .toplink.show { opacity: 1; pointer-events: auto; }
+
+  /* ============ Progressive enhancement: JS enables the docs-app behavior ============ */
+  .js .doc { display: none; }
+  .js .doc.active { display: block; animation: fade .22s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  .js .subnav { display: none; }
+  .js .nav-group.active .subnav { display: block; }
+
+  /* Desktop: fixed left sidebar, content offset to the right */
+  @media (min-width: 900px) {
+    .js .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0; width: var(--sb);
+      overflow-y: auto; overscroll-behavior: contain;
+      border-right: 1px solid var(--border); border-bottom: none;
+      padding: 24px 20px;
+    }
+    .js .content-wrap { margin-left: var(--sb); }
+  }
+
+  /* Mobile: sidebar becomes an off-canvas drawer behind a hamburger */
+  @media (max-width: 899px) {
+    .js .topbar-mobile {
+      display: flex; align-items: center; gap: 12px;
+      position: sticky; top: 0; z-index: 30;
+      background: color-mix(in srgb, var(--bg) 82%, transparent);
+      -webkit-backdrop-filter: saturate(180%) blur(18px);
+      backdrop-filter: saturate(180%) blur(18px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+    }
+    .js .topbar-mobile .brand-mini { display: flex; align-items: center; gap: 9px; font-weight: 650; font-size: 16px; }
+    .js .sidebar {
+      position: fixed; top: 0; bottom: 0; left: 0;
+      width: 300px; max-width: 84vw;
+      transform: translateX(-100%); transition: transform .26s ease;
+      z-index: 50; overflow-y: auto;
+      border-right: 1px solid var(--border); border-bottom: none;
+    }
+    .js .sidebar.open { transform: none; box-shadow: 0 0 50px rgba(0,0,0,.35); }
+    .js .backdrop {
+      display: block; position: fixed; inset: 0; z-index: 40;
+      background: rgba(0,0,0,.4); opacity: 0; pointer-events: none;
+      transition: opacity .25s ease;
+    }
+    .js .backdrop.show { opacity: 1; pointer-events: auto; }
+    .js .content-wrap { margin-left: 0; }
+    .content { padding: 30px 18px 56px; }
+  }
+
+  /* Print: show everything, drop the chrome */
+  @media print {
+    .topbar-mobile, .toplink, .backdrop, .sidebar { display: none !important; }
+    .js .doc { display: block !important; }
+    .content-wrap { margin-left: 0 !important; }
+    .content, footer { max-width: none; }
+    body { background: #fff; color: #000; }
+    .intro, .callout { box-shadow: none; }
+    a { color: #000; text-decoration: underline; }
+  }
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js');</script>
+
+<!-- Mobile top bar (shown < 900px when JS is on) -->
+<header class="topbar-mobile">
+  <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">☰</button>
+  <span class="brand-mini"><span class="logo">S</span> Shrinko</span>
+</header>
+
+<div class="backdrop" id="backdrop"></div>
+
+<!-- ============================ LEFT SIDEBAR MENU ============================ -->
+<aside class="sidebar" id="sidebar">
+  <a class="sidebar-brand" href="#privacy" data-doc="privacy">
+    <span class="logo">S</span>
+    <span>Shrinko<small>Privacy &amp; Terms</small></span>
+  </a>
+
+  <span class="chip"><span class="dot"></span>100% local · images never leave your Mac</span>
+
+  <nav class="sidenav" aria-label="Documents">
+    <div class="nav-group" data-doc="privacy">
+      <a class="nav-doc" data-doc="privacy" href="#privacy">Privacy Policy</a>
+      <ul class="subnav">
+        <li><a href="#p-images">Your images stay on your Mac</a></li>
+        <li><a href="#p-nocollect">Information we do not collect</a></li>
+        <li><a href="#p-files">File access &amp; the App Sandbox</a></li>
+        <li><a href="#p-local">Settings stored on your device</a></li>
+        <li><a href="#p-purchases">Purchases &amp; the App Store</a></li>
+        <li><a href="#p-diagnostics">Crash &amp; diagnostic data</a></li>
+        <li><a href="#p-thirdparty">Third parties</a></li>
+        <li><a href="#p-children">Children's privacy</a></li>
+        <li><a href="#p-security">Security</a></li>
+        <li><a href="#p-changes">Changes to this policy</a></li>
+        <li><a href="#p-contact">Contact</a></li>
+      </ul>
+    </div>
+
+    <div class="nav-group" data-doc="terms">
+      <a class="nav-doc" data-doc="terms" href="#terms">Terms of Use</a>
+      <ul class="subnav">
+        <li><a href="#t-acceptance">Acceptance of these terms</a></li>
+        <li><a href="#t-license">License to use Shrinko</a></li>
+        <li><a href="#t-content">Your files &amp; content</a></li>
+        <li><a href="#t-free-pro">Free tier &amp; Shrinko Pro</a></li>
+        <li><a href="#t-payment">Purchases, subscriptions &amp; auto-renewal</a></li>
+        <li><a href="#t-acceptable">Acceptable use</a></li>
+        <li><a href="#t-ip">Intellectual property</a></li>
+        <li><a href="#t-privacy">Privacy</a></li>
+        <li><a href="#t-disclaimer">Disclaimer of warranties</a></li>
+        <li><a href="#t-liability">Limitation of liability</a></li>
+        <li><a href="#t-indemnity">Indemnification</a></li>
+        <li><a href="#t-termination">Term &amp; termination</a></li>
+        <li><a href="#t-changes">Changes to the app &amp; terms</a></li>
+        <li><a href="#t-apple">Apple App Store — additional terms</a></li>
+        <li><a href="#t-law">Governing law</a></li>
+        <li><a href="#t-misc">Severability &amp; entire agreement</a></li>
+        <li><a href="#t-contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="sidebar-foot">
+    <a href="mailto:support@shrinko.app">support@shrinko.app</a>
+    <span>© 2026 Shrinko</span>
+  </div>
+</aside>
+
+<!-- ============================ CONTENT ============================ -->
+<div class="content-wrap">
+  <main class="content">
+
+    <!-- ----------------------- PRIVACY POLICY ----------------------- -->
+    <article id="privacy" class="doc">
+      <div class="doc-head">
+        <h2>Privacy Policy</h2>
+        <span class="updated">Last updated: June 20, 2026</span>
+      </div>
+
+      <div class="intro">
+        Shrinko is built to be <strong>private by default</strong>. Every image you compress is processed <strong>entirely on your Mac</strong> using Apple's built-in frameworks. Your images, their contents, file names, and metadata are <strong>never uploaded, transmitted, collected, or shared</strong>. We do not operate any servers that receive your files. This policy explains the limited information involved when you use the app and why.
+      </div>
+
+      <section class="clause" id="p-images">
+        <h3><span class="num">1</span> Your images stay on your Mac</h3>
+        <p>Shrinko compresses images locally using Apple's <code>ImageIO</code> / <code>Core Graphics</code> frameworks that are part of macOS. The supported formats — JPEG, PNG, HEIC/HEIF, TIFF, and BMP — are decoded, re-encoded, and written back on your own device.</p>
+        <div class="callout"><strong>We never see your images.</strong> Their pixels, file names, folder paths, and embedded metadata (such as EXIF) are not uploaded anywhere, are not sent to us, and are not shared with any third party.</div>
+        <p>When you quit Shrinko, no image data is retained by us, because none ever left your Mac in the first place.</p>
+      </section>
+
+      <section class="clause" id="p-nocollect">
+        <h3><span class="num">2</span> Information we do not collect</h3>
+        <p>Shrinko has no account system and no analytics. Specifically, the app does <strong>not</strong>:</p>
+        <ul>
+          <li>require you to register, sign in, or create an account;</li>
+          <li>collect your name, email address, phone number, or postal address;</li>
+          <li>collect, copy, or transmit the images or files you compress;</li>
+          <li>include advertising, advertising identifiers, or tracking SDKs;</li>
+          <li>record usage analytics, behavioral telemetry, or fingerprinting data;</li>
+          <li>use cookies or web beacons (Shrinko is a native macOS app, not a website);</li>
+          <li>log your IP address (we run no servers that could).</li>
+        </ul>
+      </section>
+
+      <section class="clause" id="p-files">
+        <h3><span class="num">3</span> File access &amp; the App Sandbox</h3>
+        <p>Shrinko runs inside the macOS <strong>App Sandbox</strong>. It can only read and write files that you explicitly choose by dragging them in, using <span class="kbd">File ▸ Open…</span>, using Finder's “Open With”, or dropping them on the app's Dock icon.</p>
+        <ul>
+          <li>By default, compressed copies are written to a <code>Shrinko</code> folder inside your <code>~/Downloads</code> directory. Your originals are left untouched.</li>
+          <li>If you select a custom output folder, macOS grants access through a <strong>security-scoped bookmark</strong>, which is stored locally on your Mac so the app can keep writing there. This bookmark stays on your device and is never transmitted.</li>
+          <li>If you turn on “Replace original”, the app overwrites the source file in place on your Mac. This is a local file operation only.</li>
+        </ul>
+      </section>
+
+      <section class="clause" id="p-local">
+        <h3><span class="num">4</span> Settings stored on your device</h3>
+        <p>Your preferences — such as output mode, the selected output folder bookmark, “reveal in Finder when done”, “play a sound when finished”, and your cumulative free-usage count — are stored locally on your Mac (in standard app preferences). This information remains on your device and is used only to make the app work the way you configured it.</p>
+      </section>
+
+      <section class="clause" id="p-purchases">
+        <h3><span class="num">5</span> Purchases &amp; the App Store</h3>
+        <p>The only feature that involves network communication is purchasing or restoring <strong>Shrinko Pro</strong>. These transactions are handled by Apple's App Store through <strong>StoreKit</strong>.</p>
+        <ul>
+          <li>Apple processes your payment and manages your subscription or purchase. Shrinko <strong>does not see or store your payment card details</strong>.</li>
+          <li>The app receives only the transaction and entitlement status it needs to unlock Pro features (for example, whether you currently hold an active subscription or a lifetime purchase).</li>
+          <li>Your use of the App Store is governed by Apple's terms and Apple's <a href="https://www.apple.com/legal/privacy/" rel="noopener" target="_blank">Privacy Policy</a>.</li>
+        </ul>
+        <p>Because prices are provided by the App Store and localized to your region, no payment or pricing data is collected or stored by us.</p>
+      </section>
+
+      <section class="clause" id="p-diagnostics">
+        <h3><span class="num">6</span> Crash &amp; diagnostic data</h3>
+        <p>Shrinko does not include any third-party crash-reporting or analytics service. If you have enabled <em>“Share with App Developers”</em> for diagnostics and usage in your macOS <strong>System Settings ▸ Privacy &amp; Security ▸ Analytics &amp; Improvements</strong>, Apple may provide us with aggregated, anonymized crash logs. This is controlled entirely by you at the operating-system level and never contains your images or file contents.</p>
+      </section>
+
+      <section class="clause" id="p-thirdparty">
+        <h3><span class="num">7</span> Third parties</h3>
+        <p>Apart from Apple — which provides the App Store, in-app purchases, and the operating-system frameworks Shrinko relies on — the app does not integrate any third-party SDKs, analytics providers, advertising networks, or external image-processing services. Your content is never shared with anyone.</p>
+      </section>
+
+      <section class="clause" id="p-children">
+        <h3><span class="num">8</span> Children's privacy</h3>
+        <p>Shrinko is a general-purpose utility intended for developers and designers. It is not directed at children, and because it collects no personal information from anyone, it does not knowingly collect personal information from children.</p>
+      </section>
+
+      <section class="clause" id="p-security">
+        <h3><span class="num">9</span> Security</h3>
+        <p>Keeping processing on-device is itself a strong privacy protection: your images are never exposed to network interception or server-side breaches, because they are never sent off your Mac. The small amount of preference data the app stores lives within the macOS App Sandbox. That said, no method of local storage or electronic processing is completely secure, and we cannot guarantee absolute security.</p>
+      </section>
+
+      <section class="clause" id="p-changes">
+        <h3><span class="num">10</span> Changes to this policy</h3>
+        <p>We may update this Privacy Policy from time to time — for example, if we add a feature that changes how data is handled. When we do, we will revise the “Last updated” date above and post the new version on this page. Material changes may also be noted in the app's update notes. Your continued use of Shrinko after an update means you accept the revised policy.</p>
+      </section>
+
+      <section class="clause" id="p-contact">
+        <h3><span class="num">11</span> Contact</h3>
+        <!-- __CONTACT_EMAIL__ -->
+        <p>If you have any questions about this Privacy Policy or how Shrinko handles your data, contact the developer of Shrinko at <a href="mailto:support@shrinko.app">support@shrinko.app</a>.</p>
+      </section>
+    </article>
+
+    <!-- ----------------------- TERMS OF USE ----------------------- -->
+    <article id="terms" class="doc">
+      <div class="doc-head">
+        <h2>Terms of Use</h2>
+        <span class="updated">Last updated: June 20, 2026</span>
+      </div>
+
+      <div class="intro">
+        These Terms of Use (this <strong>“Agreement”</strong>) govern your download, installation, and use of the <strong>Shrinko</strong> application (<strong>“Shrinko”</strong> or the <strong>“App”</strong>) for macOS. By installing or using the App, you agree to be bound by this Agreement. If you do not agree, please do not use the App.
+      </div>
+
+      <section class="clause" id="t-acceptance">
+        <h3><span class="num">1</span> Acceptance of these terms</h3>
+        <p>This Agreement is a binding contract between you and the developer of Shrinko (<strong>“we”</strong>, <strong>“us”</strong>, or <strong>“our”</strong>). Shrinko is distributed through the Apple App Store, so your use of the App is also subject to Apple's applicable terms, including the <a href="https://www.apple.com/legal/internet-services/itunes/" rel="noopener" target="_blank">Apple Media Services Terms and Conditions</a>. If you are using the App on behalf of an organization, you represent that you have authority to bind that organization to this Agreement.</p>
+      </section>
+
+      <section class="clause" id="t-license">
+        <h3><span class="num">2</span> License to use Shrinko</h3>
+        <p>Subject to this Agreement and the App Store terms, we grant you a personal, limited, non-exclusive, non-transferable, revocable license to download and use one copy of the App on any Apple-branded device that you own or control, for your personal or internal business use. All rights not expressly granted are reserved.</p>
+        <p>You may not: rent, lease, lend, sell, redistribute, or sublicense the App; copy or modify the App except as permitted by this Agreement; or reverse engineer, decompile, or disassemble the App, except to the extent that such restriction is prohibited by applicable law.</p>
+      </section>
+
+      <section class="clause" id="t-content">
+        <h3><span class="num">3</span> Your files &amp; content</h3>
+        <p>You retain all rights to the images and files you process with Shrinko. Because all compression happens on your device, we never receive, access, or store your files. You are solely responsible for the content you process and for ensuring you have the right to process it.</p>
+        <div class="callout"><strong>Keep backups.</strong> The “Replace original” output mode overwrites your source files in place and cannot be undone. For lossy formats such as JPEG and HEIC, re-encoding permanently changes image quality. You use this mode at your own risk, and you are responsible for maintaining your own backups.</div>
+      </section>
+
+      <section class="clause" id="t-free-pro">
+        <h3><span class="num">4</span> Free tier &amp; Shrinko Pro</h3>
+        <p>Shrinko is free to download and includes a free tier that allows a limited number of successful compressions (currently a cumulative total of 30). <strong>Shrinko Pro</strong> unlocks unlimited compression and is available as an in-app purchase in three forms:</p>
+        <ul>
+          <li>a <strong>monthly</strong> auto-renewing subscription (<code>com.lizhi1026.shrinko.pro.monthly</code>);</li>
+          <li>a <strong>yearly</strong> auto-renewing subscription (<code>com.lizhi1026.shrinko.pro.yearly</code>); and</li>
+          <li>a <strong>lifetime</strong> one-time purchase (<code>com.lizhi1026.shrinko.pro.forever</code>).</li>
+        </ul>
+        <p>We may change the free-tier limit, the set of available plans, or the features included in each tier in future versions of the App.</p>
+      </section>
+
+      <section class="clause" id="t-payment">
+        <h3><span class="num">5</span> Purchases, subscriptions &amp; auto-renewal</h3>
+        <p>All purchases are processed by Apple through the App Store. Prices are shown in the App at the time of purchase, are localized, and may vary by region. By purchasing, you agree to the following:</p>
+        <ul>
+          <li>Payment is charged to your Apple Account at confirmation of purchase.</li>
+          <li><strong>Auto-renewing subscriptions</strong> (monthly and yearly) automatically renew at the then-current price unless auto-renew is turned off at least <strong>24 hours before the end of the current period</strong>.</li>
+          <li>Your Apple Account is charged for renewal within 24 hours prior to the end of the current period.</li>
+          <li>You can manage your subscription and turn off auto-renewal at any time in your <strong>App Store account settings</strong>. Cancellation takes effect at the end of the current paid period; the remainder of that period is not refunded.</li>
+          <li>The <strong>lifetime</strong> option is a one-time purchase and does <strong>not</strong> auto-renew.</li>
+          <li>If a free trial is ever offered, any unused portion is forfeited when you purchase the corresponding subscription.</li>
+        </ul>
+        <p class="legalese">Refunds, where available, are handled by Apple in accordance with the App Store's policies; we are generally unable to issue refunds directly. You can request a refund through Apple at <a href="https://reportaproblem.apple.com/" rel="noopener" target="_blank">reportaproblem.apple.com</a>. You may restore previous purchases on a new device using “Restore Purchases” within the App.</p>
+      </section>
+
+      <section class="clause" id="t-acceptable">
+        <h3><span class="num">6</span> Acceptable use</h3>
+        <p>You agree to use Shrinko only for lawful purposes and in compliance with all applicable laws and regulations. You represent and warrant that:</p>
+        <ul>
+          <li>you have the necessary rights to the images and files you process with the App;</li>
+          <li>you will not use the App to infringe the intellectual-property or privacy rights of others;</li>
+          <li>you will not attempt to circumvent, disable, or interfere with the free-tier limits, licensing, or security of the App; and</li>
+          <li>you will not use the App in any way that could disable, overburden, damage, or impair it.</li>
+        </ul>
+      </section>
+
+      <section class="clause" id="t-ip">
+        <h3><span class="num">7</span> Intellectual property</h3>
+        <p>The App — including its software, source code, design, user interface, the “Shrinko” name, and associated logos — is owned by us or our licensors and is protected by copyright, trademark, and other laws. This Agreement does not grant you any rights to our trademarks or branding. We respect the intellectual property of others and ask you to do the same.</p>
+      </section>
+
+      <section class="clause" id="t-privacy">
+        <h3><span class="num">8</span> Privacy</h3>
+        <p>Your use of Shrinko is also governed by our <a href="#privacy" data-doc="privacy">Privacy Policy</a>, which is incorporated into this Agreement by reference. In short: your images are processed entirely on your Mac and never leave your device, and the only network communication for in-app features is with Apple's App Store for purchases.</p>
+      </section>
+
+      <section class="clause" id="t-disclaimer">
+        <h3><span class="num">9</span> Disclaimer of warranties</h3>
+        <p class="legalese">THE APP IS PROVIDED <strong>“AS IS”</strong> AND <strong>“AS AVAILABLE”</strong>, WITHOUT WARRANTY OF ANY KIND. TO THE MAXIMUM EXTENT PERMITTED BY LAW, WE AND OUR LICENSORS DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. We do not warrant that the App will be error-free or uninterrupted, that it will achieve any particular reduction in file size, or that compression will preserve image quality — lossy formats inherently lose quality when re-encoded. You use the App, and rely on its output, at your own risk, and you are responsible for keeping backups of your files.</p>
+      </section>
+
+      <section class="clause" id="t-liability">
+        <h3><span class="num">10</span> Limitation of liability</h3>
+        <p class="legalese">TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT WILL WE OR OUR LICENSORS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR EXEMPLARY DAMAGES, OR FOR ANY LOSS OF DATA, LOSS OF PROFITS, OR <strong>CORRUPTION OR LOSS OF FILES</strong> (INCLUDING ORIGINALS OVERWRITTEN IN “REPLACE ORIGINAL” MODE), ARISING OUT OF OR RELATING TO YOUR USE OF THE APP, WHETHER BASED ON WARRANTY, CONTRACT, TORT, OR ANY OTHER LEGAL THEORY. OUR TOTAL CUMULATIVE LIABILITY FOR ANY CLAIM RELATING TO THE APP WILL NOT EXCEED THE GREATER OF (A) THE AMOUNT YOU PAID FOR THE APP IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM, OR (B) USD $50. Some jurisdictions do not allow the exclusion or limitation of certain damages, so some of the above may not apply to you.</p>
+      </section>
+
+      <section class="clause" id="t-indemnity">
+        <h3><span class="num">11</span> Indemnification</h3>
+        <p class="legalese">You agree to indemnify and hold harmless the developer of Shrinko and its licensors from and against any claims, liabilities, damages, losses, and expenses (including reasonable legal fees) arising out of or related to your use of the App, your violation of this Agreement, or your violation of any rights of a third party.</p>
+      </section>
+
+      <section class="clause" id="t-termination">
+        <h3><span class="num">12</span> Term &amp; termination</h3>
+        <p>This Agreement remains in effect until terminated. Your license terminates automatically, without notice, if you fail to comply with any term of this Agreement. You may terminate at any time by ceasing all use of the App and deleting it. Provisions that by their nature should survive termination — including ownership, disclaimers, limitation of liability, and indemnification — will survive.</p>
+      </section>
+
+      <section class="clause" id="t-changes">
+        <h3><span class="num">13</span> Changes to the app &amp; terms</h3>
+        <p>We may modify, update, or discontinue features of the App at any time. We may also revise this Agreement; when we do, we will update the “Last updated” date and post the revised version on this page. Your continued use of the App after changes take effect constitutes acceptance of the revised Agreement.</p>
+      </section>
+
+      <section class="clause" id="t-apple">
+        <h3><span class="num">14</span> Apple App Store — additional terms</h3>
+        <p class="legalese">The following terms apply because the App is distributed through the Apple App Store:</p>
+        <ul class="legalese">
+          <li>This Agreement is between you and us only, and not with Apple. Apple is not responsible for the App or its content.</li>
+          <li>Apple has no obligation to furnish any maintenance or support services for the App.</li>
+          <li>In the event the App fails to conform to any applicable warranty, you may notify Apple, and Apple will refund the purchase price (if any). To the maximum extent permitted by law, Apple has no other warranty obligation with respect to the App.</li>
+          <li>Apple is not responsible for addressing any claims by you or any third party relating to the App, including product-liability claims, claims that the App fails to conform to legal or regulatory requirements, and claims arising under consumer-protection or similar legislation.</li>
+          <li>Apple is not responsible for the investigation, defense, settlement, or discharge of any third-party claim that the App infringes that party's intellectual-property rights.</li>
+          <li>You represent that you are not located in a country subject to a U.S. Government embargo or designated as a “terrorist supporting” country, and that you are not listed on any U.S. Government list of prohibited or restricted parties.</li>
+          <li>Apple and its subsidiaries are third-party beneficiaries of this Agreement and, upon your acceptance, will have the right to enforce it against you.</li>
+        </ul>
+      </section>
+
+      <section class="clause" id="t-law">
+        <h3><span class="num">15</span> Governing law</h3>
+        <!-- __JURISDICTION__ : replace [JURISDICTION] with your governing-law region -->
+        <p>Except to the extent applicable law provides otherwise, this Agreement and any dispute arising from it are governed by the laws of <strong>[JURISDICTION]</strong>, without regard to its conflict-of-laws rules. Nothing in this section limits any mandatory consumer-protection rights you may have under the laws of your country of residence.</p>
+      </section>
+
+      <section class="clause" id="t-misc">
+        <h3><span class="num">16</span> Severability &amp; entire agreement</h3>
+        <p>If any provision of this Agreement is held to be invalid or unenforceable, that provision will be limited or eliminated to the minimum extent necessary, and the remaining provisions will remain in full force and effect. This Agreement, together with our Privacy Policy and the applicable Apple App Store terms, constitutes the entire agreement between you and us regarding the App and supersedes any prior agreements.</p>
+      </section>
+
+      <section class="clause" id="t-contact">
+        <h3><span class="num">17</span> Contact</h3>
+        <!-- __CONTACT_EMAIL__ -->
+        <p>Questions about these Terms of Use can be sent to the developer of Shrinko at <a href="mailto:support@shrinko.app">support@shrinko.app</a>.</p>
+      </section>
+    </article>
+
+    <footer>
+      <div class="footer-grid">
+        <span>© 2026 Shrinko. All rights reserved.</span>
+        <span class="spacer"></span>
+        <a href="#privacy" data-doc="privacy">Privacy Policy</a>
+        <a href="#terms" data-doc="terms">Terms of Use</a>
+        <a href="mailto:support@shrinko.app">Contact</a>
+      </div>
+    </footer>
+  </main>
+</div>
+
+<a href="#" class="toplink" id="toplink" aria-label="Back to top">↑</a>
+
+<script>
+(function () {
+  var docs = { privacy: document.getElementById('privacy'), terms: document.getElementById('terms') };
+  var groups = Array.prototype.slice.call(document.querySelectorAll('.nav-group'));
+  var navDocs = Array.prototype.slice.call(document.querySelectorAll('.nav-doc'));
+  var subLinks = Array.prototype.slice.call(document.querySelectorAll('.subnav a'));
+  var sidebar = document.getElementById('sidebar');
+  var backdrop = document.getElementById('backdrop');
+  var menuBtn = document.getElementById('menuBtn');
+  var toplink = document.getElementById('toplink');
+
+  function isMobile() { return window.matchMedia('(max-width: 899px)').matches; }
+
+  // Map clause id -> its sidebar sub-link, for scrollspy.
+  var linkById = {};
+  subLinks.forEach(function (a) { linkById[a.getAttribute('href').slice(1)] = a; });
+
+  function setDoc(name, push) {
+    if (!docs[name]) name = 'privacy';
+    for (var k in docs) docs[k].classList.toggle('active', k === name);
+    groups.forEach(function (g) { g.classList.toggle('active', g.getAttribute('data-doc') === name); });
+    navDocs.forEach(function (a) {
+      var on = a.getAttribute('data-doc') === name;
+      a.classList.toggle('active', on);
+      if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+    subLinks.forEach(function (a) { a.classList.remove('current'); }); // reset scrollspy on switch
+    document.title = (name === 'terms' ? 'Terms of Use' : 'Privacy Policy') + ' — Shrinko';
+    if (push) history.replaceState(null, '', '#' + name);
+  }
+
+  // Which document owns a given hash (a top-level id, or any clause within it)?
+  function docForHash(hash) {
+    var id = (hash || '').replace('#', '');
+    if (!id) return 'privacy';
+    if (docs[id]) return id;
+    var el = document.getElementById(id);
+    if (el) { var art = el.closest('.doc'); if (art) return art.id; }
+    return 'privacy';
+  }
+
+  function openDrawer() { sidebar.classList.add('open'); backdrop.classList.add('show'); menuBtn.setAttribute('aria-expanded', 'true'); }
+  function closeDrawer() { sidebar.classList.remove('open'); backdrop.classList.remove('show'); menuBtn.setAttribute('aria-expanded', 'false'); }
+
+  // Any in-page link reveals the right document first, then scrolls to the anchor.
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (href === '#') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+
+    var isTopLevel = a.classList.contains('nav-doc');
+    var want = a.getAttribute('data-doc') || docForHash(href);
+    var wasHidden = docs[want] && !docs[want].classList.contains('active');
+    setDoc(want, true);
+    if (isMobile()) closeDrawer();
+
+    if (isTopLevel) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (wasHidden) {
+      var target = document.getElementById(href.slice(1));
+      if (target) {
+        e.preventDefault();
+        requestAnimationFrame(function () { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+      }
+    }
+  });
+
+  window.addEventListener('hashchange', function () { setDoc(docForHash(location.hash), false); });
+
+  // Drawer controls (mobile).
+  menuBtn.addEventListener('click', function () {
+    if (sidebar.classList.contains('open')) closeDrawer(); else openDrawer();
+  });
+  backdrop.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
+  window.addEventListener('resize', function () { if (!isMobile()) closeDrawer(); });
+
+  // Scrollspy: highlight the sidebar entry for the section nearest the top.
+  if ('IntersectionObserver' in window) {
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        var link = linkById[en.target.id];
+        if (!link) return;
+        subLinks.forEach(function (a) { a.classList.remove('current'); });
+        link.classList.add('current');
+      });
+    }, { rootMargin: '-90px 0px -68% 0px', threshold: 0 });
+    Object.keys(linkById).forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) spy.observe(el);
+    });
+  }
+
+  // Back-to-top visibility.
+  window.addEventListener('scroll', function () {
+    toplink.classList.toggle('show', window.scrollY > 600);
+  }, { passive: true });
+
+  // Initial document from the URL hash.
+  setDoc(docForHash(location.hash), false);
+})();
+</script>
+</body>
+</html>
